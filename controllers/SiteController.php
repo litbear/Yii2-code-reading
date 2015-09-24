@@ -8,11 +8,12 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\EntryForm;
+use app\models\Person;
 
-class SiteController extends Controller
-{
-    public function behaviors()
-    {
+class SiteController extends Controller {
+
+    public function behaviors() {
         return [
             'access' => [
                 'class' => AccessControl::className(),
@@ -34,8 +35,7 @@ class SiteController extends Controller
         ];
     }
 
-    public function actions()
-    {
+    public function actions() {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
@@ -47,13 +47,11 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex() {
         return $this->render('index');
     }
 
-    public function actionLogin()
-    {
+    public function actionLogin() {
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -63,19 +61,17 @@ class SiteController extends Controller
             return $this->goBack();
         }
         return $this->render('login', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    public function actionLogout()
-    {
+    public function actionLogout() {
         Yii::$app->user->logout();
 
         return $this->goHome();
     }
 
-    public function actionContact()
-    {
+    public function actionContact() {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
             Yii::$app->session->setFlash('contactFormSubmitted');
@@ -83,12 +79,61 @@ class SiteController extends Controller
             return $this->refresh();
         }
         return $this->render('contact', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    public function actionAbout()
-    {
+    public function actionAbout() {
         return $this->render('about');
     }
+
+    /**
+     * 第一个方法
+     */
+    public function actionSay($message = 'hello') {
+//        echo 'xsxs';die;
+        return $this->render('say', ['message' => $message]);
+    }
+
+    public function actionEntry() {
+        $model = new EntryForm;
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            // 验证 $model 收到的数据
+            // 做些有意义的事 ...
+
+            return $this->render('entry-confirm', ['model' => $model]);
+        } else {
+            // 无论是初始化显示还是数据验证错误
+            return $this->render('entry', ['model' => $model]);
+        }
+    }
+
+    public function actionTest() {
+        var_dump(\Yii::$app);
+        die;
+    }
+
+    public function actionEvent() {
+        echo '这是事件处理<br/>';
+
+        $person = new Person();
+
+        $this->on('SayHello', [$person, 'say_hello'], '你好，朋友');
+        $this->on('SayHello', function(){
+            echo '第二次触发'.'</br>';
+        });
+
+        $this->on('SayGoodBye', ['app\models\Person', 'say_goodbye'], '再见了，我的朋友');
+
+        $this->on('GoodNight', function() {
+            echo '晚安！';
+        });
+
+
+        $this->trigger('SayHello');
+        $this->trigger('SayGoodBye');
+        $this->trigger('GoodNight');
+    }
+
 }
