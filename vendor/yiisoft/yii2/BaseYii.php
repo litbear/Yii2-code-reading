@@ -14,11 +14,11 @@ use yii\log\Logger;
 use yii\di\Container;
 
 /**
- * Gets the application start timestamp.
+ * Gets the application start timestamp.开始运行时间戳
  */
 defined('YII_BEGIN_TIME') or define('YII_BEGIN_TIME', microtime(true));
 /**
- * This constant defines the framework installation directory.
+ * This constant defines the framework installation directory.vendor\yiisoft\yii2
  */
 defined('YII2_PATH') or define('YII2_PATH', __DIR__);
 /**
@@ -28,6 +28,7 @@ defined('YII_DEBUG') or define('YII_DEBUG', false);
 /**
  * This constant defines in which environment the application is running. Defaults to 'prod', meaning production environment.
  * You may define this constant in the bootstrap script. The value could be 'prod' (production), 'dev' (development), 'test', 'staging', etc.
+ * 运行环境 ： 生产 开发 调试 等等……
  */
 defined('YII_ENV') or define('YII_ENV', 'prod');
 /**
@@ -45,6 +46,7 @@ defined('YII_ENV_TEST') or define('YII_ENV_TEST', YII_ENV === 'test');
 
 /**
  * This constant defines whether error handling should be enabled. Defaults to true.
+ * 开启错误处理句柄
  */
 defined('YII_ENABLE_ERROR_HANDLER') or define('YII_ENABLE_ERROR_HANDLER', true);
 
@@ -64,6 +66,7 @@ class BaseYii
      * The array keys are the class names (without leading backslashes), and the array values
      * are the corresponding class file paths (or path aliases). This property mainly affects
      * how [[autoload()]] works.
+     * 储存 类名=>类文件的路径 集合
      * @see autoload()
      */
     public static $classMap = [];
@@ -294,10 +297,12 @@ class BaseYii
 
     /**
      * Creates a new object using the given configuration.
+     * 使用制定配置去实例化一个对象
      *
      * You may view this method as an enhanced version of the `new` operator.
      * The method supports creating an object based on a class name, a configuration array or
      * an anonymous function.
+     * 这个方法支持使用类名，配置数组或者一个匿名函数
      *
      * Below are some usage examples:
      *

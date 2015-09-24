@@ -17,19 +17,25 @@ use yii\base\InvalidConfigException;
  * A dependency injection (DI) container is an object that knows how to instantiate and configure objects and
  * all their dependent objects. For more information about DI, please refer to
  * [Martin Fowler's article](http://martinfowler.com/articles/injection.html).
+ * 依赖注入容器是一个用来解决如何实例化和配置对象，以及该对象所依赖的对象的类。
  *
  * Container supports constructor injection as well as property injection.
+ * 该容器支持构造函数注入和属性注入
  *
  * To use Container, you first need to set up the class dependencies by calling [[set()]].
  * You then call [[get()]] to create a new class object. Container will automatically instantiate
  * dependent objects, inject them into the object being created, configure and finally return the newly created object.
+ * 要使用这个函数  你首先需要使用set() 方法解决类的依赖，然后调用get()方法去创建一个新的对象，容器会自动的实例化该对
+ * 依赖的对对象，并将依赖的对象注入其中，配置这个对象并且返回
  *
  * By default, [[\Yii::$container]] refers to a Container instance which is used by [[\Yii::createObject()]]
  * to create new object instances. You may use this method to replace the `new` operator
  * when creating a new object, which gives you the benefit of automatic dependency resolution and default
  * property configuration.
+ * 默认情况下使用\Yii::createObject()代替new关键字实例化新对象 帮助你自动解决类的依赖和属性的配置
  *
  * Below is an example of using Container:
+ * 以下是使用容器的例子
  *
  * ```php
  * namespace app\models;
