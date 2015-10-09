@@ -110,8 +110,12 @@ class SiteController extends Controller {
     }
 
     public function actionTest() {
-        var_dump(\Yii::$app);
-        die;
+//        var_dump(\Yii::$app->log);
+//        die;
+        $model = new \app\models\Country;
+
+// 显示为 "Name"
+        echo $model->getAttributeLabel('name');die;
     }
 
     public function actionEvent() {
@@ -120,8 +124,8 @@ class SiteController extends Controller {
         $person = new Person();
 
         $this->on('SayHello', [$person, 'say_hello'], '你好，朋友');
-        $this->on('SayHello', function(){
-            echo '第二次触发'.'</br>';
+        $this->on('SayHello', function() {
+            echo '第二次触发' . '</br>';
         });
 
         $this->on('SayGoodBye', ['app\models\Person', 'say_goodbye'], '再见了，我的朋友');
@@ -134,6 +138,13 @@ class SiteController extends Controller {
         $this->trigger('SayHello');
         $this->trigger('SayGoodBye');
         $this->trigger('GoodNight');
+    }
+
+    public function actionFooBar($foo) {
+        var_dump($foo);
+        die;
+        echo 'actionID';
+        die;
     }
 
 }
