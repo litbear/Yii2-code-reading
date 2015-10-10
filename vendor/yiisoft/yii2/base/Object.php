@@ -10,10 +10,13 @@ namespace yii\base;
 use Yii;
 
 /**
+ * 三个直接子类：[[\yii\base\Component]] [[\yii\base\Event]] [[\yii\base\Behavior]]
  * Object is the base class that implements the *property* feature.
+ * Object类是实现__getter(),__set()与属性结合使用这一特点的基类
  *
  * A property is defined by a getter method (e.g. `getLabel`), and/or a setter method (e.g. `setLabel`). For example,
  * the following getter and setter methods define a property named `label`:
+ * 一个属性由相应的getter和setter方法定义 比如下面这组函数定义了一个名叫label的属性
  *
  * ~~~
  * private $_label;
@@ -30,6 +33,7 @@ use Yii;
  * ~~~
  *
  * Property names are *case-insensitive*.
+ * 属性名称是不区分大小写的
  *
  * A property can be accessed like a member variable of an object. Reading or writing a property will cause the invocation
  * of the corresponding getter or setter method. For example,
