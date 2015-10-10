@@ -314,11 +314,16 @@ class BaseYii
      * Class autoload loader.
      * This method is invoked automatically when PHP sees an unknown class.
      * The method will attempt to include the class file according to the following procedure:
+     * 类自动加载器
+     * 本方法会在调用未知类的时候自动加载其所在的文件
+     * 本方法会通过以下几步尝试include类所在的文件：
      *
      * 1. Search in [[classMap]];
+     * 1. 在[[classMap]]中搜索
      * 2. If the class is namespaced (e.g. `yii\base\Component`), it will attempt
      *    to include the file associated with the corresponding path alias
      *    (e.g. `@yii/base/Component.php`);
+     * 2. 假如等待调用的类使用了命名空间，该类则会尝试include相应的别名
      *
      * This autoloader allows loading classes that follow the [PSR-4 standard](http://www.php-fig.org/psr/psr-4/)
      * and have its top-level namespace or sub-namespaces defined as path aliases.
