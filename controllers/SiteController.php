@@ -112,10 +112,18 @@ class SiteController extends Controller {
     public function actionTest() {
 //        var_dump(\Yii::$app->log);
 //        die;
-        $model = new \app\models\Country;
+//        $model = new \app\models\Country;
 
 // 显示为 "Name"
-        echo $model->getAttributeLabel('name');die;
+//        echo $model->getAttributeLabel('name');die;
+        var_dump('=========');
+        Yii::setAlias('@xxx','C:/zzz/xxx');
+        Yii::setAlias('@xxx/aaa','C:/zzz/yyy');
+//        Yii::setAlias('@xxx',null);
+//        echo Yii::getAlias('@yii/aaa/bbb');
+        var_dump(Yii::getAlias('@xxx/aaa/bbb'));
+        die;     
+        
     }
 
     public function actionEvent() {

@@ -8,8 +8,6 @@
  */
 
 require(__DIR__ . '/BaseYii.php');
-//var_dump(YII2_PATH);die; 返回的是
-//D:\wamp\www\yii2-app-basic\vendor\yiisoft\yii2
 
 /**
  * Yii is a helper class serving common framework functionalities.

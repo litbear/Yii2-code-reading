@@ -23,6 +23,7 @@ defined('YII_BEGIN_TIME') or define('YII_BEGIN_TIME', microtime(true));
 defined('YII2_PATH') or define('YII2_PATH', __DIR__);
 /**
  * This constant defines whether the application should be in debug mode or not. Defaults to false.
+ * var_dump(YII2_PATH);die; 返回的是 D:\wamp\www\yii2-app-basic\vendor\yiisoft\yii2
  */
 defined('YII_DEBUG') or define('YII_DEBUG', false);
 /**
@@ -78,6 +79,7 @@ class BaseYii
      * @var array registered path aliases
      * @see getAlias()
      * @see setAlias()
+     * '@yii'别名对应为 /path/to/app/vendor/yiisoft/yii2 （注意！尾部没有'/'）
      */
     public static $aliases = ['@yii' => __DIR__];
     /**
@@ -101,26 +103,36 @@ class BaseYii
 
     /**
      * Translates a path alias into an actual path.
+     * 将别名转换为真实路径 
      *
      * The translation is done according to the following procedure:
+     * 别名转换遵循以下原则：
      *
      * 1. If the given alias does not start with '@', it is returned back without change;
+     * 1. 如果输入的别名并不以'@'开头 则原样输出
      * 2. Otherwise, look for the longest registered alias that matches the beginning part
      *    of the given alias. If it exists, replace the matching part of the given alias with
      *    the corresponding registered path.
+     * 2. 否则，查找相匹配的最长的别名，然后用别名路径来替换传入的参数中的别名。
      * 3. Throw an exception or return false, depending on the `$throwException` parameter.
+     * 3. 根据第二个参数`$throwException` 抛出异常或返回错误
      *
      * For example, by default '@yii' is registered as the alias to the Yii framework directory,
      * say '/path/to/yii'. The alias '@yii/web' would then be translated into '/path/to/yii/web'.
+     * 比如，'@yii'被注册为 /path/to/app/vendor/yiisoft/yii2 则'@yii/web'会被转换为
+     * /path/to/app/vendor/yiisoft/yii2/web
      *
      * If you have registered two aliases '@foo' and '@foo/bar'. Then translating '@foo/bar/config'
      * would replace the part '@foo/bar' (instead of '@foo') with the corresponding registered path.
      * This is because the longest alias takes precedence.
+     * 如果你注册了两个别名 '@foo' 和 '@foo/bar' 那么。在转换'@foo/bar/config'的时候，会优先使用'@foo/bar' 
+     * 去代替'@foo' 因为较长的别名会优先发挥作用 (单看getAlias()源码似乎解决不了为什么较长别名优先匹配的疑问)
      *
      * However, if the alias to be translated is '@foo/barbar/config', then '@foo' will be replaced
      * instead of '@foo/bar', because '/' serves as the boundary character.
      *
      * Note, this method does not check if the returned path exists or not.
+     * 提示，此方法不会检查返回的路径是否存在
      *
      * @param string $alias the alias to be translated.
      * @param boolean $throwException whether to throw an exception if the given alias is invalid.
@@ -131,18 +143,24 @@ class BaseYii
      */
     public static function getAlias($alias, $throwException = true)
     {
+        // 是否以'@'开头
         if (strncmp($alias, '@', 1)) {
             // not an alias
             return $alias;
         }
 
+        // 查找别名中'/'首次出现的位置
         $pos = strpos($alias, '/');
+        // 如果没找到'/'则原样赋给$root 如果找到了则截取'/'之前的部分赋值给$root 即父别名
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
 
         if (isset(static::$aliases[$root])) {
+            // 检查该别名的父别名是否设置
             if (is_string(static::$aliases[$root])) {
+                // 别名中出现了'/' 则拼接 如没出现 则取原始路径
                 return $pos === false ? static::$aliases[$root] : static::$aliases[$root] . substr($alias, $pos);
             } else {
+                // 如果父别名对应了一个数组 那么循环这个数组 并把（键）和（去掉根别名的别名字符串）拼接
                 foreach (static::$aliases[$root] as $name => $path) {
                     if (strpos($alias . '/', $name . '/') === 0) {
                         return $path . substr($alias, strlen($name));
@@ -187,17 +205,23 @@ class BaseYii
 
     /**
      * Registers a path alias.
+     * 注册一个路径别名
      *
      * A path alias is a short name representing a long path (a file path, a URL, etc.)
      * For example, we use '@yii' as the alias of the path to the Yii framework directory.
+     * 路径别名是……一段废话
+     * 
      *
      * A path alias must start with the character '@' so that it can be easily differentiated
      * from non-alias paths.
+     * 路径别名必须以'@'开头用以区别其他非路径别名
      *
      * Note that this method does not check if the given path exists or not. All it does is
      * to associate the alias with the path.
+     * 此函数不会验证给出路径的存在与否 他做的只是字符串替换
      *
      * Any trailing '/' and '\' characters in the given path will be trimmed.
+     * 原始路径最后一位的'/' 和 '\' 都会被去掉
      *
      * @param string $alias the alias name (e.g. "@yii"). It must start with a '@' character.
      * It may contain the forward slash '/' which serves as boundary character when performing
@@ -216,19 +240,40 @@ class BaseYii
     public static function setAlias($alias, $path)
     {
         if (strncmp($alias, '@', 1)) {
+            // 别名是否以'@'开头 如果不是 则补上
             $alias = '@' . $alias;
         }
+        // 别名中是否出现了'/' 在第几位出现
         $pos = strpos($alias, '/');
+        // 如果别名中没有“/”，则根别名$root就是所输入的别名，否则从截取“/”前面的作为根别名
+        // 如：@www，根别名就为@www；
+        // 如:@www/data，那么根别名截取为@www。
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
         if ($path !== null) {
+            // 如果真实路径不为空
+            // 真实路径是否以'@'开头？ 是则直接调用getAlias来解析得到路径。否则去掉结尾的“/”、“\”
             $path = strncmp($path, '@', 1) ? rtrim($path, '\\/') : static::getAlias($path);
             if (!isset(static::$aliases[$root])) {
+                /*
+                 * 如果根别名没设置过 且别名中没有'/' 
+                 *     则设置为['@www'=>'路径']
+                 * 如果跟别名没有设置过 但别名中有'/'
+                 *     则设置为['@www'=>['@www/data'=>'路径']]
+                 */
                 if ($pos === false) {
                     static::$aliases[$root] = $path;
                 } else {
                     static::$aliases[$root] = [$alias => $path];
                 }
             } elseif (is_string(static::$aliases[$root])) {
+                /**
+                 * 如果根别名设置过 且是根别名对应的值是字符串
+                 * 如果被命中没有'/'（就是说正在设置的根别名覆盖了原有的根别名）
+                 *     则设置为['@www'=>'路径']
+                 * 如果别名中有'/' 则再加上一个根别名的元素
+                 *     则设置为['@www'=>['@www/data'=>'路径1','@www' => '路径2']]
+                 * 
+                 */
                 if ($pos === false) {
                     static::$aliases[$root] = $path;
                 } else {
@@ -238,16 +283,31 @@ class BaseYii
                     ];
                 }
             } else {
+                /**
+                 * 剩下最后一种情况就是
+                 * 如果根别名设置过 且对应的值是数组
+                 * 则新增一个元素 即：
+                 * ['@www'=>['@www/data'=>'路径1','@www' => '路径2','@www/data/new'=>'路径3']]
+                 * 并排序
+                 */
                 static::$aliases[$root][$alias] = $path;
                 krsort(static::$aliases[$root]);
             }
         } elseif (isset(static::$aliases[$root])) {
+            /**
+             * 如果路径为null的话则代表着要unset掉相应的
+             * 元素 下面的代码貌似多此一举 因为 如果数组
+             * ['@aaa' => ['@aaa' => '/tmp/aaa' , '@aaa/bbb' => '/usr/bbb']]
+             * unset掉了static::$aliases['@aaa']['@aaa']貌似会导致其他的失效？
+             * 验证后：不会失效
+             */
             if (is_array(static::$aliases[$root])) {
                 unset(static::$aliases[$root][$alias]);
             } elseif ($pos === false) {
                 unset(static::$aliases[$root]);
             }
         }
+//        var_dump(static::$aliases);
     }
 
     /**
