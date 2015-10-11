@@ -11,21 +11,29 @@ use Yii;
 
 /**
  * Component is the base class that implements the *property*, *event* and *behavior* features.
+ * Component 是实现属性（魔术方法），事件，行为等特性的基类
  *
  * Component provides the *event* and *behavior* features, in addition to the *property* feature which is implemented in
  * its parent class [[Object]].
+ * Component 提供是事件和行为特性，属性特性从父类Object处获得
  *
  * Event is a way to "inject" custom code into existing code at certain places. For example, a comment object can trigger
  * an "add" event when the user adds a comment. We can write custom code and attach it to this event so that when the event
  * is triggered (i.e. comment will be added), our custom code will be executed.
+ * 事件，是一种将自定义代码注入到指定位置的方式。比如说：当用户新增评论的时候，评论对象会触发一个“新增”的事件。我们可以写一段
+ * 自定义代码，并且把这段代码绑定到事件上，这样一来，当事件被触发的时候，自定义方法也会被执行
  *
  * An event is identified by a name that should be unique within the class it is defined at. Event names are *case-sensitive*.
+ * 在被定义的类内，事件名必须是唯一的，区分大小写的
  *
  * One or multiple PHP callbacks, called *event handlers*, can be attached to an event. You can call [[trigger()]] to
  * raise an event. When an event is raised, the event handlers will be invoked automatically in the order they were
  * attached.
+ * 事件句柄，由一个或多个PHP调用组成，事件句柄可以被绑定到事件上，通过调用触发器可以触发事件。当事件被触发时，事件句柄内
+ * 内的php调用会被按照绑定时的顺序依次执行
  *
  * To attach an event handler to an event, call [[on()]]:
+ * 当为事件定一个事件句柄时，会调用on()函数
  *
  * ~~~
  * $post->on('update', function ($event) {
@@ -35,22 +43,30 @@ use Yii;
  *
  * In the above, an anonymous function is attached to the "update" event of the post. You may attach
  * the following types of event handlers:
+ * 可以用作php句柄的有效回调有以下几种：
  *
  * - anonymous function: `function ($event) { ... }`
+ * - 匿名函数
  * - object method: `[$object, 'handleAdd']`
+ * - 对象的方法
  * - static class method: `['Page', 'handleAdd']`
+ * - 类的静态方法
  * - global function: `'handleAdd'`
+ * - 全局函数
  *
  * The signature of an event handler should be like the following:
+ * 事件句柄的签名如下所示：
  *
  * ~~~
  * function foo($event)
  * ~~~
  *
  * where `$event` is an [[Event]] object which includes parameters associated with the event.
+ * 这里的$event参数必须是一个包含着事件相关参数的Event对象
  *
  * You can also attach a handler to an event when configuring a component with a configuration array.
  * The syntax is like the following:
+ * 当使用最后一个参数（配置数组）配置一个组件的时候，你也可以向事件绑定事件句柄，如下所示
  *
  * ~~~
  * [
@@ -59,9 +75,12 @@ use Yii;
  * ~~~
  *
  * where `on add` stands for attaching an event to the `add` event.
+ * 这里的`on add` 可以看作向add事件绑定事件句柄
  *
  * Sometimes, you may want to associate extra data with an event handler when you attach it to an event
  * and then access it when the handler is invoked. You may do so by
+ * 有些时候，你可能会希望在为事件绑定事件句柄的似乎带入一些额外的数据，以便在事件句柄被调用的时候访问这些数据
+ * 你可以采用如下的方法
  *
  * ~~~
  * $post->on('update', function ($event) {
@@ -72,6 +91,8 @@ use Yii;
  * A behavior is an instance of [[Behavior]] or its child class. A component can be attached with one or multiple
  * behaviors. When a behavior is attached to a component, its public properties and methods can be accessed via the
  * component directly, as if the component owns those properties and methods.
+ * 行为，是Behavior类或其子类的实例，一个组件可以绑定一个或多个行为，当行为被绑定到组件上的时候，，行为的公共方法和属性
+ * 可以被组件直接访问
  *
  * To attach a behavior to a component, declare it in [[behaviors()]], or explicitly call [[attachBehavior]]. Behaviors
  * declared in [[behaviors()]] are automatically attached to the corresponding component.
