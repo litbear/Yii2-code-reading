@@ -9,11 +9,14 @@ namespace yii\base;
 
 /**
  * Behavior is the base class for all behavior classes.
+ * Behavior是所有行为类的基类
  *
  * A behavior can be used to enhance the functionality of an existing component without modifying its code.
  * In particular, it can "inject" its own methods and properties into the component
  * and make them directly accessible via the component. It can also respond to the events triggered in the component
  * and thus intercept the normal code execution.
+ * 行为可以在不修改已存在组件的情况下增强它的功能。特别是，它可以把自己的方法和属性注入到组件中
+ * 使他们可以直接被组件访问，同时，也可以在组件触发事件时做出响应 因此拦截正常代码的执行
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
