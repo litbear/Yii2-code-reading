@@ -130,13 +130,18 @@ class Component extends Object
 
     /**
      * Returns the value of a component property.
+     * 返回组件的属性 
      * This method will check in the following order and act accordingly:
+     * 除了继承Object中的使用魔术方法 __get() 和 __set()获取属性之外
+     * 还要获取所有行为类的属性 以确保行为类的方法和属性能够被用到
+     * （前文 Behavior内已提到过） 下面两句就不翻了
      *
      *  - a property defined by a getter: return the getter result
      *  - a property of a behavior: return the behavior property value
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `$value = $component->property;`.
+     * 本方法是PHP魔术方法  不要直接访问哦
      * @param string $name the property name
      * @return mixed the property value or the value of a behavior's property
      * @throws UnknownPropertyException if the property is not defined
@@ -167,12 +172,18 @@ class Component extends Object
 
     /**
      * Sets the value of a component property.
+     * 为组件属性设置值
      * This method will check in the following order and act accordingly:
+     * 本方法会考虑以下即几种情况
      *
      *  - a property defined by a setter: set the property value
+     *  - 由相应的set函数定义的变量
      *  - an event in the format of "on xyz": attach the handler to the event "xyz"
+     *  - 以on 开头的事件 （注意空格）
      *  - a behavior in the format of "as xyz": attach the behavior named as "xyz"
+     *  - 以as 开头的行为
      *  - a property of a behavior: set the behavior property value
+     *  - 行为内的属性（似乎是 最先找到的被赋值 后面的不管？）
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `$component->property = $value;`.
@@ -221,11 +232,16 @@ class Component extends Object
 
     /**
      * Checks if a property is set, i.e. defined and not null.
+     * 检查属性是否被设置了 也就是 定义了 且值不为空
      * This method will check in the following order and act accordingly:
+     * 该方法会考虑以下几种情况
      *
      *  - a property defined by a setter: return whether the property is set
+     *  - 相应的get方法能取到不为null的值
      *  - a property of a behavior: return whether the property is set
+     *  - 行为中设置了并且不为null值
      *  - return `false` for non existing properties
+     *  - 再找不到即返回false
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `isset($component->property)`.
@@ -253,12 +269,15 @@ class Component extends Object
     /**
      * Sets a component property to be null.
      * This method will check in the following order and act accordingly:
+     * 还是考虑以下几种方法 本类中有set方法的 行为中有的
      *
      *  - a property defined by a setter: set the property value to be null
      *  - a property of a behavior: set the property value to be null
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `unset($component->property)`.
+     * 无需直接调用  使用unset($component->property) 即可
+     * 
      * @param string $name the property name
      * @throws InvalidCallException if the property is read only.
      * @see http://php.net/manual/en/function.unset.php
@@ -284,9 +303,11 @@ class Component extends Object
 
     /**
      * Calls the named method which is not a class method.
+     * 调用本组建类没有的方法时 从行为里找
      *
      * This method will check if any attached behavior has
      * the named method and will execute it if available.
+     * 遍历所有行为 哪个有就用第一个 其余的不管 
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when an unknown method is being invoked.
@@ -309,6 +330,7 @@ class Component extends Object
     /**
      * This method is called after the object is created by cloning an existing one.
      * It removes all behaviors because they are attached to the old object.
+     * 克隆前 先把本类的行为和事件清空
      */
     public function __clone()
     {
@@ -319,6 +341,11 @@ class Component extends Object
     /**
      * Returns a value indicating whether a property is defined for this component.
      * A property is defined if:
+     * 根据：
+     * 本类是否有该属性 行为内是否有该属性
+     * 仅检测get方法 检测属性是否真的存在
+     * 检测本组件 检测绑定行为内
+     * 以上这六种情况综合判断
      *
      * - the class has a getter or setter method associated with the specified name
      *   (in this case, property name is case-insensitive);
@@ -400,9 +427,12 @@ class Component extends Object
     /**
      * Returns a value indicating whether a method is defined.
      * A method is defined if:
+     * 判断是否有给定的方法
      *
      * - the class has a method with the specified name
+     * - 判断本类
      * - an attached behavior has a method with the given name (when `$checkBehaviors` is true).
+     * - 判断所有行为
      *
      * @param string $name the property name
      * @param boolean $checkBehaviors whether to treat behaviors' methods as methods of this component
@@ -425,12 +455,17 @@ class Component extends Object
 
     /**
      * Returns a list of behaviors that this component should behave as.
+     * 返回一个本组件应当执行的事件列表
      *
      * Child classes may override this method to specify the behaviors they want to behave as.
+     * 子类可以重写本方法以指定所需要的行为
      *
      * The return value of this method should be an array of behavior objects or configurations
      * indexed by behavior names. A behavior configuration can be either a string specifying
      * the behavior class or an array of the following structure:
+     * 本方法的返回值是一个以行为对象为元素，或者行为名为键的数组为的元素 组成的数组
+     * 一个行为配置元素，可以是一个行为类的字符串名字 也可以是如下结构的数组
+     * 
      *
      * ~~~
      * 'behaviorName' => [
@@ -443,9 +478,13 @@ class Component extends Object
      * Note that a behavior class must extend from [[Behavior]]. Behavior names can be strings
      * or integers. If the former, they uniquely identify the behaviors. If the latter, the corresponding
      * behaviors are anonymous and their properties and methods will NOT be made available via the component
-     * (however, the behaviors can still respond to the component's events).
+     * (however, the behaviors can still respond to the component's events). 
+     * 注意，行为类必须继承自Behavior类。行为的名字可以是字符串或者是证书，如果是前者，则唯一的标识行为。
+     * 如果是后者对应的行为是匿名的，并且，它们的属性和方法将不能通过组件使用。（然而，该行为仍然能通过
+     * 组件的事件调用）
      *
      * Behaviors declared in this method will be attached to the component automatically (on demand).
+     * 在这个方法里定义的行为会自动绑定到本组件内
      *
      * @return array the behavior configurations.
      */
@@ -456,12 +495,16 @@ class Component extends Object
 
     /**
      * Returns a value indicating whether there is any handler attached to the named event.
+     * 判断传进来的事件名 上是否有事件句柄
      * @param string $name the event name
      * @return boolean whether there is any handler attached to the event.
      */
     public function hasEventHandlers($name)
     {
+        // 先把定义在本类的行为全部绑定上
         $this->ensureBehaviors();
+        // 然后载判断有没有这个行为
+        // 先看本类的属性里有没有 再看类级方法里有没有
         return !empty($this->_events[$name]) || Event::hasHandlers($this, $name);
     }
 
@@ -583,6 +626,7 @@ class Component extends Object
 
     /**
      * Returns all behaviors attached to this component.
+     * 获取本组件绑定的所有行为
      * @return Behavior[] list of behaviors attached to this component
      */
     public function getBehaviors()
@@ -593,9 +637,11 @@ class Component extends Object
 
     /**
      * Attaches a behavior to this component.
+     * 为本组件绑定一个行为
      * This method will create the behavior object based on the given
      * configuration. After that, the behavior object will be attached to
      * this component by calling the [[Behavior::attach()]] method.
+     * 本方法会先根据给出的配置创建一个行为对象，然后，使用Behavior::attach()把行为对象绑定到本组件内
      * @param string $name the name of the behavior.
      * @param string|array|Behavior $behavior the behavior configuration. This can be one of the following:
      *
@@ -648,6 +694,7 @@ class Component extends Object
 
     /**
      * Detaches all behaviors from the component.
+     * 遍历每一个行为 执行解绑
      */
     public function detachBehaviors()
     {
@@ -659,6 +706,7 @@ class Component extends Object
 
     /**
      * Makes sure that the behaviors declared in [[behaviors()]] are attached to this component.
+     * 确保定义在了behaviors()中的行为被绑定在了本组件上 （就是说先把子类定义的行为给绑定上）
      */
     public function ensureBehaviors()
     {
@@ -672,21 +720,34 @@ class Component extends Object
 
     /**
      * Attaches a behavior to this component.
+     * 将行为绑定在本组件上
      * @param string|integer $name the name of the behavior. If this is an integer, it means the behavior
      * is an anonymous one. Otherwise, the behavior is a named one and any existing behavior with the same name
      * will be detached first.
+     * 行为名称。接受字符串和整型，如果是整型，则意味着该行为是匿名的。否则，行为如果是命名的，所有同名的行为会先解绑
+     * （再绑定形参内的行为） 有覆盖的作用
      * @param string|array|Behavior $behavior the behavior to be attached
      * @return Behavior the attached behavior.
      */
     private function attachBehaviorInternal($name, $behavior)
     {
+        /**
+         * 如果$behavior 不是Behavior的示例，则通过
+         * Yii::createObject() 创建一个实例
+         */
         if (!($behavior instanceof Behavior)) {
             $behavior = Yii::createObject($behavior);
         }
+        /**
+         * 整型就加到数组尾部
+         */
         if (is_int($name)) {
             $behavior->attach($this);
             $this->_behaviors[] = $behavior;
         } else {
+            /**
+             * 非整形 就先解绑所有同名行为，再绑定传来的行为
+             */
             if (isset($this->_behaviors[$name])) {
                 $this->_behaviors[$name]->detach();
             }
