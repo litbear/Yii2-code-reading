@@ -676,8 +676,11 @@ class Component extends Object
     /**
      * Detaches a behavior from the component.
      * The behavior's [[Behavior::detach()]] method will be invoked.
+     * 从组件中解绑一个行为
+     * 行为对象相应的detach()方法会被执行（双向解绑？）
      * @param string $name the behavior's name.
      * @return Behavior the detached behavior. Null if the behavior does not exist.
+     * 会返回解绑后的行为
      */
     public function detachBehavior($name)
     {

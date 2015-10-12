@@ -99,7 +99,7 @@ class Behavior extends Object
      * and detach event handlers declared in [[events]].
      * 默认的逻辑会使本对象的owner属性为null，并且从绑定的组件中逐一解绑本行为中的事件句柄
      * Make sure you call the parent implementation if you override this method.
-     * 加入你在子类中重写了此方法，请确保调用了父类方法
+     * 假如你在子类中重写了此方法，请确保调用了父类方法
      */
     public function detach()
     {
