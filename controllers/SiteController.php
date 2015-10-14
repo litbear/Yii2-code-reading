@@ -113,17 +113,36 @@ class SiteController extends Controller {
 //        var_dump(\Yii::$app->log);
 //        die;
 //        $model = new \app\models\Country;
-
 // 显示为 "Name"
 //        echo $model->getAttributeLabel('name');die;
-        var_dump('=========');
-        Yii::setAlias('@xxx','C:/zzz/xxx');
-        Yii::setAlias('@xxx/aaa','C:/zzz/yyy');
+//        var_dump('=========');
+//        Yii::setAlias('@xxx','C:/zzz/xxx');
+//        Yii::setAlias('@xxx/aaa','C:/zzz/yyy');
 //        Yii::setAlias('@xxx',null);
 //        echo Yii::getAlias('@yii/aaa/bbb');
-        var_dump(Yii::getAlias('@xxx/aaa/bbb'));
-        die;     
-        
+//        var_dump(Yii::getAlias('@xxx/aaa/bbb'));
+//        die;     
+        $container = new \yii\di\Container;
+//        $container->set('yii\mail\MailInterface', 'yii\swiftmailer\Mailer');
+//        $container->set('foo', 'yii\db\Connection');
+//        $container->set('yii\db\Connection', [
+//            'dsn' => 'mysql:host=127.0.0.1;dbname=demo',
+//            'username' => 'root',
+//            'password' => '',
+//            'charset' => 'utf8',
+//        ]);
+//        $container->set('db', [
+//            'class' => 'yii\db\Connection',
+//            'dsn' => 'mysql:host=127.0.0.1;dbname=demo',
+//            'username' => 'root',
+//            'password' => '',
+//            'charset' => 'utf8',
+//        ]);
+//        $container->set('db', function ($container, $params, $config) {
+//            return new \yii\db\Connection($config);
+//        });
+//        $container->set('pageCache', new FileCache);
+        var_dump(\yii\di\Instance::of(null));
     }
 
     public function actionEvent() {
