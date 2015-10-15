@@ -253,12 +253,14 @@ class Container extends Component
             $params = $this->resolveDependencies($this->mergeParams($class, $params));
             $object = call_user_func($definition, $this, $params, $config);
         } elseif (is_array($definition)) {
+            // 当前的类
             $concrete = $definition['class'];
             unset($definition['class']);
 
             $config = array_merge($definition, $config);
             $params = $this->mergeParams($class, $params);
 
+            // 递归入口
             if ($concrete === $class) {
                 $object = $this->build($class, $params, $config);
             } else {
@@ -491,7 +493,7 @@ class Container extends Component
         // 一是要创建的类是一个 yii\base\Object 类，
         // Object类的构造函数参数是一个【属性=>值】的数组。
         // 二是依赖信息不为空，也就是要么已经注册过依赖，
-        // 要么为build() 传入构造函数参数。【此处 递归入口】
+        // 要么为build() 传入构造函数参数。
         $dependencies = $this->resolveDependencies($dependencies, $reflection);
         if (empty($config)) {
             return $reflection->newInstanceArgs($dependencies);
@@ -513,6 +515,7 @@ class Container extends Component
 
     /**
      * Merges the user-specified constructor parameters with the ones registered via [[set()]].
+     * 用用户自定义的构造器参数去覆盖注册的构造器参数
      * @param string $class class name, interface name or alias name
      * @param array $params the constructor parameters
      * @return array the merged parameters
