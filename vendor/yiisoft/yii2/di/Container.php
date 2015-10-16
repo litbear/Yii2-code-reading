@@ -236,6 +236,8 @@ class Container extends Component
      */
     public function get($class, $params = [], $config = [])
     {
+//        var_dump($class);
+//        var_dump(isset($this->_definitions[$class]));
         /**
          * 假如在单例属性中有，则直接返回
          * 否则在
@@ -255,7 +257,7 @@ class Container extends Component
         } elseif (is_array($definition)) {
             $concrete = $definition['class'];
             unset($definition['class']);
-
+//            var_dump('enter is_array');
             $config = array_merge($definition, $config);
             $params = $this->mergeParams($class, $params);
 
@@ -274,7 +276,7 @@ class Container extends Component
             // singleton
             $this->_singletons[$class] = $object;
         }
-
+//        var_dump($this->_dependencies);
         return $object;
     }
 
@@ -356,7 +358,7 @@ class Container extends Component
         $this->_params[$class] = $params;
         //  set() 在注册依赖时，会把使用 setSingleton() 注册的依赖删除
         unset($this->_singletons[$class]);
-//        var_dump($this->_definitions);die;
+//        var_dump($this->_definitions);
         return $this;
     }
 
@@ -477,10 +479,12 @@ class Container extends Component
      */
     protected function build($class, $params, $config)
     {
+//        var_dump($class);
+//        var_dump($this->getDependencies($class));
         /* @var $reflection ReflectionClass */
         // 调用getDependencies来获取并缓存依赖信息，以及相应的反射类，留意这里 list 的用法
         list ($reflection, $dependencies) = $this->getDependencies($class);
-
+        
         // 用传入的 $params 的内容补充、覆盖到依赖信息中 
         // 这样$param就覆盖掉了构造方法参数的默认值
         foreach ($params as $index => $param) {
@@ -491,9 +495,10 @@ class Container extends Component
         // 一是要创建的类是一个 yii\base\Object 类，
         // Object类的构造函数参数是一个【属性=>值】的数组。
         // 二是依赖信息不为空，也就是要么已经注册过依赖，
-        // 要么为build() 传入构造函数参数。【此处 递归入口】
+        // 要么为build() 传入构造函数参数。
         $dependencies = $this->resolveDependencies($dependencies, $reflection);
         if (empty($config)) {
+//            var_dump($dependencies);
             return $reflection->newInstanceArgs($dependencies);
         }
 
@@ -540,6 +545,8 @@ class Container extends Component
      */
     protected function getDependencies($class)
     {
+//        var_dump($class);
+//        var_dump($this->_reflections['app\models\UserFinder']);
         /**
          * $this->_reflections 是用于缓存ReflectionClass对象，
          * 以类名或接口名为键 所以先去找缓存
@@ -547,7 +554,6 @@ class Container extends Component
         if (isset($this->_reflections[$class])) {
             return [$this->_reflections[$class], $this->_dependencies[$class]];
         }
-
         /**
          * 缓存里没有 那么执行反射
          */
@@ -582,7 +588,7 @@ class Container extends Component
          */
         $this->_reflections[$class] = $reflection;
         $this->_dependencies[$class] = $dependencies;
-
+//        var_dump($this->_dependencies['app\models\UserFinder']);
         return [$reflection, $dependencies];
     }
 
@@ -598,6 +604,7 @@ class Container extends Component
      */
     protected function resolveDependencies($dependencies, $reflection = null)
     {
+//        var_dump($dependencies);
         /**
          * $dependencies 是无下标的 默认从0开始
          */
@@ -605,6 +612,7 @@ class Container extends Component
             // 只有是Instance类的实例才能进行下一步
             if ($dependency instanceof Instance) {
                 if ($dependency->id !== null) {
+                    // 进入递归
                     $dependencies[$index] = $this->get($dependency->id);
                 } elseif ($reflection !== null) {
                     // 这里表明，如果$dependency->id 为NULL 则逻辑也进行不下去，
