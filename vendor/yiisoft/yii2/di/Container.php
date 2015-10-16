@@ -255,12 +255,14 @@ class Container extends Component
             $params = $this->resolveDependencies($this->mergeParams($class, $params));
             $object = call_user_func($definition, $this, $params, $config);
         } elseif (is_array($definition)) {
+            // 当前的类
             $concrete = $definition['class'];
             unset($definition['class']);
 //            var_dump('enter is_array');
             $config = array_merge($definition, $config);
             $params = $this->mergeParams($class, $params);
 
+            // 递归入口
             if ($concrete === $class) {
                 $object = $this->build($class, $params, $config);
             } else {
@@ -518,6 +520,7 @@ class Container extends Component
 
     /**
      * Merges the user-specified constructor parameters with the ones registered via [[set()]].
+     * 用用户自定义的构造器参数去覆盖注册的构造器参数
      * @param string $class class name, interface name or alias name
      * @param array $params the constructor parameters
      * @return array the merged parameters
