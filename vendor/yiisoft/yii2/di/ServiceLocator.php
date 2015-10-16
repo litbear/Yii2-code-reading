@@ -14,13 +14,16 @@ use yii\base\InvalidConfigException;
 
 /**
  * ServiceLocator implements a [service locator](http://en.wikipedia.org/wiki/Service_locator_pattern).
+ * 张三是张三 :)
  *
  * To use ServiceLocator, you first need to register component IDs with the corresponding component
  * definitions with the locator by calling [[set()]] or [[setComponents()]].
  * You can then call [[get()]] to retrieve a component with the specified ID. The locator will automatically
  * instantiate and configure the component according to the definition.
+ * 要使用服务定位器，首先你要通过调用set()或者setComponents()方法为相应的组件定义组件ID
  *
  * For example,
+ * 例如:
  *
  * ```php
  * $locator = new \yii\di\ServiceLocator;
@@ -40,6 +43,7 @@ use yii\base\InvalidConfigException;
  * ```
  *
  * Because [[\yii\base\Module]] extends from ServiceLocator, modules and the application are all service locators.
+ * 因为[[\yii\base\Module]]类继承自ServiceLocator 所以所有的模块和应用都是ServiceLocator类的实例
  *
  * @property array $components The list of the component definitions or the loaded component instances (ID =>
  * definition or instance).
