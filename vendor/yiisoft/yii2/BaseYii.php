@@ -398,6 +398,10 @@ class BaseYii
      *   and the rest of the name-value pairs will be used to initialize the corresponding object properties
      * - a PHP callable: either an anonymous function or an array representing a class method (`[$class or $object, $method]`).
      *   The callable should return a new instance of the object being created.
+     * 在Yii框架代码中，只要创建实例，就是调用 Yii::createObject() 这个方法来实现。 可以说，
+     * Yii中所有的实例（除了Application，DI容器自身等入口脚本中实例化的），都是通过DI容器来获取的。
+     * 当Service Locator中服务或组件的定义是一个PHP callable时，对其形式有一定要求。 
+     * 一是返回一个实例，二是不接收任何参数。 这在 Yii::createObject() 中也可以看出来。
      *
      * @param array $params the constructor parameters
      * @return object the created object

@@ -55,10 +55,12 @@ class ServiceLocator extends Component
 {
     /**
      * @var array shared component instances indexed by their IDs
+     * 这里保存已经实例化好的
      */
     private $_components = [];
     /**
      * @var array component definitions indexed by their IDs
+     * 这里保存定义，尚未实例化的
      */
     private $_definitions = [];
 
@@ -96,6 +98,7 @@ class ServiceLocator extends Component
     /**
      * Returns a value indicating whether the locator has the specified component definition or has instantiated the component.
      * This method may return different results depending on the value of `$checkInstance`.
+     * 返回一个boolean 表明服务定位器中是否定义了此组件
      *
      * - If `$checkInstance` is false (default), the method will return a value indicating whether the locator has the specified
      *   component definition.
@@ -114,6 +117,12 @@ class ServiceLocator extends Component
 
     /**
      * Returns the component instance with the specified ID.
+     * 返回指定id的组件的实例
+     * 
+     *  // 使用访问属性的方法访问这个 cache 服务
+     *  $serviceLocator->cache->flushValues();
+     *  // 上面的方法等效于下面这个
+     *  $serviceLocator->get('cache')->flushValues();
      *
      * @param string $id component ID (e.g. `db`).
      * @param boolean $throwException whether to throw an exception if `$id` is not registered with the locator before.
@@ -134,6 +143,10 @@ class ServiceLocator extends Component
             if (is_object($definition) && !$definition instanceof Closure) {
                 return $this->_components[$id] = $definition;
             } else {
+                /** 
+                 * BaseYii::createObject() 方法内部使用了static::$container->get();
+                 * 也就是引入了Container类 在这里，服务定位器和依赖注入容器结合在了一起
+                 */
                 return $this->_components[$id] = Yii::createObject($definition);
             }
         } elseif ($throwException) {
