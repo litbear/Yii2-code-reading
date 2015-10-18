@@ -146,25 +146,23 @@ class SiteController extends Controller {
     }
 
     public function actionEvent() {
-        echo '这是事件处理<br/>';
 
-        $person = new Person();
+        $person = new Person;
 
-        $this->on('SayHello', [$person, 'say_hello'], '你好，朋友');
-        $this->on('SayHello', function() {
-            echo '第二次触发' . '</br>';
-        });
+// 使用PHP全局函数作为handler来进行绑定
+        $person->on(Person::EVENT_GREET, 'person_say_hello');
 
-        $this->on('SayGoodBye', ['app\models\Person', 'say_goodbye'], '再见了，我的朋友');
+// 使用对象$obj的成员函数say_hello来进行绑定
+        $person->on(Person::EVENT_GREET, [$person, 'say_hello']);
 
-        $this->on('GoodNight', function() {
-            echo '晚安！';
-        });
+// 使用类Greet的静态成员函数say_hello进行绑定
+        $person->on(Person::EVENT_GREET, ['app\helper\Greet', 'say_hello']);
 
-
-        $this->trigger('SayHello');
-        $this->trigger('SayGoodBye');
-        $this->trigger('GoodNight');
+// 使用匿名函数
+//        $person->on(Person::EVENT_GREET, function ($event) {
+//            echo 'Hello';
+//        });
+        var_dump($person->toString());
     }
 
     public function actionFooBar($foo) {

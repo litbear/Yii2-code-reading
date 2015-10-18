@@ -87,12 +87,12 @@ Container::$_definitions =
             'charset' => 'utf8',
             'tablePrefix' => 'tbl_',
             'class' => 'yii\db\Connection'
-        ]
+        ],
 
     'app\models\UserFinderInterface' => 
         [
             'class' => 'app\models\UserFinder'
-        ]
+        ],
 
     'userLister' => 
         [
@@ -117,11 +117,11 @@ Container::$__dependencies =
     'app\models\UserLister' => [
         0 => object(yii\di\Instance){ public 'id' = 'app\models\UserFinderInterface'; },
         1 => []
-    ]
+    ],
     'app\models\UserFinder' => [
         0 => object(yii\di\Instance){ public 'id' => 'yii\db\Connection'; },
         1 => []
-    ]
+    ],
     'yii\db\Connection' => [
         0 => []
     ]
