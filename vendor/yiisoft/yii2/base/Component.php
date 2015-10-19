@@ -592,6 +592,10 @@ class Component extends Object
     {
         $this->ensureBehaviors();
         if (!empty($this->_events[$name])) {
+            /**
+             * 假如触发的时候没传$event，那就new一个
+             * 然后在运行时配置这个新的Event对象。
+             */
             if ($event === null) {
                 $event = new Event;
             }
@@ -602,6 +606,9 @@ class Component extends Object
             $event->name = $name;
             foreach ($this->_events[$name] as $handler) {
                 $event->data = $handler[1];
+//                调试信息 证明了$handler[0] 是个数组 
+//                call_user_func([实例变量,方法名],方法参数);
+//                if($name == 'EVENT_GREET'){var_dump($name);var_dump($handler[0]);}
                 call_user_func($handler[0], $event);
                 // stop further handling if the event is handled
                 if ($event->handled) {
@@ -610,6 +617,11 @@ class Component extends Object
             }
         }
         // invoke class-level attached handlers
+        // 最后，把配置好的对象Event $event对象传给静态方法
+        // Event::trigger。
+        // 重点：上面其实已经把对象级别的事件执行完了
+        // 下面执行的就是类级事件！！！就是传说中的类级事件！！！
+        // 思路可算通了！！！
         Event::trigger($this, $name, $event);
     }
 

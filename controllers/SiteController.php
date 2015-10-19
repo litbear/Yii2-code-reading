@@ -150,19 +150,19 @@ class SiteController extends Controller {
         $person = new Person;
 
 // 使用PHP全局函数作为handler来进行绑定
-        $person->on(Person::EVENT_GREET, 'person_say_hello');
+//        $person->on(Person::EVENT_GREET, 'person_say_hello');
 
 // 使用对象$obj的成员函数say_hello来进行绑定
-        $person->on(Person::EVENT_GREET, [$person, 'say_hello']);
+        $person->on(Person::EVENT_GREET, [$person,'say_hello'],'hello');
 
 // 使用类Greet的静态成员函数say_hello进行绑定
-        $person->on(Person::EVENT_GREET, ['app\helper\Greet', 'say_hello']);
+//        $person->on(Person::EVENT_GREET, ['app\helper\Greet', 'say_hello']);
 
 // 使用匿名函数
 //        $person->on(Person::EVENT_GREET, function ($event) {
 //            echo 'Hello';
 //        });
-        var_dump($person->toString());
+        $person->trigger(Person::EVENT_GREET);
     }
 
     public function actionFooBar($foo) {
