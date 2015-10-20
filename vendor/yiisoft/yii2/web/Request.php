@@ -144,6 +144,9 @@ class Request extends \yii\base\Request
      * The array keys are the request `Content-Types`, and the array values are the
      * corresponding configurations for [[Yii::createObject|creating the parser objects]].
      * A parser must implement the [[RequestParserInterface]].
+     * 存放用于转换http请求体内容解析器的数组，该数组的键是请求的`Content-Types`
+     * 值是[[Yii::createObject|creating the parser objects]]用于构建对象的配置数组
+     * 解析器必须实现[[RequestParserInterface]]数组
      *
      * To enable parsing for JSON requests you can use the [[JsonParser]] class like in the following example:
      *
@@ -198,13 +201,22 @@ class Request extends \yii\base\Request
      */
     public function getHeaders()
     {
+        // 存在$this->_headers则直接返回
         if ($this->_headers === null) {
+            // $this->_headers是一个HeaderCollection实例
             $this->_headers = new HeaderCollection;
+            //用两种方式尝试获取请求头
             if (function_exists('getallheaders')) {
                 $headers = getallheaders();
             } elseif (function_exists('http_get_request_headers')) {
                 $headers = http_get_request_headers();
             } else {
+                /**
+                 *  两种方法都失败则使用 $_SERVER 数组获取头部并集合化
+                 * $_SERVER 数组的方法，需要遍历整个数组，并将所有以 
+                 * HTTP_* 元素加入到集合中去。 并且，要将所有 
+                 * HTTP_HEADER_NAME 转换成 Header-Name 的形式
+                 */
                 foreach ($_SERVER as $name => $value) {
                     if (strncmp($name, 'HTTP_', 5) === 0) {
                         $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
@@ -305,6 +317,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns whether this is an AJAX (XMLHttpRequest) request.
+     * AJAX请求是通过 X_REQUESTED_WITH 消息头来判断的
      *
      * Note that jQuery doesn't set the header in case of cross domain
      * requests: https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
@@ -318,6 +331,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns whether this is a PJAX request
+     * PJAX请求是AJAX请求的一种，增加了X_PJAX消息头的定义
      * @return boolean whether this is a PJAX request
      */
     public function getIsPjax()
@@ -327,6 +341,8 @@ class Request extends \yii\base\Request
 
     /**
      * Returns whether this is an Adobe Flash or Flex request.
+     * HTTP_USER_AGENT消息头中包含 'Shockwave' 或 'Flash' 字眼的
+     * （不区分大小写），就认为是FLASH请求
      * @return boolean whether this is an Adobe Flash or Adobe Flex request.
      */
     public function getIsFlash()
@@ -339,6 +355,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the raw HTTP request body.
+     * 获取未经处理的HTTP请求体
      * @return string the request body
      */
     public function getRawBody()
@@ -375,19 +392,35 @@ class Request extends \yii\base\Request
      */
     public function getBodyParams()
     {
+        /**
+         * 在$this->_bodyParams为空的情况下进行判断
+         * 否则$_POST会失效
+         */
         if ($this->_bodyParams === null) {
+            /**
+             * 假如$_POST['_method']有值，则将$_POST赋值给$this->_bodyParams
+             * 将$_POST['_method']unset掉
+             */
             if (isset($_POST[$this->methodParam])) {
                 $this->_bodyParams = $_POST;
                 unset($this->_bodyParams[$this->methodParam]);
                 return $this->_bodyParams;
             }
 
+            /**
+             * 获取Content Type 对于 'application/json; charset=UTF-8'
+             * ，得到的是 'application/json'
+             */
             $contentType = $this->getContentType();
             if (($pos = strpos($contentType, ';')) !== false) {
                 // e.g. application/json; charset=UTF-8
                 $contentType = substr($contentType, 0, $pos);
             }
 
+            /**
+             * 假如从$this->parsers找到了指定的解析器
+             * 则实例化解析器并处理之
+             */
             if (isset($this->parsers[$contentType])) {
                 $parser = Yii::createObject($this->parsers[$contentType]);
                 if (!($parser instanceof RequestParserInterface)) {
@@ -395,15 +428,24 @@ class Request extends \yii\base\Request
                 }
                 $this->_bodyParams = $parser->parse($this->getRawBody(), $contentType);
             } elseif (isset($this->parsers['*'])) {
+                /**
+                 * 加入未找到指定的解析器，则使用通用解析器
+                 */
                 $parser = Yii::createObject($this->parsers['*']);
                 if (!($parser instanceof RequestParserInterface)) {
                     throw new InvalidConfigException("The fallback request parser is invalid. It must implement the yii\\web\\RequestParserInterface.");
                 }
                 $this->_bodyParams = $parser->parse($this->getRawBody(), $contentType);
             } elseif ($this->getMethod() === 'POST') {
+                /**
+                 * 假如没有通用的解析器，就看看是不是post请求，并且直接处理$_POST
+                 */
                 // PHP has already parsed the body so we have all params in $_POST
                 $this->_bodyParams = $_POST;
             } else {
+                /**
+                 * 如果不是post请求，则使用mb_parse_str() 处理
+                 */
                 $this->_bodyParams = [];
                 mb_parse_str($this->getRawBody(), $this->_bodyParams);
             }
@@ -426,6 +468,7 @@ class Request extends \yii\base\Request
     /**
      * Returns the named request body parameter value.
      * If the parameter does not exist, the second parameter passed to this method will be returned.
+     * 获取指定的post值，如果不存在则返回默认值
      * @param string $name the parameter name
      * @param mixed $defaultValue the default parameter value if the parameter does not exist.
      * @return mixed the parameter value
@@ -441,6 +484,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns POST parameter with a given name. If name isn't specified, returns an array of all POST parameters.
+     * 根据指定的post参数名返回值，假如未指定参数名，则返回全部post参数数组
      *
      * @param string $name the parameter name
      * @param mixed $defaultValue the default parameter value if the parameter does not exist.
@@ -459,6 +503,9 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the request parameters given in the [[queryString]].
+     * 获取所有get参数的值
+     * 【请留意这里并未使用 $this->_queryParams = $_GET 进行缓存。
+     * 说明一旦指定了 $_queryParams 则 $_GET 会失效。】
      *
      * This method will return the contents of `$_GET` if params where not explicitly set.
      * @return array the request GET parameter values.
@@ -486,6 +533,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns GET parameter with a given name. If name isn't specified, returns an array of all GET parameters.
+     * 根据指定的get参数名返回指定的get参数值，如果参数名为指定则返回get参数数组
      *
      * @param string $name the parameter name
      * @param mixed $defaultValue the default parameter value if the parameter does not exist.
@@ -502,6 +550,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the named GET parameter value.
+     * 获取指定get参数的值
      * If the GET parameter does not exist, the second parameter passed to this method will be returned.
      * @param string $name the GET parameter name.
      * @param mixed $defaultValue the default parameter value if the GET parameter does not exist.
