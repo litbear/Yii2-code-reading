@@ -224,6 +224,8 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the method of the current request (e.g. GET, POST, HEAD, PUT, PATCH, DELETE).
+     * 返回当前请求的HTTP方法 可以用$_POST['_method']参数模拟除GET/POST之外的方法
+     *  并且$_POST参数的优先级最高 强制转换为大写
      * @return string request method, such as GET, POST, HEAD, PUT, PATCH, DELETE.
      * The value returned is turned into upper case.
      */

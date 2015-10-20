@@ -372,12 +372,14 @@ abstract class Application extends Module
             $this->trigger(self::EVENT_BEFORE_REQUEST);
 
             $this->state = self::STATE_HANDLING_REQUEST;
+            // 获得请求句柄 为响应组织内容
             $response = $this->handleRequest($this->getRequest());
 
             $this->state = self::STATE_AFTER_REQUEST;
             $this->trigger(self::EVENT_AFTER_REQUEST);
 
             $this->state = self::STATE_SENDING_RESPONSE;
+            // 发送响应
             $response->send();
 
             $this->state = self::STATE_END;
@@ -529,7 +531,9 @@ abstract class Application extends Module
 
     /**
      * Returns the request component.
+     * 返回request组件
      * @return \yii\web\Request|\yii\console\Request the request component.
+     * 返回的组件是\yii\web\Request或\yii\console\Request 类的实例 在哪儿绑定的暂时没发现？？？
      */
     public function getRequest()
     {

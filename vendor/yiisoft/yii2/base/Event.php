@@ -234,6 +234,11 @@ class Event extends Object
         $event->handled = false;
         $event->name = $name;
 
+        /**
+         * 【这段代码会对 $evnet->sender 进行设置，如果传入的时候
+         * ，已经指定了他的值，那么这个值会保留，否则，就会替换成类名。】
+         * 类级事件只存类名，不存实例名
+         */
         if (is_object($class)) {
             if ($event->sender === null) {
                 $event->sender = $class;
@@ -242,6 +247,12 @@ class Event extends Object
         } else {
             $class = ltrim($class, '\\');
         }
+        /**
+         * 【对于类级别事件，有一个要格外注意的地方，就是他不
+         * 光会触发自身这个类的事件，这个类的所有祖先类的同一
+         * 事件也会被触发。但是，自身类事件与所有祖先类的事件
+         * ，视为同一级别:】
+         */
         do {
             if (!empty(self::$_events[$name][$class])) {
                 foreach (self::$_events[$name][$class] as $handler) {

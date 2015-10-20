@@ -95,6 +95,10 @@ class Application extends \yii\base\Application
      */
     protected function loadConfig($config)
     {
+        /**
+         * 如果命令行参数中有 --appconfig=/path/to/config
+         * 则验证该配置文件是否存在并启用之
+         */
         if (!empty($_SERVER['argv'])) {
             $option = '--' . self::OPTION_APPCONFIG . '=';
             foreach ($_SERVER['argv'] as $param) {
