@@ -221,27 +221,33 @@ class UrlManager extends Component
 
     /**
      * Parses the user request.
+     * 解析用户请求
      * @param Request $request the request component
      * @return array|boolean the route and the associated parameters. The latter is always empty
      * if [[enablePrettyUrl]] is false. False is returned if the current request cannot be successfully parsed.
      */
     public function parseRequest($request)
     {
+        // 启用了PrettyUrl 的逻辑
         if ($this->enablePrettyUrl) {
             $pathInfo = $request->getPathInfo();
             /* @var $rule UrlRule */
+            // 就近匹配规则
             foreach ($this->rules as $rule) {
                 if (($result = $rule->parseRequest($this, $request)) !== false) {
                     return $result;
                 }
             }
 
+            // 所有规则都不匹配 且开启了严格解析模式，则返回false
             if ($this->enableStrictParsing) {
                 return false;
             }
 
+            // 若所有规则都不匹配 且未开启严格解析模式 则使用默认解析器
             Yii::trace('No matching URL rules. Using default URL parsing logic.', __METHOD__);
 
+            // 获取伪静态后缀
             $suffix = (string) $this->suffix;
             if ($suffix !== '' && $pathInfo !== '') {
                 $n = strlen($this->suffix);
@@ -259,6 +265,7 @@ class UrlManager extends Component
 
             return [$pathInfo, []];
         } else {
+            // 未启用 PrettyUrl ，则输出日志 再进行 $request->getQueryParam($this->routeParam, '')
             Yii::trace('Pretty URL not enabled. Using default URL parsing logic.', __METHOD__);
             $route = $request->getQueryParam($this->routeParam, '');
             if (is_array($route)) {

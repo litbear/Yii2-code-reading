@@ -177,12 +177,15 @@ class Request extends \yii\base\Request
      */
     public function resolve()
     {
+        // 使用UrlmanagerurlManager()解析请求
         $result = Yii::$app->getUrlManager()->parseRequest($this);
         if ($result !== false) {
             list ($route, $params) = $result;
             if ($this->_queryParams === null) {
+                // 如果$this->_queryParams 为空 则解析出的参数与$_GET参数合并
                 $_GET = $params + $_GET; // preserve numeric keys
             } else {
+                // 如果$this->_queryParams 不为空 则解析出的参数与$this->_queryParams参数合并
                 $this->_queryParams = $params + $this->_queryParams;
             }
             return [$route, $this->getQueryParams()];
@@ -588,6 +591,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the relative URL of the entry script.
+     * 返回入口脚本的相对URL地址
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
      * @return string the relative URL of the entry script.
      * @throws InvalidConfigException if unable to determine the entry script URL
@@ -654,6 +658,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the path info of the currently requested URL.
+     * 获取当前请求的路径信息，实际上调用的是$this->resolvePathInfo()
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting and ending slashes are both removed.
      * @return string part of the request URL that is after the entry script and before the question mark.
@@ -689,16 +694,23 @@ class Request extends \yii\base\Request
      */
     protected function resolvePathInfo()
     {
+        // 这个 getUrl() 调用的是 resolveRequestUri() 来获取当前的URL
         $pathInfo = $this->getUrl();
 
+        // URI中找到了'?' 那就去掉问号之后的内容
         if (($pos = strpos($pathInfo, '?')) !== false) {
             $pathInfo = substr($pathInfo, 0, $pos);
         }
 
+        //使用PHP urldecode() 进行解码，所有 %## 转成对应的字符， + 转成空格
         $pathInfo = urldecode($pathInfo);
 
         // try to encode in UTF8 if not so
         // http://w3.org/International/questions/qa-forms-utf-8.html
+        /*
+         * 这个正则列举了各种编码方式，通过排除这些编码，来确认是 UTF-8 编码
+         * 出处可参考 http://w3.org/International/questions/qa-forms-utf-8.html
+         */
         if (!preg_match('%^(?:
             [\x09\x0A\x0D\x20-\x7E]              # ASCII
             | [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
@@ -713,7 +725,9 @@ class Request extends \yii\base\Request
             $pathInfo = utf8_encode($pathInfo);
         }
 
+        // 获取当前脚本的URL
         $scriptUrl = $this->getScriptUrl();
+        // 获取Base URL
         $baseUrl = $this->getBaseUrl();
         if (strpos($pathInfo, $scriptUrl) === 0) {
             $pathInfo = substr($pathInfo, strlen($scriptUrl));
@@ -773,6 +787,13 @@ class Request extends \yii\base\Request
 
     /**
      * Resolves the request URI portion for the currently requested URL.
+     * 获取当前请求的URI
+     * 这个方法用于获取当前URL的URI部分，即主机或主机名之后的内容，包括查询参数。
+     * 这个方法参考了 Zend Framework 1 的部分代码，通过各种环境下的HTTP头来获取URI。
+     * 返回值为 $_SERVER['REQUEST_URI'] 或 $_SERVER['HTTP_X_REWRITE_URL']，
+     * 或 $_SERVER['ORIG_PATH_INFO'] + $_SERVER['QUERY_STRING']。
+     * 即，对于 http://www.digpage.com/index.html?helloworld，
+     * 得到URI为 index.html?helloworld
      * This refers to the portion that is after the [[hostInfo]] part. It includes the [[queryString]] part if any.
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
      * @return string|boolean the request URI portion for the currently requested URL.
