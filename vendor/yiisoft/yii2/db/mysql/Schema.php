@@ -21,6 +21,7 @@ class Schema extends \yii\db\Schema
 {
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
+     * 将指定数据库(在这里就是MySQL)中的数据类型 转换为 基本数据类型
      */
     public $typeMap = [
         'tinyint' => self::TYPE_SMALLINT,

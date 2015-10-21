@@ -12,6 +12,7 @@ use yii\base\NotSupportedException;
 
 /**
  * QueryBuilder builds a SELECT SQL statement based on the specification given as a [[Query]] object.
+ * QueryBuilder 类通过[[Query]]对象带来的描述构建查询的SQL语句
  *
  * QueryBuilder can also be used to build SQL statements such as INSERT, UPDATE, DELETE, CREATE TABLE,
  * from a [[Query]] object.
@@ -39,6 +40,7 @@ class QueryBuilder extends \yii\base\Object
      * @var array the abstract column types mapped to physical column types.
      * This is mainly used to support creating/modifying tables using DB-independent data type specifications.
      * Child classes should override this property to declare supported type mappings.
+     * $typeMap用于定义Schema类中定义的抽象数据类型到DBMS数据类型的映射关系，具体由各QueryBuilder子类实现。
      */
     public $typeMap = [];
 
@@ -557,6 +559,8 @@ class QueryBuilder extends \yii\base\Object
      * The conversion is done using the type map specified in [[typeMap]].
      * The following abstract column types are supported (using MySQL as an example to explain the corresponding
      * physical types):
+     * 将抽象数据类型转换为数据库实际的列类型，这里的转换是借助[[typeMap]类型
+     * 映射完成的，支持以下的抽象数据类型(以MySQL为例)
      *
      * - `pk`: an auto-incremental primary key type, will be converted into "int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY"
      * - `bigpk`: an auto-incremental primary key type, will be converted into "bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY"
@@ -578,29 +582,42 @@ class QueryBuilder extends \yii\base\Object
      * If the abstract type contains two or more parts separated by spaces (e.g. "string NOT NULL"), then only
      * the first part will be converted, and the rest of the parts will be appended to the converted result.
      * For example, 'string NOT NULL' is converted to 'varchar(255) NOT NULL'.
+     * 假如抽象数据类型包含了两个或多个由空格分隔的部分(例如 字符串'string NOT NULL')，那么只有第一部分会被解析，
+     * 剩余部分将会被追加到转换后的就过中，因此'string NOT NULL'将会被转换为'varchar(255) NOT NULL'
      *
      * For some of the abstract types you can also specify a length or precision constraint
      * by appending it in round brackets directly to the type.
      * For example `string(32)` will be converted into "varchar(32)" on a MySQL database.
      * If the underlying DBMS does not support these kind of constraints for a type it will
      * be ignored.
+     * 对于有些抽象数据类型，你甚至可以通过在其后直接追加圆括号来指定长度和精度。比如说：
+     * `string(32)`在MySQL中会被转换成 "varchar(32)" 。假如当前所使用的数据库系统不支持
+     * 这汇总数据类型，那么(附加的？)将会被忽略
      *
      * If a type cannot be found in [[typeMap]], it will be returned without any change.
+     * 如果输入的抽象数据类型在[[typeMap]]中无法找到，则原样输出
      * @param string|ColumnSchemaBuilder $type abstract column type
      * @return string physical column type.
      */
     public function getColumnType($type)
     {
+        /*
+         * $type 参数如果是一个ColumnSchemaBuilder实例，
+         * 则之星__toString()方法
+         */
         if ($type instanceof ColumnSchemaBuilder) {
             $type = $type->__toString();
         }
 
+        //$this->typeMap 找到了，则返回其值
         if (isset($this->typeMap[$type])) {
             return $this->typeMap[$type];
+            //否则看看有没有括号 形如"Schema::TYPE_INT(11) DEFAULT 0" 之类的
         } elseif (preg_match('/^(\w+)\((.+?)\)(.*)$/', $type, $matches)) {
             if (isset($this->typeMap[$matches[1]])) {
                 return preg_replace('/\(.+\)/', '(' . $matches[2] . ')', $this->typeMap[$matches[1]]) . $matches[3];
             }
+            //形如 "Schema::TYPE_INT NOT NULL" 之类的 \s 匹配任意空白字符，
         } elseif (preg_match('/^(\w+)\s+/', $type, $matches)) {
             if (isset($this->typeMap[$matches[1]])) {
                 return preg_replace('/^\w+/', $this->typeMap[$matches[1]], $type);
