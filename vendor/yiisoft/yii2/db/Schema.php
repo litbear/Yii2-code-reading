@@ -16,6 +16,7 @@ use yii\caching\TagDependency;
 
 /**
  * Schema is the base class for concrete DBMS-specific schema classes.
+ * Schema 类是所有特定数据库模式类的基类
  *
  * Schema represents the database schema information that is DBMS specific.
  *
@@ -103,6 +104,7 @@ abstract class Schema extends Object
 
     /**
      * Loads the metadata for the specified table.
+     * 加载指定表的元数据 抽象方法 由具体的子类去实现
      * @param string $name table name
      * @return TableSchema DBMS-dependent table metadata, null if the table does not exist.
      */
@@ -576,11 +578,13 @@ abstract class Schema extends Object
 
     /**
      * Extracts the PHP type from abstract DB type.
+     * 将抽象数据库类型转换为PHP数据类型
      * @param ColumnSchema $column the column schema information
      * @return string PHP type name
      */
     protected function getColumnPhpType($column)
     {
+        //定义从抽象数据类型到PHP数据类型的映射
         static $typeMap = [
             // abstract type => php type
             'smallint' => 'integer',
@@ -591,15 +595,23 @@ abstract class Schema extends Object
             'double' => 'double',
             'binary' => 'resource',
         ];
+        /*
+         * TYPE_STRING 和 TYPE_TEXT ，TYPE_DECIMAL 和 TYPE_MONEY 都用string
+         */
+        
         if (isset($typeMap[$column->type])) {
             if ($column->type === 'bigint') {
+                // 假如抽象数据类型是bigint，（且PHP环境中int为8位，且不是unsigned），则使用int型
                 return PHP_INT_SIZE == 8 && !$column->unsigned ? 'integer' : 'string';
+                // 假如抽象数据类型是int型 （且PHP环境中int为4位，而且是unsigned），则使用string型
             } elseif ($column->type === 'integer') {
                 return PHP_INT_SIZE == 4 && $column->unsigned ? 'string' : 'integer';
             } else {
+                // 假如抽象数据类型不是bigint也不是int 那就从映射里取
                 return $typeMap[$column->type];
             }
         } else {
+            // 影射中不存在的情况一律使用string
             return 'string';
         }
     }

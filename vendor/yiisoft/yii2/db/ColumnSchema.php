@@ -11,7 +11,8 @@ use yii\base\Object;
 
 /**
  * ColumnSchema class describes the metadata of a column in a database table.
- *
+ * ColumnSchema 是用来封装数据库表中（一个列的元数据）的对象
+  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -106,6 +107,7 @@ class ColumnSchema extends Object
 
     /**
      * Converts the input value according to [[phpType]] after retrieval from the database.
+     * 将输入的值（都是string）根据本对象的phpType转换为php类型
      * If the value is null or an [[Expression]], it will not be converted.
      * @param mixed $value input value
      * @return mixed converted value
@@ -113,12 +115,15 @@ class ColumnSchema extends Object
      */
     protected function typecast($value)
     {
+        // 值为空 且抽象数据类型不是TYPE_TEXT TYPE_STRING TYPE_BINARY 那就返回null
         if ($value === '' && $this->type !== Schema::TYPE_TEXT && $this->type !== Schema::TYPE_STRING && $this->type !== Schema::TYPE_BINARY) {
             return null;
         }
+        //【内容为null，或者 $value 的类型与PHP类型一致，或者 $value 是一个数据库表达式，那么可以直接返回】
         if ($value === null || gettype($value) === $this->phpType || $value instanceof Expression) {
             return $value;
         }
+        // 否则根据php类型完成转换
         switch ($this->phpType) {
             case 'resource':
             case 'string':
