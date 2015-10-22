@@ -13,6 +13,7 @@ use yii\db\ColumnSchema;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
+ * Schema 是负责从MySQL数据库中检索元数据的类
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -21,7 +22,7 @@ class Schema extends \yii\db\Schema
 {
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
-     * 将指定数据库(在这里就是MySQL)中的数据类型 转换为 基本数据类型
+     * 将指定数据库(在这里就是MySQL)中的数据类型 转换为 列的抽象数据类型
      */
     public $typeMap = [
         'tinyint' => self::TYPE_SMALLINT,

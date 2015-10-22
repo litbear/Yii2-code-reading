@@ -13,6 +13,7 @@ use yii\db\Expression;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
+ * yii\db\QueryBuilder在MySQL数据库下的实现
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -21,7 +22,7 @@ class QueryBuilder extends \yii\db\QueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
-     * 对父类的实现 虚拟数据类型 转换为 指定数据库的类型
+     * 对父类的实现 `虚拟数据类型`到`指定数据库的类型`的映射
      */
     public $typeMap = [
         Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
