@@ -93,6 +93,7 @@ abstract class Schema extends Object
 
 
     /**
+     * 创建一个列信息的对象
      * @return \yii\db\ColumnSchema
      * @throws \yii\base\InvalidConfigException
      */
@@ -103,6 +104,7 @@ abstract class Schema extends Object
 
     /**
      * Loads the metadata for the specified table.
+     * 加载指定表的基本信息 抽象方法 每个表的实现方法各有不同
      * @param string $name table name
      * @return TableSchema DBMS-dependent table metadata, null if the table does not exist.
      */

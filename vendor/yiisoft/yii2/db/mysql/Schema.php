@@ -123,46 +123,78 @@ class Schema extends \yii\db\Schema
 
     /**
      * Loads the column information into a [[ColumnSchema]] object.
-     * @param array $info column information
+     * 加载列信息 并把每个列的信息封装到[[ColumnSchema]]对象中
+     * 随便拿个建表语句做例子：
+     * 
+     * CREATE TABLE `wb_follow` (
+     * `follow` int(10) unsigned NOT NULL COMMENT '关注用户ID',
+     * `fans` int(10) unsigned NOT NULL COMMENT '粉丝用户ID',
+     * `gid` int(11) NOT NULL COMMENT '所属关注分组id',
+     * KEY `follow` (`follow`),
+     * KEY `fans` (`fans`),
+     * KEY `gid` (`gid`)
+     * ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='关注与粉丝表';
+     * 
+     * @param array $info column information 接收数组
      * @return ColumnSchema the column schema object
      */
     protected function loadColumnSchema($info)
     {
+        //为每个列分别建一个ColumnSchema 对象
         $column = $this->createColumnSchema();
 
+        // 字段名
         $column->name = $info['field'];
+        // 是否允许为空
         $column->allowNull = $info['null'] === 'YES';
+        // 是否是主键
         $column->isPrimaryKey = strpos($info['key'], 'PRI') !== false;
+        // 是否自增
         $column->autoIncrement = stripos($info['extra'], 'auto_increment') !== false;
+        // 注释
         $column->comment = $info['comment'];
 
+        // 字段类型 如int(11)
         $column->dbType = $info['type'];
+        // 是否unsigned
         $column->unsigned = stripos($column->dbType, 'unsigned') !== false;
 
+        // 准备把数据库类型，转换成对应的抽象类型，默认为 TYPE_STRING
         $column->type = self::TYPE_STRING;
+        // 例：将'int(10) not null'匹配为 $matches = ['int','10']
         if (preg_match('/^(\w+)(?:\(([^\)]+)\))?/', $column->dbType, $matches)) {
             $type = strtolower($matches[1]);
+            // 如果映射表里有 则直接取出实际类型
             if (isset($this->typeMap[$type])) {
                 $column->type = $this->typeMap[$type];
             }
+            // 假如括号里有值 则开始讨论
             if (!empty($matches[2])) {
+                // 如果是枚举类型  则转换为如下: enum('jj','hh','jj')
                 if ($type === 'enum') {
                     $values = explode(',', $matches[2]);
                     foreach ($values as $i => $value) {
+                        // 删除每个元素左右的半角单引号
                         $values[$i] = trim($value, "'");
                     }
+                    //以数组形式存入
                     $column->enumValues = $values;
                 } else {
+                    // 如果不是枚举类型 还剩下 int(10) 和 decimal(19,4) 两种形式了
                     $values = explode(',', $matches[2]);
                     $column->size = $column->precision = (int) $values[0];
                     if (isset($values[1])) {
+                        // 处理精度
                         $column->scale = (int) $values[1];
                     }
+                    // 如果是bit(1) 类型的 则转换为boolean
                     if ($column->size === 1 && $type === 'bit') {
                         $column->type = 'boolean';
                     } elseif ($type === 'bit') {
+                        // 由于bit最多64位，如果超过 32 位，那么用一个 bigint 足以。
                         if ($column->size > 32) {
                             $column->type = 'bigint';
+                            // 如果正好32位，那么用一个 interger 来表示。
                         } elseif ($column->size === 32) {
                             $column->type = 'integer';
                         }
