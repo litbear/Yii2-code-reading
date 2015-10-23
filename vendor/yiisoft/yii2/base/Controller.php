@@ -11,6 +11,8 @@ use Yii;
 
 /**
  * Controller is the base class for classes containing controller logic.
+ * Controller 类是所有包含控制器逻辑的类的基类
+ * 继承自Component类 因此具有事件 行为等特性
  *
  * @property Module[] $modules All ancestor modules that this controller is located within. This property is
  * read-only.
@@ -30,24 +32,30 @@ class Controller extends Component implements ViewContextInterface
     /**
      * @event ActionEvent an event raised right before executing a controller action.
      * You may set [[ActionEvent::isValid]] to be false to cancel the action execution.
+     * 动作事件，在执行控制器动作之前执行的事件，可以通过设置 [[ActionEvent::isValid]] 
+     * 属性为false来取消控制器动作的执行
      */
     const EVENT_BEFORE_ACTION = 'beforeAction';
     /**
      * @event ActionEvent an event raised right after executing a controller action.
+     * 在控制器动作执行之后执行的事件
      */
     const EVENT_AFTER_ACTION = 'afterAction';
 
     /**
      * @var string the ID of this controller.
+     * 控制器的id
      */
     public $id;
     /**
      * @var Module $module the module that this controller belongs to.
+     * 控制器属于的那个module
      */
     public $module;
     /**
      * @var string the ID of the action that is used when the action ID is not specified
      * in the request. Defaults to 'index'.
+     * 默认动作名称
      */
     public $defaultAction = 'index';
     /**
@@ -55,24 +63,32 @@ class Controller extends Component implements ViewContextInterface
      * This property mainly affects the behavior of [[render()]].
      * Defaults to null, meaning the actual layout value should inherit that from [[module]]'s layout value.
      * If false, no layout will be applied.
+     * 本控制器应用的布局文件，接受string或boolean类型，本属性主要影响render()行为
+     * 默认为空，意味着从[[module]]处继承（没错，是继承，module是行为？）布局文件，假如
+     * 设为false。则表示没有布局文件
      */
     public $layout;
     /**
      * @var Action the action that is currently being executed. This property will be set
      * by [[run()]] when it is called by [[Application]] to run an action.
+     * 当前被执行的动作。当Application调用动作时，该属性会在run()方法中被设置，
      */
     public $action;
 
     /**
      * @var View the view object that can be used to render views or view files.
+     * 被用作渲染的视图对象
      */
     private $_view;
 
 
     /**
      * @param string $id the ID of this controller.
+     * 控制器id
      * @param Module $module the module that this controller belongs to.
+     * 控制器所在的module对象
      * @param array $config name-value pairs that will be used to initialize the object properties.
+     * 用来初始化对象的键值对属性数组
      */
     public function __construct($id, $module, $config = [])
     {
@@ -83,9 +99,12 @@ class Controller extends Component implements ViewContextInterface
 
     /**
      * Declares external actions for the controller.
+     * 声明控制器的外部动作
      * This method is meant to be overwritten to declare external actions for the controller.
      * It should return an array, with array keys being action IDs, and array values the corresponding
      * action class names or action configuration arrays. For example,
+     * 本方法将被复写，用来声明本控制器的外部动作，本方法会返回一个【以动作id为键，相应的动作类名或
+     * 动作配置数组为值】的数组，例如：
      *
      * ~~~
      * return [
@@ -100,6 +119,7 @@ class Controller extends Component implements ViewContextInterface
      *
      * [[\Yii::createObject()]] will be used later to create the requested action
      * using the configuration provided here.
+     * 稍后，[[\Yii::createObject()]]将会利用这里提供的配置去创建被请求的动作
      */
     public function actions()
     {
@@ -109,6 +129,7 @@ class Controller extends Component implements ViewContextInterface
     /**
      * Runs an action within this controller with the specified action ID and parameters.
      * If the action ID is empty, the method will use [[defaultAction]].
+     * 通过指定的动作id和参数运行本控制器相应的动作。假如动作id为空，则使用[[defaultAction]]
      * @param string $id the ID of the action to be executed.
      * @param array $params the parameters (name-value pairs) to be passed to the action.
      * @return mixed the result of the action.
@@ -117,6 +138,11 @@ class Controller extends Component implements ViewContextInterface
      */
     public function runAction($id, $params = [])
     {
+        /*
+         *  $this->createAction($id);会得到一个动作类或内联动作类的实例
+         *  class InlineAction extends Action 
+         *  class Action extends Component
+         */
         $action = $this->createAction($id);
         if ($action === null) {
             throw new InvalidRouteException('Unable to resolve the request: ' . $this->getUniqueId() . '/' . $id);
@@ -135,6 +161,14 @@ class Controller extends Component implements ViewContextInterface
         $runAction = true;
 
         // call beforeAction on modules
+        /*
+         * 获取所有父类的module，依次调用他们的beforeAction
+         * 【获取当前控制器的所以的模块，并执行每个模块的beforeAction来检查当前的action是否可以执行，
+         * 注意：getModules返回的数组顺序为：从父模块到子模块，
+         * 所以在执行beforeAction的时候，先检查最外层的父模块，然后检查子模块。
+         *
+         * 然而在执行afterAction的时候，顺序就反过来了，先执行子模块，最后执行父模块。】
+         */
         foreach ($this->getModules() as $module) {
             if ($module->beforeAction($action)) {
                 array_unshift($modules, $module);
@@ -146,6 +180,10 @@ class Controller extends Component implements ViewContextInterface
 
         $result = null;
 
+        /**
+         * 如果$runAction 始终标记为true且当前控制器的
+         * beforeAction($action)也通过，则执行action
+         */
         if ($runAction && $this->beforeAction($action)) {
             // run the action
             $result = $action->runWithParams($params);
@@ -170,17 +208,22 @@ class Controller extends Component implements ViewContextInterface
      * of module IDs, controller ID and action ID. If the route starts with a slash '/', the parsing of
      * the route will start from the application; otherwise, it will start from the parent module of this controller.
      * @param string $route the route to be handled, e.g., 'view', 'comment/view', '/admin/comment/view'.
+     * 待使用的路由
      * @param array $params the parameters to be passed to the action.
+     * 传入动作的参数
      * @return mixed the result of the action.
      * @see runAction()
      */
     public function run($route, $params = [])
     {
         $pos = strpos($route, '/');
+        //路由中没找到'/' 则直接调用runAction()
         if ($pos === false) {
             return $this->runAction($route, $params);
+            // '/'在中间则调用模块module的runAction()
         } elseif ($pos > 0) {
             return $this->module->runAction($route, $params);
+            // '/'在开头，则调用当前的应用来处理路由
         } else {
             return Yii::$app->runAction(ltrim($route, '/'), $params);
         }
@@ -189,6 +232,7 @@ class Controller extends Component implements ViewContextInterface
     /**
      * Binds the parameters to the action.
      * This method is invoked by [[Action]] when it begins to run with the given parameters.
+     * 将参数绑定到动作上。在带着给定参数开始运行时，本方法由Action类的实例调用。
      * @param Action $action the action to be bound with parameters.
      * @param array $params the parameters to be bound to the action.
      * @return array the valid parameters that the action can run with.
@@ -200,23 +244,56 @@ class Controller extends Component implements ViewContextInterface
 
     /**
      * Creates an action based on the given action ID.
+     * 使用给定的动作id创建动作
      * The method first checks if the action ID has been declared in [[actions()]]. If so,
      * it will use the configuration declared there to create the action object.
      * If not, it will look for a controller method whose name is in the format of `actionXyz`
      * where `Xyz` stands for the action ID. If found, an [[InlineAction]] representing that
      * method will be created and returned.
+     * 本方法首先会检查actions()中是否定义了动作id。假如定义了，将会使用定义的配置去创建动作对象。
+     * 假如没定义，就会找本控制器中哪个方法是以'actionXyz'形式命名的，'Xyz'就是动作id。假如找到了，
+     * 那么就是内联的动作会被创建和返回
      * @param string $id the action ID.
      * @return Action the newly created action instance. Null if the ID doesn't resolve into any action.
      */
     public function createAction($id)
     {
+        // id为空？那么使用默认动作
         if ($id === '') {
             $id = $this->defaultAction;
         }
 
+        /*
+         *  查找外部动作 假如发现了，以下方数组为例：
+         * [
+         *     'action1' => 'app\components\Action1',
+         *     'action2' => [
+         *         'class' => 'app\components\Action2',
+         *         'property1' => 'value1',
+         *         'property2' => 'value2',
+         *     ],
+         * ];
+         * Yii::createObject 返回：return static::$container->get($type, $params);
+         * 如果在外部动作数组没找到，则找本控制器内部的数组，并用实例化InlineAction类
+         * 如果都没找到 则返回null
+         */
         $actionMap = $this->actions();
         if (isset($actionMap[$id])) {
             return Yii::createObject($actionMap[$id], [$id, $this]);
+            /*
+             * action id由：a到z、0到9、\、-、_ 这五种字符组成，
+             * 并且不能包含“--”
+             * 并且不能以“-”为开头或结尾
+             *
+             * 先以“-”把id分隔为数组，再以“ ”连接到字符串，把每个单词首字母大写，最后把“ ”去掉，并和"action"连接
+             * 如;
+             * 1、new-post-v-4
+             * 2、['new','post','v','4']
+             * 3、new post v 4
+             * 4、New Post V 4
+             * 5、NewPostV4
+             * 6、actionNewPostV4
+             */
         } elseif (preg_match('/^[a-z0-9\\-_]+$/', $id) && strpos($id, '--') === false && trim($id, '-') === $id) {
             $methodName = 'action' . str_replace(' ', '', ucwords(implode(' ', explode('-', $id))));
             if (method_exists($this, $methodName)) {
@@ -297,6 +374,8 @@ class Controller extends Component implements ViewContextInterface
      * Returns all ancestor modules of this controller.
      * The first module in the array is the outermost one (i.e., the application instance),
      * while the last is the innermost one.
+     * 获取当前控制器的所有父模块module。第一个模块是最外部的模块(也就是application实例)，
+     * 最后一个是最内部的模块。
      * @return Module[] all ancestor modules that this controller is located within.
      */
     public function getModules()

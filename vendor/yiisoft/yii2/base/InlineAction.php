@@ -11,9 +11,11 @@ use Yii;
 
 /**
  * InlineAction represents an action that is defined as a controller method.
+ * InlineAction 表示了一个定义在控制器内部的对象实例
  *
  * The name of the controller method is available via [[actionMethod]] which
  * is set by the [[controller]] who creates this action.
+ * 当创建动作的时候，控制器会通过actionMethod属性设置控制器的方法名
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0

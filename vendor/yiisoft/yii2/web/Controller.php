@@ -13,6 +13,7 @@ use yii\helpers\Url;
 
 /**
  * Controller is the base class of web controllers.
+ * 控制器类的基类
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -54,12 +55,19 @@ class Controller extends \yii\base\Controller
      * the provided parameters according to the requirement. If there is any missing parameter,
      * an exception will be thrown.
      * @param \yii\base\Action $action the action to be bound with parameters
+     * 待绑定参数的动作类实例
      * @param array $params the parameters to be bound to the action
+     * 待绑定的参数数组
      * @return array the valid parameters that the action can run with.
      * @throws BadRequestHttpException if there are missing or invalid parameters.
      */
     public function bindActionParams($action, $params)
     {
+        /*
+         * 当前对象是一个控制器对象，且不是由基类实例化的。
+         * 通过反射获取动作，如果动作是一个内联动作，则从当前对象获取，如果是
+         * 外部动作，则从外部获取
+         */
         if ($action instanceof InlineAction) {
             $method = new \ReflectionMethod($this, $action->actionMethod);
         } else {
@@ -71,6 +79,11 @@ class Controller extends \yii\base\Controller
         $actionParams = [];
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
+            /*
+             * array_key_exists('key',$array)
+             * 当['key' => null]时，返回值仍未true
+             * 首先：有参数名，但无默认值
+             */
             if (array_key_exists($name, $params)) {
                 if ($param->isArray()) {
                     $args[] = $actionParams[$name] = (array) $params[$name];
@@ -82,13 +95,18 @@ class Controller extends \yii\base\Controller
                     ]));
                 }
                 unset($params[$name]);
+                // 有参数名，有默认值
             } elseif ($param->isDefaultValueAvailable()) {
                 $args[] = $actionParams[$name] = $param->getDefaultValue();
             } else {
+                // 未找到参数名 则计入丢失参数内
                 $missing[] = $name;
             }
         }
 
+        /**
+         * 有丢失的参数 则抛出异常
+         */
         if (!empty($missing)) {
             throw new BadRequestHttpException(Yii::t('yii', 'Missing required parameters: {params}', [
                 'params' => implode(', ', $missing),
