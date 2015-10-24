@@ -208,6 +208,7 @@ abstract class Application extends Module
 
     /**
      * Pre-initializes the application.
+     * 预初始化应用（从配置文件读取配置的第一步）
      * This method is called at the beginning of the application constructor.
      * It initializes several important application properties.
      * If you override this method, please make sure you call the parent implementation.
@@ -219,6 +220,7 @@ abstract class Application extends Module
         if (!isset($config['id'])) {
             throw new InvalidConfigException('The "id" configuration for the Application is required.');
         }
+        // $config['basePath']即为本文件所处文件夹的上一层
         if (isset($config['basePath'])) {
             $this->setBasePath($config['basePath']);
             unset($config['basePath']);
@@ -349,6 +351,7 @@ abstract class Application extends Module
     /**
      * Sets the root directory of the application and the @app alias.
      * This method can only be invoked at the beginning of the constructor.
+     * 设置应用的根文件夹，设置@app 别名。本方法只能在构造器的开头执行。
      * @param string $path the root directory of the application.
      * @property string the root directory of the application.
      * @throws InvalidParamException if the directory does not exist.

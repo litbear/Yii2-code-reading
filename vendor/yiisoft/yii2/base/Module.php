@@ -12,14 +12,18 @@ use yii\di\ServiceLocator;
 
 /**
  * Module is the base class for module and application classes.
+ * Module类是所有模块和应用类的基类
  *
  * A module represents a sub-application which contains MVC elements by itself, such as
  * models, views, controllers, etc.
+ * 模块代表着一个资深含有MVC元素的子应用
  *
  * A module may consist of [[modules|sub-modules]].
+ * 模块可以由子模块组成
  *
  * [[components|Components]] may be registered with the module so that they are globally
  * accessible within the module.
+ * 组件可以注册到模块中，因此组件可以在模块中被全局访问
  *
  * @property array $aliases List of path aliases to be defined. The array keys are alias names (must start
  * with '@') and the array values are the corresponding paths or aliases. See [[setAliases()]] for an example.
