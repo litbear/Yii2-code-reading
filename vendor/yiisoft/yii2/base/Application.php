@@ -11,34 +11,55 @@ use Yii;
 
 /**
  * Application is the base class for all application classes.
+ * Application是所有应用类的基类
  *
  * @property \yii\web\AssetManager $assetManager The asset manager application component. This property is
  * read-only.
+ * $assetManager 一个\yii\web\AssetManager类的实例，负责管理应用组件的一个只读属性
  * @property \yii\rbac\ManagerInterface $authManager The auth manager application component. Null is returned
  * if auth manager is not configured. This property is read-only.
+ * $authManager \yii\rbac\ManagerInterface接口的一个实例，负责管理应用组件权限的一个只读属性。
+ * 假如该对象还没有被配置，则返回null
  * @property string $basePath The root directory of the application.
+ * $basePath 返回应用的根文件夹
  * @property \yii\caching\Cache $cache The cache application component. Null if the component is not enabled.
  * This property is read-only.
+ * $cache \yii\caching\Cache类的实例，应用的缓存组件，未开启的状态下返回null，只读属性
  * @property \yii\db\Connection $db The database connection. This property is read-only.
+ * $db \yii\db\Connection类的实例，存放数据库的连接，只读属性。
  * @property \yii\web\ErrorHandler|\yii\console\ErrorHandler $errorHandler The error handler application
  * component. This property is read-only.
+ * $errorHandler \yii\web\ErrorHandler或\yii\console\ErrorHandler类的实例，应用的错误句柄组件，只读属性。
  * @property \yii\i18n\Formatter $formatter The formatter application component. This property is read-only.
+ * $formatter \yii\i18n\Formatter类的实例，应用的格式化组件，只读属性。
  * @property \yii\i18n\I18N $i18n The internationalization application component. This property is read-only.
+ * $i18n \yii\i18n\I18N类的实例，类的国际化组件，只读属性。
  * @property \yii\log\Dispatcher $log The log dispatcher application component. This property is read-only.
+ * $log  \yii\log\Dispatcher类的实例，类的日志调度组件，只读属性。
  * @property \yii\mail\MailerInterface $mailer The mailer application component. This property is read-only.
+ * $mailer \yii\mail\MailerInterface类的实例，应用的邮件组件，只读属性。
  * @property \yii\web\Request|\yii\console\Request $request The request component. This property is read-only.
+ * $request \yii\web\Request或\yii\console\Request类的属性，请求组件，只读属性。
  * @property \yii\web\Response|\yii\console\Response $response The response component. This property is
  * read-only.
+ * $response \yii\web\Response或\yii\console\Response类的属性 响应组件，只读属性。
  * @property string $runtimePath The directory that stores runtime files. Defaults to the "runtime"
  * subdirectory under [[basePath]].
+ * $runtimePath 字符串，用来存放运行时文件的文件夹，默认为basePath下的runtime子文件夹。
  * @property \yii\base\Security $security The security application component. This property is read-only.
+ * $security \yii\base\Security类的实例，应用的安全组件，只读属性。
  * @property string $timeZone The time zone used by this application.
+ * $timeZone 字符串，应用所在的时区。
  * @property string $uniqueId The unique ID of the module. This property is read-only.
+ * $uniqueId 字符串，存放模块的唯一id，只读属性。
  * @property \yii\web\UrlManager $urlManager The URL manager for this application. This property is read-only.
+ * $urlManager \yii\web\UrlManager类的实例，应哟的url管理对象，只读属性。
  * @property string $vendorPath The directory that stores vendor files. Defaults to "vendor" directory under
  * [[basePath]].
+ * $vendorPath 字符串，存放第三方文件的文件夹，默认为basePath下的vendor文件夹。
  * @property View|\yii\web\View $view The view application component that is used to render various view
  * files. This property is read-only.
+ * $view View或\yii\web\View类的实例，应用的视图组件，用来为视图文件渲染变量，只读属性。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -47,38 +68,47 @@ abstract class Application extends Module
 {
     /**
      * @event Event an event raised before the application starts to handle a request.
+     * 处理请求前执行的事件（名）。
      */
     const EVENT_BEFORE_REQUEST = 'beforeRequest';
     /**
      * @event Event an event raised after the application successfully handles a request (before the response is sent out).
+     * 成功处理请求后，执行响应之前执行的事件（名）。
      */
     const EVENT_AFTER_REQUEST = 'afterRequest';
     /**
      * Application state used by [[state]]: application just started.
+     * 用于state属性，表示应用的开始
      */
     const STATE_BEGIN = 0;
     /**
      * Application state used by [[state]]: application is initializing.
+     * 用于state属性，表示应用正在初始化。
      */
     const STATE_INIT = 1;
     /**
      * Application state used by [[state]]: application is triggering [[EVENT_BEFORE_REQUEST]].
+     * 用于state属性，表示应用正在触发请求前的事件。
      */
     const STATE_BEFORE_REQUEST = 2;
     /**
      * Application state used by [[state]]: application is handling the request.
+     * 用于state属性，表示应用正在处理请求。
      */
     const STATE_HANDLING_REQUEST = 3;
     /**
      * Application state used by [[state]]: application is triggering [[EVENT_AFTER_REQUEST]]..
+     * 用于state属性，表示应用正在实行请求成功处理后的事件。
      */
     const STATE_AFTER_REQUEST = 4;
     /**
      * Application state used by [[state]]: application is about to send response.
+     * 用于state属性，
      */
     const STATE_SENDING_RESPONSE = 5;
     /**
      * Application state used by [[state]]: application has ended.
+     * 用于state属性，表示应用已经结束。
      */
     const STATE_END = 6;
 
@@ -86,20 +116,26 @@ abstract class Application extends Module
      * @var string the namespace that controller classes are located in.
      * This namespace will be used to load controller classes by prepending it to the controller class name.
      * The default namespace is `app\controllers`.
+     * 记录控制器位于的命名空间。
+     * 该命名空间将用于获取控制器类所在文件的路径。默认空间为'app\controllers'
      *
      * Please refer to the [guide about class autoloading](guide:concept-autoloading.md) for more details.
+     * 请参考自动加载类的相关文档获取更多信息
      */
     public $controllerNamespace = 'app\\controllers';
     /**
      * @var string the application name.
+     * 应用的名称
      */
     public $name = 'My Application';
     /**
      * @var string the version of this application.
+     * 应用的版本
      */
     public $version = '1.0';
     /**
      * @var string the charset currently used for the application.
+     * 应用当前使用的字符串编码
      */
     public $charset = 'UTF-8';
     /**
@@ -107,38 +143,46 @@ abstract class Application extends Module
      * use [IETF language tags](http://en.wikipedia.org/wiki/IETF_language_tag). For example, `en` stands
      * for English, while `en-US` stands for English (United States).
      * @see sourceLanguage
+     * 表示终端用户的语言，参考XXX文档……
      */
     public $language = 'en-US';
     /**
      * @var string the language that the application is written in. This mainly refers to
      * the language that the messages and view files are written in.
      * @see language
+     * 书写应用的语言，，主要用于消息和视图
      */
     public $sourceLanguage = 'en-US';
     /**
      * @var Controller the currently active controller instance
+     * 当前激活的控制器实例
      */
     public $controller;
     /**
      * @var string|boolean the layout that should be applied for views in this application. Defaults to 'main'.
      * If this is false, layout will be disabled.
+     * 将要用于本应用视图的布局文件，默认为'main'，假如为false则表示禁用布局。
      */
     public $layout = 'main';
     /**
      * @var string the requested route
+     * 请求路由
      */
     public $requestedRoute;
     /**
      * @var Action the requested Action. If null, it means the request cannot be resolved into an action.
+     * 被请求的动作，如果为null，则表示请求无法解析出动作。
      */
     public $requestedAction;
     /**
      * @var array the parameters supplied to the requested action.
+     * 提供给请求的参数数组
      */
     public $requestedParams;
     /**
      * @var array list of installed Yii extensions. Each array element represents a single extension
      * with the following structure:
+     * Yii框架已安装的扩展，每个数组元素代表一个单独的扩展，结构如下：
      *
      * ~~~
      * [
@@ -155,33 +199,46 @@ abstract class Application extends Module
      * The "bootstrap" class listed above will be instantiated during the application
      * [[bootstrap()|bootstrapping process]]. If the class implements [[BootstrapInterface]],
      * its [[BootstrapInterface::bootstrap()|bootstrap()]] method will be also be called.
+     * 上述的bootstrap键所指向的值是在应用执行初始化方法bootstrap()时被初始化的。假如该类实现了
+     * BootstrapInterface接口，那么BootstrapInterface::bootstrap()或bootstrap()将会被调用。
      *
      * If not set explicitly in the application config, this property will be populated with the contents of
      * `@vendor/yiisoft/extensions.php`.
+     * 假如在配置文件中没有明确的声明，该属性将会填充@vendor/yiisoft/extensions.php中的内容
      */
     public $extensions;
     /**
      * @var array list of components that should be run during the application [[bootstrap()|bootstrapping process]].
+     * 一个应用在启动过程中（执行bootstrap()过程中）会被运行的组件组成的数组列表
      *
      * Each component may be specified in one of the following formats:
+     * 每个组件都由一下几种格式之一描述：
      *
      * - an application component ID as specified via [[components]].
+     * - 由components指定的应用组件id
      * - a module ID as specified via [[modules]].
+     * - 由modules指定的模块id
      * - a class name.
+     * - 类的全限定名
      * - a configuration array.
+     * - 配置数组
      *
      * During the bootstrapping process, each component will be instantiated. If the component class
      * implements [[BootstrapInterface]], its [[BootstrapInterface::bootstrap()|bootstrap()]] method
      * will be also be called.
+     * 在应用启动过程中，每个组件都会被初始化，假如该类实现了BootstrapInterface接口，
+     * 那么BootstrapInterface::bootstrap()或bootstrap()将会被调用。
      */
     public $bootstrap = [];
     /**
      * @var integer the current application state during a request handling life cycle.
      * This property is managed by the application. Do not modify this property.
+     * 用来描述在处理请求的生命周期中，当前应用处于何种状态，该属性由应用管理，不要修改这个属性。
      */
     public $state;
     /**
      * @var array list of loaded modules indexed by their class names.
+     * 一个由已被加载的模块类名组成的数组列表
      */
     public $loadedModules = [];
 
