@@ -194,6 +194,7 @@ class Module extends ServiceLocator
      * 缓存当前请求用到的模块。
      * @param Module|null $instance the currently requested instance of this module class.
      * If it is null, the instance of the calling class will be removed, if any.
+     * 如果不为空，则以类名为键，对象为值缓存，如果为空，则移除该类的元素。
      */
     public static function setInstance($instance)
     {

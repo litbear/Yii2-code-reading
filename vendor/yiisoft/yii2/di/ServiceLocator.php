@@ -234,6 +234,7 @@ class ServiceLocator extends Component
 
     /**
      * Returns the list of the component definitions or the loaded component instances.
+     * 返回已经定义或加载的组件列表
      * @param boolean $returnDefinitions whether to return component definitions instead of the loaded component instances.
      * @return array the list of the component definitions or the loaded component instances (ID => definition or instance).
      */

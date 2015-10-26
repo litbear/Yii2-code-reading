@@ -251,13 +251,18 @@ abstract class Application extends Module
      */
     public function __construct($config = [])
     {
+        // 将自身实例用作Yii的属性
         Yii::$app = $this;
+        // 缓存当前对象
         $this->setInstance($this);
 
+        // 设置当前状态
         $this->state = self::STATE_BEGIN;
 
+        // 预处理配置文件
         $this->preInit($config);
 
+        // 注册错误处理句柄
         $this->registerErrorHandler($config);
 
         Component::__construct($config);
@@ -285,6 +290,7 @@ abstract class Application extends Module
             throw new InvalidConfigException('The "basePath" configuration for the Application is required.');
         }
 
+        // 设置第三方库文件夹
         if (isset($config['vendorPath'])) {
             $this->setVendorPath($config['vendorPath']);
             unset($config['vendorPath']);
@@ -292,6 +298,7 @@ abstract class Application extends Module
             // set "@vendor"
             $this->getVendorPath();
         }
+        // 设置运行时文件夹
         if (isset($config['runtimePath'])) {
             $this->setRuntimePath($config['runtimePath']);
             unset($config['runtimePath']);
@@ -300,6 +307,7 @@ abstract class Application extends Module
             $this->getRuntimePath();
         }
 
+        // 设置时区 默认取UTC
         if (isset($config['timeZone'])) {
             $this->setTimeZone($config['timeZone']);
             unset($config['timeZone']);
@@ -309,11 +317,14 @@ abstract class Application extends Module
 
         // merge core components with custom components
         foreach ($this->coreComponents() as $id => $component) {
+            // 配置数组的组件集合里 如果没有 则用预写的核心组件赋值
             if (!isset($config['components'][$id])) {
                 $config['components'][$id] = $component;
+                // 如果有，且值传来的配置数组元素值为数组，且数组中没有class，则使用预写的class赋值
             } elseif (is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
                 $config['components'][$id]['class'] = $component['class'];
             }
+            // 传来的配置数组中如果有class，则不用管他，留下一步处理
         }
     }
 
@@ -322,6 +333,7 @@ abstract class Application extends Module
      */
     public function init()
     {
+        // 设置初始化状态
         $this->state = self::STATE_INIT;
         $this->bootstrap();
     }
@@ -337,6 +349,10 @@ abstract class Application extends Module
             $file = Yii::getAlias('@vendor/yiisoft/extensions.php');
             $this->extensions = is_file($file) ? include($file) : [];
         }
+        /*
+         * 在应用启动过程中，每个组件都会被初始化，假如该类实现了BootstrapInterface接口，
+         * 那么BootstrapInterface::bootstrap()或bootstrap()将会被调用。
+         */
         foreach ($this->extensions as $extension) {
             if (!empty($extension['alias'])) {
                 foreach ($extension['alias'] as $name => $path) {
@@ -497,6 +513,7 @@ abstract class Application extends Module
      * Returns the directory that stores vendor files.
      * @return string the directory that stores vendor files.
      * Defaults to "vendor" directory under [[basePath]].
+     * 如果没设置vendor，则默认曲basePath的子文件夹vendor
      */
     public function getVendorPath()
     {

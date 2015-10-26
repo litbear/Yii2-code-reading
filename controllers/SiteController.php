@@ -175,4 +175,8 @@ class SiteController extends Controller {
     public function actionExt(){
         var_dump(Yii::$app->extensions);
     }
+    
+    public function actionComponents(){
+        var_dump(Yii::$app->getComponents(true));die;
+    }
 }
