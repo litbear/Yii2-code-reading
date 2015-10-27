@@ -14,27 +14,40 @@ use yii\base\InvalidValueException;
 
 /**
  * User is the class for the "user" application component that manages the user authentication status.
+ * User类是一个管理用户权限状态的应用组件。
  *
  * You may use [[isGuest]] to determine whether the current user is a guest or not.
  * If the user is a guest, the [[identity]] property would return null. Otherwise, it would
  * be an instance of [[IdentityInterface]].
+ * 可能你使用过Yii::$app->user->isGuest 来判断当前的用户是否是访客。假如用户是访客，那么
+ * identity属性将会返回null。否则该属性将会返回一个IdentityInterface接口的实例
  *
  * You may call various methods to change the user authentication status:
+ * 你可以通过一系列的方法去改变用户的权限状态，
  *
  * - [[login()]]: sets the specified identity and remembers the authentication status in session and cookie.
+ * - [[login()]]: 为用户设置指定的身份并将权限状态保存在session或cookie里。
  * - [[logout()]]: marks the user as a guest and clears the relevant information from session and cookie.
+ * - [[logout()]]: 将用户标记为访客，并且从session和cookie中清除掉相关信息。
  * - [[setIdentity()]]: changes the user identity without touching session or cookie.
  *   This is best used in stateless RESTful API implementation.
+ * - [[setIdentity()]]: 不通过session和cookie而改变用户的身份，此方法最好被用在无状态的restful api的实现上。
  *
  * Note that User only maintains the user authentication status. It does NOT handle how to authenticate
  * a user. The logic of how to authenticate a user should be done in the class implementing [[IdentityInterface]].
  * You are also required to set [[identityClass]] with the name of this class.
+ * 注意，User类只维护用户的权限状态。并不负责验证权限，验证用户权限的逻辑应该在实现了[[IdentityInterface]]
+ * 接口的类中完成。你也需要设置identityClass通过本类的名字？？（没理解）
+ * 
  *
  * User is configured as an application component in [[\yii\web\Application]] by default.
  * You can access that instance via `Yii::$app->user`.
+ * User组件被当作是[[\yii\web\Application]]中默认的应用组件，你可以通过`Yii::$app->user`访问
+ * 本类的对象。
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
+ * 你可以通过在配置项的components 元素中增加一个数组达到更改配置的目的，如下所示：
  *
  * ~~~
  * 'user' => [
@@ -47,11 +60,16 @@ use yii\base\InvalidValueException;
  *
  * @property string|integer $id The unique identifier for the user. If null, it means the user is a guest.
  * This property is read-only.
+ * $id 用户的唯一标识。假如为null，则说明是访客，只读属性。
  * @property IdentityInterface|null $identity The identity object associated with the currently logged-in
  * user. `null` is returned if the user is not logged in (not authenticated).
+ * $identity 一个IdentityInterface实例或者为null，一个与当前登录用户有关的身份对象，如果为null则表示用户未登录。
  * @property boolean $isGuest Whether the current user is a guest. This property is read-only.
+ * $isGuest 表示当前用户是否为访客，只读属性。
  * @property string $returnUrl The URL that the user should be redirected to after login. Note that the type
  * of this property differs in getter and setter. See [[getReturnUrl()]] and [[setReturnUrl()]] for details.
+ * $returnUrl 字符串，表示用户在登陆后需要跳转的地址。注意，这里的属性和相应的getter，setter方法不同，详情参阅
+ * [[getReturnUrl()]] 和 [[setReturnUrl()]]
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -65,17 +83,21 @@ class User extends Component
 
     /**
      * @var string the class name of the [[identity]] object.
+     * [[identity]]对象的全限定类名。
      */
     public $identityClass;
     /**
      * @var boolean whether to enable cookie-based login. Defaults to false.
      * Note that this property will be ignored if [[enableSession]] is false.
+     * 布尔值，决定是否开启基于cookie的用户验证，默认为不开启。注意，假如
+     * enableSession属性设置为false，那么该属性会被忽略。
      */
     public $enableAutoLogin = false;
     /**
      * @var boolean whether to use session to persist authentication status across multiple requests.
      * You set this property to be false if your application is stateless, which is often the case
      * for RESTful APIs.
+     * 布尔值，决定是否开启session保存用户的验证信息。假如你的应用是无状态的，可设置为false，通常像RESTful 接口。
      */
     public $enableSession = true;
     /**
@@ -83,16 +105,21 @@ class User extends Component
      * If an array is given, [[UrlManager::createUrl()]] will be called to create the corresponding URL.
      * The first element of the array should be the route to the login action, and the rest of
      * the name-value pairs are GET parameters used to construct the login URL. For example,
+     *  字符串或数组，[[loginRequired()]] 被调用时的URL（其实就是登录页的URL），假如给的是数组，则会调用
+     * [[UrlManager::createUrl()]] 创建出相应的URL。数组的第一个元素应为登录动作的路由，其余的键值对用来
+     * 构造登录地址的get参数，例如：
      *
      * ~~~
      * ['site/login', 'ref' => 1]
      * ~~~
      *
      * If this property is null, a 403 HTTP exception will be raised when [[loginRequired()]] is called.
+     * 假如该属性为null，那么调用[[loginRequired()]]的时候会触发一个状态码为403的http错误。
      */
     public $loginUrl = ['site/login'];
     /**
      * @var array the configuration of the identity cookie. This property is used only when [[enableAutoLogin]] is true.
+     * 数组，身份cookie的配置，该属性仅当[[enableAutoLogin]] 为true时使用。
      * @see Cookie
      */
     public $identityCookie = ['name' => '_identity', 'httpOnly' => true];
@@ -101,6 +128,7 @@ class User extends Component
      * remains inactive. If this property is not set, the user will be logged out after
      * the current session expires (c.f. [[Session::timeout]]).
      * Note that this will not work if [[enableAutoLogin]] is true.
+     * 整数，
      */
     public $authTimeout;
     /**
@@ -134,6 +162,7 @@ class User extends Component
     public $absoluteAuthTimeoutParam = '__absoluteExpire';
     /**
      * @var string the session variable name used to store the value of [[returnUrl]].
+     * 字符串，用来储存[[returnUrl]]值的session变量名。
      */
     public $returnUrlParam = '__returnUrl';
 
