@@ -70,6 +70,7 @@ interface IdentityInterface
 
     /**
      * Returns an ID that can uniquely identify a user identity.
+     * 返回一个可以唯一区分用户的id
      * @return string|integer an ID that uniquely identifies a user identity.
      */
     public function getId();

@@ -52,6 +52,11 @@ class SiteController extends Controller {
     }
 
     public function actionLogin() {
+        /*
+         * 先判断用户是不是访客，不是访客则到用户首页
+         * Yii::$app->user->isGuest 调用了User组件的
+         * User::getIsGuest()判断User::getIdentity()==null
+         */
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }

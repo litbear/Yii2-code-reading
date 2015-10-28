@@ -119,7 +119,7 @@ class User extends Component
     public $loginUrl = ['site/login'];
     /**
      * @var array the configuration of the identity cookie. This property is used only when [[enableAutoLogin]] is true.
-     * 数组，身份cookie的配置，该属性仅当[[enableAutoLogin]] 为true时使用。
+     * 数组，身份认证信息cookie的配置，该属性仅当[[enableAutoLogin]] 为true时使用。
      * @see Cookie
      */
     public $identityCookie = ['name' => '_identity', 'httpOnly' => true];
@@ -128,13 +128,16 @@ class User extends Component
      * remains inactive. If this property is not set, the user will be logged out after
      * the current session expires (c.f. [[Session::timeout]]).
      * Note that this will not work if [[enableAutoLogin]] is true.
-     * 整数，
+     * 权限超时，int类型，用户登陆后长期无操作后权限失效的时间秒数。假如本属性未被设置，则使用session的失效时间
+     * 注意，当enableAutoLogin为true时，本属性无效。
      */
     public $authTimeout;
     /**
      * @var integer the number of seconds in which the user will be logged out automatically
      * regardless of activity.
      * Note that this will not work if [[enableAutoLogin]] is true.
+     * 绝对权限超时，用户登录后失效的秒数，有操作也会失效。
+     * 注意，当enableAutoLogin为true时，本属性无效。
      */
     public $absoluteAuthTimeout;
     /**
@@ -144,20 +147,26 @@ class User extends Component
      * is initially logged in. When this is true, the identity cookie will expire after the specified duration
      * since the user visits the site the last time.
      * @see enableAutoLogin
+     * 布尔值，是否每次请求都要自动更新身份认证的cookie。本属性只有在当enableAutoLogin为true时生效。
+     * 当本属性值为false时，cookie中的身份验证信息会在用户第一次访问后的指定时间内失效
+     * 当本属性值为true时，cookie中的身份验证信息会在用户最后一次访问后的指定时间内失效。
      */
     public $autoRenewCookie = true;
     /**
      * @var string the session variable name used to store the value of [[id]].
+     * 用来储存id的session变量
      */
     public $idParam = '__id';
     /**
      * @var string the session variable name used to store the value of expiration timestamp of the authenticated state.
      * This is used when [[authTimeout]] is set.
+     * 用来存放身份认证信息失效时间戳的session变量名，在authTimeout被设置后使用。
      */
     public $authTimeoutParam = '__expire';
     /**
      * @var string the session variable name used to store the value of absolute expiration timestamp of the authenticated state.
      * This is used when [[absoluteAuthTimeout]] is set.
+     * 用来存放身份认证信息失效的绝对时间戳的session变量名，在absoluteAuthTimeout被设置后使用
      */
     public $absoluteAuthTimeoutParam = '__absoluteExpire';
     /**
@@ -171,11 +180,13 @@ class User extends Component
 
     /**
      * Initializes the application component.
+     * 初始化应用组件
      */
     public function init()
     {
         parent::init();
 
+        // 父类构造方法结束后必须配置好identityClass属性，否则抛异常
         if ($this->identityClass === null) {
             throw new InvalidConfigException('User::identityClass must be set.');
         }
@@ -190,8 +201,11 @@ class User extends Component
      * Returns the identity object associated with the currently logged-in user.
      * When [[enableSession]] is true, this method may attempt to read the user's authentication data
      * stored in session and reconstruct the corresponding identity object, if it has not done so before.
+     * 返回一个与当前登录用户有关的身份对象实例。当enableSession为true的时候，本方法将会尝试读取储存在session
+     * 中的用户认证信息，并重建相应的身份对象实例，假如enableSession为false的时候，就不会这么做
      * @param boolean $autoRenew whether to automatically renew authentication status if it has not been done so before.
      * This is only useful when [[enableSession]] is true.
+     * 是否会自动更新权限状态，假如之前还没有这么做过，仅当enableSession为true时有效。
      * @return IdentityInterface|null the identity object associated with the currently logged-in user.
      * `null` is returned if the user is not logged in (not authenticated).
      * @see login()
@@ -213,12 +227,15 @@ class User extends Component
 
     /**
      * Sets the user identity object.
+     * 设置用户身份对象
      *
      * Note that this method does not deal with session or cookie. You should usually use [[switchIdentity()]]
      * to change the identity of the current user.
+     * 注意这个方法并不处理session和cookies。你通常会用到switchIdentity()方法干煸当前用户的身份。
      *
      * @param IdentityInterface|null $identity the identity object associated with the currently logged user.
      * If null, it means the current user will be a guest without any associated identity.
+     * 与当前登录用户有关的身份对象，假如为null，则意味着当前用户是一个不具备身份信息的访客。
      * @throws InvalidValueException if `$identity` object does not implement [[IdentityInterface]].
      */
     public function setIdentity($identity)
@@ -235,22 +252,30 @@ class User extends Component
 
     /**
      * Logs in a user.
+     * 用户登录
      *
      * After logging in a user, you may obtain the user's identity information from the [[identity]] property.
      * If [[enableSession]] is true, you may even get the identity information in the next requests without
      * calling this method again.
+     * 在用户登录之后，你可能需要从identity属性中获取用户身份信息。假如enableSession属性为真，你甚至可以在下次
+     * 请求时获取登录信息而无需重新调用本方法。
      *
      * The login status is maintained according to the `$duration` parameter:
+     * 登录状态被$duration参数维护：
      *
      * - `$duration == 0`: the identity information will be stored in session and will be available
      *   via [[identity]] as long as the session remains active.
+     * - $duration == 0 ： 身份验证信息会被储存到session中，通过identity属性在session的生命周期中保持可用。
      * - `$duration > 0`: the identity information will be stored in session. If [[enableAutoLogin]] is true,
      *   it will also be stored in a cookie which will expire in `$duration` seconds. As long as
      *   the cookie remains valid or the session is active, you may obtain the user identity information
      *   via [[identity]].
+     * - $duration > 0 ： 身份认证信息会被储存到session中，假如enableAutoLogin属性为true，那么身份认证信息
+     * 同样会储存在cookie中，期限为$duration秒。只要cookie或者session有效，就可以通过identity获取用户身份认证信息。
      *
      * Note that if [[enableSession]] is false, the `$duration` parameter will be ignored as it is meaningless
      * in this case.
+     * 注意，假如enableSession 属性为false，那么 $duration 参数会被忽略。
      *
      * @param IdentityInterface $identity the user identity (which should already be authenticated)
      * @param integer $duration number of seconds that the user can remain in logged-in status.
@@ -263,6 +288,7 @@ class User extends Component
     {
         if ($this->beforeLogin($identity, false, $duration)) {
             $this->switchIdentity($identity, $duration);
+            //到这里就是登录成功了，些日志
             $id = $identity->getId();
             $ip = Yii::$app->getRequest()->getUserIP();
             if ($this->enableSession) {
@@ -465,10 +491,16 @@ class User extends Component
      * The default implementation will trigger the [[EVENT_BEFORE_LOGIN]] event.
      * If you override this method, make sure you call the parent implementation
      * so that the event is triggered.
+     * 此方法默认在用户登录前被调用，默认会实现触发EVENT_BEFORE_LOGIN事件的操作
+     * 假如你重写了此方法，请确保调用父类实现，以保证事件的触发。
+     * 【只是预留一个触发事件的触发器，类内并没有什么事件被绑定】
      * @param IdentityInterface $identity the user identity information
+     * 用户的身份信息
      * @param boolean $cookieBased whether the login is cookie-based
+     * 是否基于cookie验证
      * @param integer $duration number of seconds that the user can remain in logged-in status.
      * If 0, it means login till the user closes the browser or the session is manually destroyed.
+     * 用户能够保持登录状态的时长。假如为0，那就意味着用户关闭浏览器或session自动销毁
      * @return boolean whether the user should continue to be logged in
      */
     protected function beforeLogin($identity, $cookieBased, $duration)
@@ -488,6 +520,7 @@ class User extends Component
      * The default implementation will trigger the [[EVENT_AFTER_LOGIN]] event.
      * If you override this method, make sure you call the parent implementation
      * so that the event is triggered.
+     * 登录后事件触发器，其余同前。
      * @param IdentityInterface $identity the user identity information
      * @param boolean $cookieBased whether the login is cookie-based
      * @param integer $duration number of seconds that the user can remain in logged-in status.
@@ -507,6 +540,7 @@ class User extends Component
      * The default implementation will trigger the [[EVENT_BEFORE_LOGOUT]] event.
      * If you override this method, make sure you call the parent implementation
      * so that the event is triggered.
+     * 登出前事件触发器，其余同前。
      * @param IdentityInterface $identity the user identity information
      * @return boolean whether the user should continue to be logged out
      */
@@ -525,6 +559,7 @@ class User extends Component
      * The default implementation will trigger the [[EVENT_AFTER_LOGOUT]] event.
      * If you override this method, make sure you call the parent implementation
      * so that the event is triggered.
+     * 登出后事件触发器，其余同前。
      * @param IdentityInterface $identity the user identity information
      */
     protected function afterLogout($identity)
@@ -577,17 +612,24 @@ class User extends Component
 
     /**
      * Switches to a new identity for the current user.
+     * 为当前用户切换到一个新的身份。
      *
      * When [[enableSession]] is true, this method may use session and/or cookie to store the user identity information,
      * according to the value of `$duration`. Please refer to [[login()]] for more details.
+     * 当enableSession 为真时，本方法会使用session 且/或 cookies 来储存用户身份认证信息，通过$duration的值。
+     * 请参考login()获取更多信息。
      *
      * This method is mainly called by [[login()]], [[logout()]] and [[loginByCookie()]]
      * when the current user needs to be associated with the corresponding identity information.
+     * 本方法主要被 [[login()]], [[logout()]] 和 [[loginByCookie()]]三个方法调用，在当前用户需要与
+     * 相应的身份认证信息相关联时。
      *
      * @param IdentityInterface|null $identity the identity information to be associated with the current user.
      * If null, it means switching the current user to be a guest.
+     * 与当前登录用户有关的身份对象，假如为null，则将当前的on过户切换为访客。
      * @param integer $duration number of seconds that the user can remain in logged-in status.
      * This parameter is used only when `$identity` is not null.
+     * 用户可以保持已登录状态的秒数。仅当$identity非空时有效
      */
     public function switchIdentity($identity, $duration = 0)
     {
@@ -601,6 +643,7 @@ class User extends Component
         if (!YII_ENV_TEST) {
             $session->regenerateID(true);
         }
+        // 移除session中的id和失效时间戳
         $session->remove($this->idParam);
         $session->remove($this->authTimeoutParam);
 
@@ -633,28 +676,45 @@ class User extends Component
     protected function renewAuthStatus()
     {
         $session = Yii::$app->getSession();
+        // 判断当前用户是否有session，或者session已经激活，并尝试取出用户id
         $id = $session->getHasSessionId() || $session->getIsActive() ? $session->get($this->idParam) : null;
 
+        // session中的用户id是否为null进行相应处理
         if ($id === null) {
             $identity = null;
         } else {
             /* @var $class IdentityInterface */
             $class = $this->identityClass;
+            /*
+             *  根据用户id从数据源取出相应的用户对象
+             * 【注意格式是IdentityInterface对象】
+             */
             $identity = $class::findIdentity($id);
         }
 
+        // 为本对象设置用户信息对象
         $this->setIdentity($identity);
 
+        // 假如取回了用户信息，且 权限超时和绝对权限超时中有一个不为空
         if ($identity !== null && ($this->authTimeout !== null || $this->absoluteAuthTimeout !== null)) {
+            // 最后一次操作超时时间戳或null
             $expire = $this->authTimeout !== null ? $session->get($this->authTimeoutParam) : null;
+            // 绝对超时时间戳或null
             $expireAbsolute = $this->absoluteAuthTimeout !== null ? $session->get($this->absoluteAuthTimeoutParam) : null;
+            // 如果超出了最后一次操作的超时时间或绝对超时时间，则登出（不销毁session）
             if ($expire !== null && $expire < time() || $expireAbsolute !== null && $expireAbsolute < time()) {
                 $this->logout(false);
             } elseif ($this->authTimeout !== null) {
+                // 否则重新设置最后一次操作的超时时间
                 $session->set($this->authTimeoutParam, time() + $this->authTimeout);
             }
         }
 
+        /*
+         * 假如开启了cookie验证，首先判断是否是访客
+         * 如果是访客，尝试cookie登录。否则判断是否
+         * 自动更新cookie，是则更新cookie
+         */
         if ($this->enableAutoLogin) {
             if ($this->getIsGuest()) {
                 $this->loginByCookie();
