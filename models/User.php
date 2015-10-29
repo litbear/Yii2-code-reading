@@ -28,6 +28,8 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
     ];
 
     /**
+     * 根据用户id从数据源取出关联数组，再使用关联数组，
+     * 借助Object的构造方法构建一个用户对象【new static(self::$users[$id])】
      * @inheritdoc
      */
     public static function findIdentity($id)

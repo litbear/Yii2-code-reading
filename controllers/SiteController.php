@@ -62,6 +62,18 @@ class SiteController extends Controller {
         }
 
         $model = new LoginForm();
+        /*
+         * die(var_dump(Yii::$app->request->post()));
+         * [
+         *    '_csrf': 'QzNEaGwyTGolRAAMP0Q7JBBXEUUdBB8bIlU2Ol96CiA7VnMgPgoHOA==',
+         *    'LoginForm': [
+         *      'username': 'admin',
+         *      'password': 'admin',
+         *      'rememberMe': '1',
+         *      'login-button': ''
+         *    ]
+         *  ]
+         */
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }

@@ -176,12 +176,17 @@ class Validator extends Component
 
     /**
      * Creates a validator object.
+     * 创建验证器对象。
      * @param mixed $type the validator type. This can be a built-in validator name,
      * a method name of the model class, an anonymous function, or a validator class name.
+     * 验证器类型，可以使内嵌验证器的名称，模型类中的方法，匿名函数或者是一个验证器的类名。
      * @param \yii\base\Model $model the data model to be validated.
+     * 使用验证器的数据模型实例
      * @param array|string $attributes list of attributes to be validated. This can be either an array of
      * the attribute names or a string of comma-separated attribute names.
+     * 待验证的属性。可以使属性数组或者是一个逗号分隔属性名的字符串
      * @param array $params initial values to be applied to the validator properties
+     * 应用到验证类的初始值
      * @return Validator the validator
      */
     public static function createValidator($type, $model, $attributes, $params = [])
