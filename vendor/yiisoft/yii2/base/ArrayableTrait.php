@@ -18,6 +18,8 @@ use yii\web\Linkable;
  *
  * ArrayableTrait implements [[toArray()]] by respecting the field definitions as declared
  * in [[fields()]] and [[extraFields()]].
+ * ArrayableTrait 通过像[[fields()]] 和 [[extraFields()]]方法中声明……在实现[[toArray()]]方法
+ * 【这段没看懂，先读代码】
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -26,14 +28,18 @@ trait ArrayableTrait
 {
     /**
      * Returns the list of fields that should be returned by default by [[toArray()]] when no specific fields are specified.
+     * 返回一个字段列表
      *
      * A field is a named element in the returned array by [[toArray()]].
+     * 字段是一个在[[toArray()]]方法返回的数组中命名的元素
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
      * as the field value. If the latter, the array key should be the field name while the array value should be
      * the corresponding field definition which can be either an object property name or a PHP callable
      * returning the corresponding field value. The signature of the callable should be:
+     * 本方法会返回一个 字段名 或 字段定义 组成的数组。假如是字段名，那么字段名将会被当作对象属性名，字段值会被当作属性值。
+     * 如果是后者，那么
      *
      * ```php
      * function ($model, $field) {
@@ -42,6 +48,7 @@ trait ArrayableTrait
      * ```
      *
      * For example, the following code declares four fields:
+     * 例如，以下代码定义了四个字段
      *
      * - `email`: the field name is the same as the property name `email`;
      * - `firstName` and `lastName`: the field names are `firstName` and `lastName`, and their
@@ -100,13 +107,18 @@ trait ArrayableTrait
 
     /**
      * Converts the model into an array.
+     * 将模型转换为数组。
      *
      * This method will first identify which fields to be included in the resulting array by calling [[resolveFields()]].
      * It will then turn the model into an array with these fields. If `$recursive` is true,
      * any embedded objects will also be converted into arrays.
+     * 本方法会首先通过调用[[resolveFields()]]方法确认那些字段会被包含在结果数组中。然后会使用这些字段将模型转换为数组。假如
+     * `$recursive` 为真，那么任何潜入的对象同样都会被转换为数组【就是递归呗】
      *
      * If the model implements the [[Linkable]] interface, the resulting array will also have a `_link` element
      * which refers to a list of links as specified by the interface.
+     * 假如模型实现了[[Linkable]] 接口，那么结果数组将会包含一个`_link`元素，该元素引用一个由接口指定的链接集合
+     * 【不该翻译成链表吧】
      *
      * @param array $fields the fields being requested. If empty, all fields as specified by [[fields()]] will be returned.
      * @param array $expand the additional fields being requested for exporting. Only fields declared in [[extraFields()]]
@@ -132,6 +144,8 @@ trait ArrayableTrait
      * Determines which fields can be returned by [[toArray()]].
      * This method will check the requested fields against those declared in [[fields()]] and [[extraFields()]]
      * to determine which fields can be returned.
+     * 确定哪些元素可以被返回给[[toArray()]]
+     * 本方法会检查那些定义在 [[fields()]] 和 [[extraFields()]]方法中的被请求的字段，来确定哪些字段可以被返回
      * @param array $fields the fields being requested for exporting
      * @param array $expand the additional fields being requested for exporting
      * @return array the list of fields to be exported. The array keys are the field names, and the array values
