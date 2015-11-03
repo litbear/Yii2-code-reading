@@ -33,6 +33,7 @@ trait ActiveQueryTrait
 
     /**
      * Sets the [[asArray]] property.
+     * 设置asArray属性
      * @param boolean $value whether to return the query results in terms of arrays instead of Active Records.
      * @return $this the query object itself
      */
