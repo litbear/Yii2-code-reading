@@ -10,6 +10,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\EntryForm;
 use app\models\Person;
+use app\models\Post;
 
 class SiteController extends Controller {
 
@@ -168,13 +169,11 @@ class SiteController extends Controller {
 
 // 使用PHP全局函数作为handler来进行绑定
 //        $person->on(Person::EVENT_GREET, 'person_say_hello');
-
 // 使用对象$obj的成员函数say_hello来进行绑定
-        $person->on(Person::EVENT_GREET, [$person,'say_hello'],'hello');
+        $person->on(Person::EVENT_GREET, [$person, 'say_hello'], 'hello');
 
 // 使用类Greet的静态成员函数say_hello进行绑定
 //        $person->on(Person::EVENT_GREET, ['app\helper\Greet', 'say_hello']);
-
 // 使用匿名函数
 //        $person->on(Person::EVENT_GREET, function ($event) {
 //            echo 'Hello';
@@ -189,11 +188,18 @@ class SiteController extends Controller {
         die;
     }
 
-    public function actionExt(){
+    public function actionExt() {
         var_dump(Yii::$app->extensions);
     }
+
+    public function actionComponents() {
+        var_dump(Yii::$app->getComponents(true));
+        die;
+    }
     
-    public function actionComponents(){
-        var_dump(Yii::$app->getComponents(true));die;
+    public function actionModel() {
+        $sql = 'select * from post';
+        $res = Post::findBySql($sql);
+        var_dump($res);
     }
 }

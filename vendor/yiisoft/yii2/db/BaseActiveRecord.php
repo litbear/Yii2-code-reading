@@ -19,8 +19,10 @@ use yii\helpers\ArrayHelper;
 
 /**
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
+ * ActiveRecord 是所有关系数据对象的基类。
  *
  * See [[\yii\db\ActiveRecord]] for a concrete implementation.
+ * 请参考具体实现[[\yii\db\ActiveRecord]]类
  *
  * @property array $dirtyAttributes The changed attribute values (name-value pairs). This property is
  * read-only.

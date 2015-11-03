@@ -15,11 +15,14 @@ use yii\helpers\StringHelper;
 
 /**
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
+ * ActiveRecord 是所有关系数据对象的基类。
  *
  * Active Record implements the [Active Record design pattern](http://en.wikipedia.org/wiki/Active_record).
  * The premise behind Active Record is that an individual [[ActiveRecord]] object is associated with a specific
  * row in a database table. The object's attributes are mapped to the columns of the corresponding table.
  * Referencing an Active Record attribute is equivalent to accessing the corresponding table column for that record.
+ * Active Record 实现了活动记录设计模式。实现Active Record 的前提是，特定的[[ActiveRecord]]对象与指定数据库表中的某一行
+ * 相关联。对象的属性与行中的某一列相映射。引用一个 Active Record对象的属性，等同于访问表中指定记录的某一列。
  *
  * As an example, say that the `Customer` ActiveRecord class is associated with the `customer` table.
  * This would mean that the class's `name` attribute is automatically mapped to the `name` column in `customer` table.
@@ -27,9 +30,13 @@ use yii\helpers\StringHelper;
  * the `name` column for the table row, you can use the expression `$customer->name`.
  * In this example, Active Record is providing an object-oriented interface for accessing data stored in the database.
  * But Active Record provides much more functionality than this.
+ * 例如，ActiveRecord类`Customer` 与数据库中的`customer`表相关联，这就意味着，类中的`name`属性被自动地映射为 `customer`表的
+ *  `name` 列。多亏了 Active Record，假设`$customer`是`Customer`类的一个实例，若想得到该实例关联的数据库行中对应的`name`，只需
+ * 执行`$customer->name`。
  *
  * To declare an ActiveRecord class you need to extend [[\yii\db\ActiveRecord]] and
  * implement the `tableName` method:
+ * 若想定义ActiveRecord类你需要扩展[[\yii\db\ActiveRecord]]并且实现`tableName`方法：
  *
  * ```php
  * <?php
@@ -44,6 +51,7 @@ use yii\helpers\StringHelper;
  * ```
  *
  * The `tableName` method only has to return the name of the database table associated with the class.
+ * `tableName` 方法只需返回与本类关联的数据库表的名称
  *
  * > Tip: You may also use the [Gii code generator](guide:start-gii) to generate ActiveRecord classes from your
  * > database tables.
