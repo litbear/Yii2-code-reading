@@ -53,10 +53,18 @@ class BaseStringHelper
      * This method was mainly created to work on php namespaces. When working with real
      * file paths, php's `basename()` should work fine for you.
      * Note: this method is not aware of the actual filesystem, or path components such as "..".
+     * 返回路径末尾的名称（就是返回路径中的文件名部分）
+     * 本方法与php原生的basename()方法类似，然而本方法会将正斜线'/'和反斜线'\'都当成目录分隔符，
+     * 并不依赖于操作系统。本方法主要用于PHP命名空间中。普通的工作情境下，原生的basename()函数
+     * 就已经够用了。
+     * 注意：本方法不会识别真是文件系统中的'..'即上层文件夹符号???
      *
      * @param string $path A path string.
+     * 一个路径字符串
      * @param string $suffix If the name component ends in suffix this will also be cut off.
+     * 如果文件名包含后缀，那么后缀会被切掉
      * @return string the trailing name component of the given path.
+     * 返回一个文件名
      * @see http://www.php.net/manual/en/function.basename.php
      */
     public static function basename($path, $suffix = '')

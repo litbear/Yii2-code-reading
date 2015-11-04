@@ -199,7 +199,9 @@ class SiteController extends Controller {
     
     public function actionModel() {
         $sql = 'select * from post';
-        $res = Post::findBySql($sql);
+        $res = Post::findBySql($sql)->one();
         var_dump($res);
+        $person = new \app\models\Person;
+        var_dump($person::tableName());
     }
 }

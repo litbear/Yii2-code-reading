@@ -328,8 +328,10 @@ class BaseInflector
 
     /**
      * Converts a CamelCase name into an ID in lowercase.
+     * 将驼峰是写法的命名转换为小写字母组成的ID
      * Words in the ID may be concatenated using the specified character (defaults to '-').
      * For example, 'PostTag' will be converted to 'post-tag'.
+     * ID中单词与单词之间用指定的字符串连接，默认是"-"，例如'PostTag'会被转换为'post-tag'
      * @param string $name the string to be converted
      * @param string $separator the character used to concatenate the words in the ID
      * @param boolean|string $strict whether to insert a separator between two consecutive uppercase chars, defaults to false

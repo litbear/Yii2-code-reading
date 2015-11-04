@@ -55,13 +55,19 @@ use yii\helpers\StringHelper;
  *
  * > Tip: You may also use the [Gii code generator](guide:start-gii) to generate ActiveRecord classes from your
  * > database tables.
+ * > 小贴士：你同样可以使用Gii为数据库表创建关联的ActiveRecord类
  *
  * Class instances are obtained in one of two ways:
+ * 类的实例可以通过以下两种方法获取：
+ * 
  *
  * * Using the `new` operator to create a new, empty object
  * * Using a method to fetch an existing record (or records) from the database
+ * * 使用new 关键字实例化一个新的空的对象。
+ * * 使用方法从数据库结果集中获取关联对象。
  *
  * Below is an example showing some typical usage of ActiveRecord:
+ * 以下是ActiveRecord 使用的典型方式：
  *
  * ```php
  * $user = new User();
@@ -76,6 +82,7 @@ use yii\helpers\StringHelper;
  * ```
  *
  * For more details and usage information on ActiveRecord, see the [guide article on ActiveRecord](guide:db-active-record).
+ * ActiveRecord 更多的使用细节请参照权威指南
  *
  * @method ActiveQuery hasMany($class, array $link) see [[BaseActiveRecord::hasMany()]] for more info
  * @method ActiveQuery hasOne($class, array $link) see [[BaseActiveRecord::hasOne()]] for more info
@@ -88,6 +95,7 @@ class ActiveRecord extends BaseActiveRecord
 {
     /**
      * The insert operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * 八进制插入
      */
     const OP_INSERT = 0x01;
     /**
@@ -134,7 +142,10 @@ class ActiveRecord extends BaseActiveRecord
      * Returns the database connection used by this AR class.
      * By default, the "db" application component is used as the database connection.
      * You may override this method if you want to use a different database connection.
+     * 为本类获取数据库链接。默认情况下应用的db组件用于存放数据库连接，假如你想使用不同的
+     * 数据库链接你可以复写此方法。
      * @return Connection the database connection used by this AR class.
+     * 返回数据库链接Connection 实例
      */
     public static function getDb()
     {
@@ -285,6 +296,10 @@ class ActiveRecord extends BaseActiveRecord
      * with prefix [[Connection::tablePrefix]]. For example if [[Connection::tablePrefix]] is 'tbl_',
      * 'Customer' becomes 'tbl_customer', and 'OrderItem' becomes 'tbl_order_item'. You may override this method
      * if the table is not named after this convention.
+     * 不再逐字翻译了，例子说话：
+     * 类 \app\models\FooBar extends ActiveRecord 类，那么，本方法会取出\app\models\FooBar 的最后一段，FooBar然后
+     * 转换为foo-bar并拼接成{{%foo-bar}}
+     * 【很严重的问题：子类重写了自方法 就失去了{{% }}的包裹 前缀怎么办？】
      * @return string the table name
      */
     public static function tableName()
@@ -294,7 +309,9 @@ class ActiveRecord extends BaseActiveRecord
 
     /**
      * Returns the schema information of the DB table associated with this AR class.
+     * 返回与本来关联的数据库表的架构信息
      * @return TableSchema the schema information of the DB table associated with this AR class.
+     * 返回一个 TableSchema实例用来描述关联数据库表的架构信息
      * @throws InvalidConfigException if the table for the AR class does not exist.
      */
     public static function getTableSchema()
@@ -311,12 +328,15 @@ class ActiveRecord extends BaseActiveRecord
      * Returns the primary key name(s) for this AR class.
      * The default implementation will return the primary key(s) as declared
      * in the DB table that is associated with this AR class.
+     * 返回AR类关联的数据库表主键的名称。
      *
      * If the DB table does not declare any primary key, you should override
      * this method to return the attributes that you want to use as primary keys
      * for this AR class.
+     * 假如数据库表没有指定主键，你需要重写此方法返回一个本AR类指定的主键
      *
      * Note that an array should be returned even for a table with single primary key.
+     * 注意：就算只有一个字段作为主键 也要返回数组
      *
      * @return string[] the primary keys of the associated database table.
      */
@@ -328,6 +348,7 @@ class ActiveRecord extends BaseActiveRecord
     /**
      * Returns the list of all attribute names of the model.
      * The default implementation will return all column names of the table associated with this AR class.
+     * 返回本AR类关联的数据库表的列明
      * @return array list of attribute names.
      */
     public function attributes()
