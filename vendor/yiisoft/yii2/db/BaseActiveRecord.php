@@ -26,17 +26,23 @@ use yii\helpers\ArrayHelper;
  *
  * @property array $dirtyAttributes The changed attribute values (name-value pairs). This property is
  * read-only.
+ * 已更改的属性键值对集合，只读属性。
  * @property boolean $isNewRecord Whether the record is new and should be inserted when calling [[save()]].
+ * 本条记录是否是新的，如果是新的调用save()方法会执行insert()方法，否则执行update()方法。
  * @property array $oldAttributes The old attribute values (name-value pairs). Note that the type of this
  * property differs in getter and setter. See [[getOldAttributes()]] and [[setOldAttributes()]] for details.
+ * 旧的属性键值对集合，注意，本属性的getter和setter方法与其他的不同。
  * @property mixed $oldPrimaryKey The old primary key value. An array (column name => column value) is
  * returned if the primary key is composite. A string is returned otherwise (null will be returned if the key
  * value is null). This property is read-only.
+ * 旧的主键值。假如是联合主键，则返回主键值的键值对集合。否则返回字符串。假如是空的，表示主键值为空。只读属性。
  * @property mixed $primaryKey The primary key value. An array (column name => column value) is returned if
  * the primary key is composite. A string is returned otherwise (null will be returned if the key value is null).
  * This property is read-only.
+ * 主键值集合，其余同上。
  * @property array $relatedRecords An array of related records indexed by relation names. This property is
  * read-only.
+ * 以关系名为索引的关联记录集合。只读属性。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Carsten Brandt <mail@cebe.cc>
@@ -258,6 +264,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * PHP setter magic method.
      * This method is overridden so that AR attributes can be accessed like properties.
+     * 如果该属性是关联数据库的字段，则存进$this->_attributes属性集合，否则执行父类方法。
      * @param string $name property name
      * @param mixed $value property value
      */
@@ -416,6 +423,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Returns a value indicating whether the model has an attribute with the specified name.
+     * 判断指定的属性是否在本AR类内
      * @param string $name the name of the attribute
      * @return boolean whether the model has an attribute with the specified name.
      */
@@ -428,6 +436,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Returns the named attribute value.
      * If this record is the result of a query and the attribute is not loaded,
      * null will be returned.
+     * 根据属性名返回属性值
      * @param string $name the attribute name
      * @return mixed the attribute value. Null if the attribute is not set or does not exist.
      * @see hasAttribute()
@@ -439,6 +448,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Sets the named attribute value.
+     * 为数据库字段关联属性指定的属性名赋指定的值
      * @param string $name the attribute name
      * @param mixed $value the attribute value.
      * @throws InvalidParamException if the named attribute does not exist.
@@ -455,6 +465,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Returns the old attribute values.
+     * 获取旧的属性值集合
      * @return array the old attribute values (name-value pairs)
      */
     public function getOldAttributes()
@@ -465,6 +476,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Sets the old attribute values.
      * All existing old attribute values will be discarded.
+     * 获取旧的属性值集合，所有存在的旧的属性值都会被抛弃
      * @param array|null $values old attribute values to be set.
      * If set to `null` this record is considered to be [[isNewRecord|new]].
      */
@@ -477,6 +489,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Returns the old value of the named attribute.
      * If this record is the result of a query and the attribute is not loaded,
      * null will be returned.
+     * 根据属性值获取指定的旧属性名。假如本条记录是一条查询结果，并且属性未被载入，
+     * 则会返回null。
      * @param string $name the attribute name
      * @return mixed the old attribute value. Null if the attribute is not loaded before
      * or does not exist.
@@ -489,6 +503,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Sets the old value of the named attribute.
+     * 按照文件名，设置旧的属性值
      * @param string $name the attribute name
      * @param mixed $value the old attribute value.
      * @throws InvalidParamException if the named attribute does not exist.
@@ -507,6 +522,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Marks an attribute dirty.
      * This method may be called to force updating a record when calling [[update()]],
      * even if there is no change being made to the record.
+     * 污染一个属性。本方法可以用于调用[[update()]]强制更新一条记录，甚至在该条记录
+     * 没有被更改的情况下
      * @param string $name the attribute name
      */
     public function markAttributeDirty($name)
@@ -520,6 +537,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param bool $identical whether the comparison of new and old value is made for
      * identical values using `===`, defaults to `true`. Otherwise `==` is used for comparison.
      * This parameter is available since version 2.0.4.
+     * 开启严格不等于
      * @return bool whether the attribute has been changed
      */
     public function isAttributeChanged($name, $identical = true)
@@ -569,11 +587,14 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Saves the current record.
+     * 保存当前纪录
      *
      * This method will call [[insert()]] when [[isNewRecord]] is true, or [[update()]]
      * when [[isNewRecord]] is false.
+     * 如果是新记录调用insert()如果不是新记录，则调用update()
      *
      * For example, to save a customer record:
+     * 例如：
      *
      * ```php
      * $customer = new Customer; // or $customer = Customer::findOne($id);
@@ -600,17 +621,26 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Saves the changes to this active record into the associated database table.
+     * 保存更改到关联的数据库表中
      *
      * This method performs the following steps in order:
+     * 本方法依次执行以下几步：
      *
      * 1. call [[beforeValidate()]] when `$runValidation` is true. If [[beforeValidate()]]
      *    returns `false`, the rest of the steps will be skipped;
+     *    当`$runValidation`为真时，调用[[beforeValidate()]] ，假如[[beforeValidate()]] 返回
+     *    false，则以下步骤均不会执行。
      * 2. call [[afterValidate()]] when `$runValidation` is true. If validation
      *    failed, the rest of the steps will be skipped;
+     *    当`$runValidation`为真时，调用[[afterValidate()]]方法，假如验证器验证失败，则其余
+     *     步骤也不会执行。
      * 3. call [[beforeSave()]]. If [[beforeSave()]] returns `false`,
      *    the rest of the steps will be skipped;
+     *    调用[[beforeSave()]] 方法，假如[[beforeSave()]]方法返回false，那么其余的步骤也不会被执行
      * 4. save the record into database. If this fails, it will skip the rest of the steps;
+     *    执行SQL语句，如果出错，则其余的部分也不会被执行。
      * 5. call [[afterSave()]];
+     *    调用 [[afterSave()]];
      *
      * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
      * [[EVENT_AFTER_VALIDATE]], [[EVENT_BEFORE_UPDATE]], and [[EVENT_AFTER_UPDATE]]

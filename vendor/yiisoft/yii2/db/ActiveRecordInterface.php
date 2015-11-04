@@ -18,10 +18,13 @@ interface ActiveRecordInterface
 {
     /**
      * Returns the primary key **name(s)** for this AR class.
+     * 返回本AR类主键的字段名
      *
      * Note that an array should be returned even when the record only has a single primary key.
+     * 注意，即使主键只有一个，返回的也是数组。
      *
      * For the primary key **value** see [[getPrimaryKey()]] instead.
+     * 如何获取主键的值，请残月[[getPrimaryKey()]] 方法。
      *
      * @return string[] the primary key name(s) for this AR class.
      */

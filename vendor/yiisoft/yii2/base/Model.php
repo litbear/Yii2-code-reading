@@ -280,14 +280,19 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
 
     /**
      * Returns the form name that this model class should use.
+     * 返回使用本模型的表单的名称
      *
      * The form name is mainly used by [[\yii\widgets\ActiveForm]] to determine how to name
      * the input fields for the attributes in a model. If the form name is "A" and an attribute
      * name is "b", then the corresponding input name would be "A[b]". If the form name is
      * an empty string, then the input name would be "b".
+     * 表单名称主要用于[[\yii\widgets\ActiveForm]] 类去确定如何为模型中属性的输入域命名。假如表单名称为A
+     * 其中一个属性名为b，那么对应的输入域名称就是A[b]。假如表单名称是空字符串，那么输入域的名称就是b
      *
      * By default, this method returns the model class name (without the namespace part)
      * as the form name. You may override it when the model is used in different forms.
+     * 默认情况下，本方法返回模型的类名（并非全限定名作为表单名称，在模型被用于不同表单时
+     * 你可以重写此方法。
      *
      * @return string the form name of this model class.
      */
@@ -302,6 +307,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
      * Returns the list of attribute names.
      * By default, this method returns all public non-static properties of the class.
      * You may override this method to change the default behavior.
+     * 返回属性名组成的集合。默认情况下本方法返回公共非静态属性，你可以重写办法去改变他的默认行为
      * @return array list of attribute names.
      */
     public function attributes()
@@ -319,16 +325,22 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
 
     /**
      * Returns the attribute labels.
+     * 返回属性的标签
      *
      * Attribute labels are mainly used for display purpose. For example, given an attribute
      * `firstName`, we can declare a label `First Name` which is more user-friendly and can
      * be displayed to end users.
+     * 属性标签主要被用于显示数据。例如，给定一个名为`firstName`的属性名，你可以将他的标签定义
+     * 为`First Name`。我们可以将标签定义的更加用户友好。
      *
      * By default an attribute label is generated using [[generateAttributeLabel()]].
      * This method allows you to explicitly specify attribute labels.
+     * 默认情况下属性标签是由[[generateAttributeLabel()]]生成的，本方法允许你显式地
+     * 指定属性标签。
      *
      * Note, in order to inherit labels defined in the parent class, a child class needs to
      * merge the parent labels with child labels using functions such as `array_merge()`.
+     * 注意，为了继承父类定义的属性标签，子类需要使用例如 `array_merge()`函数覆盖合并父类的标签。
      *
      * @return array attribute labels (name => label)
      * @see generateAttributeLabel()
@@ -340,6 +352,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
 
     /**
      * Returns the attribute hints.
+     * 返回属性的暗示。
      *
      * Attribute hints are mainly used for display purpose. For example, given an attribute
      * `isPublic`, we can declare a hint `Whether the post should be visible for not logged in users`,
