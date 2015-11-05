@@ -45,6 +45,7 @@ class Transaction extends \yii\base\Object
     /**
      * A constant representing the transaction isolation level `READ UNCOMMITTED`.
      * @see http://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
+     * 以下是事务的四种隔离级别
      */
     const READ_UNCOMMITTED = 'READ UNCOMMITTED';
     /**
@@ -76,6 +77,9 @@ class Transaction extends \yii\base\Object
 
     /**
      * Returns a value indicating whether this transaction is active.
+     * 活跃事务三要素，等级大于0，绑定数据库链接，数据库链接活跃
+     * 摘抄一段解释【_level > 0 。这是由于为0是，要么是刚刚初始化， 要么是所有的事务已经提交或回滚了。
+     * 也就是说，只有调用过了 begin() 但还没有调用过匹配的 commit() 或 rollBack() 的事务对象，才是有效的。】
      * @return boolean whether this transaction is active. Only an active transaction
      * can [[commit()]] or [[rollBack()]].
      */
@@ -104,17 +108,24 @@ class Transaction extends \yii\base\Object
      */
     public function begin($isolationLevel = null)
     {
+        /*
+         * Connection中 beginTransaction($isolationLevel = null)方法的这句
+         * $transaction = $this->_transaction = new Transaction(['db' => $this]);
+         */
         if ($this->db === null) {
             throw new InvalidConfigException('Transaction::db must be set.');
         }
         $this->db->open();
 
+        // 最外层的事务
         if ($this->_level == 0) {
+            // 给定了个隔离级别就设定之
             if ($isolationLevel !== null) {
                 $this->db->getSchema()->setTransactionIsolationLevel($isolationLevel);
             }
             Yii::trace('Begin transaction' . ($isolationLevel ? ' with isolation level ' . $isolationLevel : ''), __METHOD__);
 
+            // 触发事务开始事件
             $this->db->trigger(Connection::EVENT_BEGIN_TRANSACTION);
             $this->db->pdo->beginTransaction();
             $this->_level = 1;
@@ -122,13 +133,35 @@ class Transaction extends \yii\base\Object
             return;
         }
 
+        /*
+         * 当 _level > 0 时，表示的是嵌套的事务，并非最外层的事务。
+         * 对此，Yii使用 SQL 的 SAVEPOINT 和 ROLLBACK TO SAVEPOINT
+         * 来实现设置事务保存点和回滚到保存点的操作。
+         */
+        /**
+         * 摘抄：
+         * 1，事务对象初始化时，设 _level 为0，表示如果要启用事务， 这是一个最外层的事务。
+         * 
+         * 2，每当调用 Transaction::begin() 来启用具体事务时， _level 自增1。 
+         *    表示如再启用事务，将是层级为1的嵌套事务。
+         * 
+         * 3，每当调用 Transaction::commit() 或 Transaction::rollBack() 时，
+         *    _level 自减1，表示当前层级的事务处理完毕，返回上一层级的事务中。
+         * 
+         * 4，当调用了一次 begin() 且还没有调用匹配的 commit() 或 rollBack() ，
+         *    就再次调用 begin() 时，会使事务进行更深一层级的嵌套中。
+         */
+        // 事务级别大于0 表示是嵌套事务
         $schema = $this->db->getSchema();
+        // 判断数据库是否支持嵌套事务
         if ($schema->supportsSavepoint()) {
             Yii::trace('Set savepoint ' . $this->_level, __METHOD__);
+            // 创建事务保存点
             $schema->createSavepoint('LEVEL' . $this->_level);
         } else {
             Yii::info('Transaction not started: nested transaction not supported', __METHOD__);
         }
+        // 一旦调用这个方法 事物级别$this->_level 就会自增1
         $this->_level++;
     }
 
@@ -142,7 +175,9 @@ class Transaction extends \yii\base\Object
             throw new Exception('Failed to commit transaction: transaction was inactive.');
         }
 
+        // 事务级别自减1
         $this->_level--;
+        // 如果自减后等于0，说明是最外层事务，则实行commit操作
         if ($this->_level == 0) {
             Yii::trace('Commit transaction', __METHOD__);
             $this->db->pdo->commit();
@@ -150,6 +185,7 @@ class Transaction extends \yii\base\Object
             return;
         }
 
+        // 自减后大于0 那么是内层事务，执行释放保存点操作
         $schema = $this->db->getSchema();
         if ($schema->supportsSavepoint()) {
             Yii::trace('Release savepoint ' . $this->_level, __METHOD__);
@@ -171,6 +207,7 @@ class Transaction extends \yii\base\Object
             return;
         }
 
+        // 回滚也会使事物级别自减1，如果自减后为0，说明是最外层事务，调用rollback操作
         $this->_level--;
         if ($this->_level == 0) {
             Yii::trace('Roll back transaction', __METHOD__);
@@ -179,6 +216,7 @@ class Transaction extends \yii\base\Object
             return;
         }
 
+        // 自减后大于1，说明是内层操作，执行回滚保存点操作
         $schema = $this->db->getSchema();
         if ($schema->supportsSavepoint()) {
             Yii::trace('Roll back to savepoint ' . $this->_level, __METHOD__);

@@ -634,9 +634,17 @@ class Connection extends Component
     {
         $this->open();
 
+        /**
+         * 先查看缓存getTransaction()方法，如果缓存为null，则表示
+         * 尚未初始化当前连接使用的Transaction对象，所以新创建一个
+         * 这也就说明了：【在一个应用中Connection唯一，Transaction对象
+         * 也是唯一的，不管是外层事务还是内层事务使用的都是一个
+         * Transaction对象】
+         */
         if (($transaction = $this->getTransaction()) === null) {
             $transaction = $this->_transaction = new Transaction(['db' => $this]);
         }
+        // 设置事务的隔离级别
         $transaction->begin($isolationLevel);
 
         return $transaction;

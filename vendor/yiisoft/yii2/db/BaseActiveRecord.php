@@ -147,6 +147,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Updates the whole table using the provided attribute values and conditions.
      * For example, to change the status to be 1 for all customers whose status is 2:
+     * 使用提供的属性值和条件更新整个数据库表，例如将所有status为2的用户更新为status为1：
      *
      * ```php
      * Customer::updateAll(['status' => 1], 'status = 2');
@@ -166,6 +167,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Updates the whole table using the provided counter changes and conditions.
      * For example, to increment all customers' age by 1,
+     * 【具体用途还是看子类实现吧，现在没太看懂】例如，将所有用户年龄加1
      *
      * ```php
      * Customer::updateAllCounters(['age' => 1]);
@@ -186,6 +188,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Deletes rows in the table using the provided conditions.
      * WARNING: If you do not specify any condition, this method will delete ALL rows in the table.
+     * 使用给定的条件删除记录。注意：假如没给任何条件，本方法将会删除整张表。
      *
      * For example, to delete all customers whose status is 3:
      *
@@ -206,24 +209,35 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Returns the name of the column that stores the lock version for implementing optimistic locking.
+     * 返回储存了实现乐观锁的锁版本号的数据库列名。
      *
      * Optimistic locking allows multiple users to access the same record for edits and avoids
      * potential conflicts. In case when a user attempts to save the record upon some staled data
      * (because another user has modified the data), a [[StaleObjectException]] exception will be thrown,
      * and the update or deletion is skipped.
+     * 乐观锁机制允许多个用户同时使用相同记录编辑，并防止潜在冲突。假如一个用户尝试将记录保存在国企数据中
+     * （因为此时其他用户已经更改了数据），此时将会触发一个[[StaleObjectException]] 异常，并且更新和删除动作
+     * 会被跳过。
      *
      * Optimistic locking is only supported by [[update()]] and [[delete()]].
+     * 乐观锁机制仅在[[update()]] 和 [[delete()]]操作中被支持。
      *
      * To use Optimistic locking:
+     * 使用乐观锁的步骤。
      *
      * 1. Create a column to store the version number of each row. The column type should be `BIGINT DEFAULT 0`.
      *    Override this method to return the name of this column.
+     *    创建一个列用于储存每一行的版本号。该列的类型应该为`BIGINT DEFAULT 0`。重写本方法要返回该列名。
      * 2. Add a `required` validation rule for the version column to ensure the version value is submitted.
+     *    为该列增加一个`required`的验证规则以保证版本号必须提交。
      * 3. In the Web form that collects the user input, add a hidden field that stores
      *    the lock version of the recording being updated.
+     *    在收集用户输入数据的表单中，增加一个隐藏字段用于储存记录的版本号。
      * 4. In the controller action that does the data updating, try to catch the [[StaleObjectException]]
      *    and implement necessary business logic (e.g. merging the changes, prompting stated data)
      *    to resolve the conflict.
+     *    在处理数据上传的控制器动作中，尝试捕捉[[StaleObjectException]]异常 并且实现必要的业务逻辑（如覆盖
+     *    数据或提示数据冲突）用来解决数据冲突。
      *
      * @return string the column name that stores the lock version of a table row.
      * If null is returned (default implemented), optimistic locking will not be supported.
@@ -236,6 +250,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * PHP getter magic method.
      * This method is overridden so that attributes and related objects can be accessed like properties.
+     * 重写本方法以达到以对象属性的方式显示数据库字段的目的。
      *
      * @param string $name property name
      * @throws \yii\base\InvalidParamException if relation name is wrong
@@ -246,6 +261,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     {
         if (isset($this->_attributes[$name]) || array_key_exists($name, $this->_attributes)) {
             return $this->_attributes[$name];
+            // 有本属性，但是$this->_attributes里面找不到，则返回null，说明没被赋值。
         } elseif ($this->hasAttribute($name)) {
             return null;
         } else {
@@ -313,6 +329,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Declares a `has-one` relation.
      * The declaration is returned in terms of a relational [[ActiveQuery]] instance
      * through which the related record can be queried and retrieved back.
+     * 定义一个`has-one` 的关系
      *
      * A `has-one` relation means that there is at most one related record matching
      * the criteria set by this relation, e.g., a customer has one country.
@@ -587,7 +604,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Saves the current record.
-     * 保存当前纪录
+     * 保存当前记录
      *
      * This method will call [[insert()]] when [[isNewRecord]] is true, or [[update()]]
      * when [[isNewRecord]] is false.
@@ -645,10 +662,13 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
      * [[EVENT_AFTER_VALIDATE]], [[EVENT_BEFORE_UPDATE]], and [[EVENT_AFTER_UPDATE]]
      * will be raised by the corresponding methods.
+     * 在1，2，3，5四个步骤中，四个事件会被依次触发。
      *
      * Only the [[dirtyAttributes|changed attribute values]] will be saved into database.
+     * 只有被更改的属性值，也就是[[dirtyAttributes|changed attribute values]] 会被保存到数据库中
      *
      * For example, to update a customer record:
+     * 例如：
      *
      * ```php
      * $customer = Customer::findOne($id);
@@ -660,6 +680,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Note that it is possible the update does not affect any row in the table.
      * In this case, this method will return 0. For this reason, you should use the following
      * code to check if update() is successful or not:
+     * 注意，有可能update()方法没影响任何数据库行。假如是这样，那么update()方法会返回0，因此
+     * 应该使用严格不等于。
      *
      * ```php
      * if ($customer->update() !== false) {
@@ -690,15 +712,20 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Updates the specified attributes.
+     * 更新指定的属性。
      *
      * This method is a shortcut to [[update()]] when data validation is not needed
      * and only a small set attributes need to be updated.
+     * 在数据不需要进行合法性验证，并且只有一小部分数据需要更新的时候，本方法是uodate()的快捷方式。
      *
      * You may specify the attributes to be updated as name list or name-value pairs.
      * If the latter, the corresponding attribute values will be modified accordingly.
      * The method will then save the specified attributes into database.
+     * 你可以指定更新参数为属性名集合或键值对集合，假如是后者，相应的属性值就是被修改后的值，
+     * 本方法会保存相应的值到数据库中。
      *
      * Note that this method will **not** perform data validation and will **not** trigger events.
+     * 注意，本方法不会执行认证，也不会触发事件。
      *
      * @param array $attributes the attributes (names or name-value pairs) to be updated
      * @return integer the number of rows affected.
@@ -731,43 +758,67 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * @see update()
+     * updateInternal() 由 update() 调用，
+     * 类似的有deleteInternal() ，由ActiveRecord定义，这里略去。
      * @param array $attributes attributes to update
      * @return integer number of rows updated
      * @throws StaleObjectException
      */
     protected function updateInternal($attributes = null)
     {
+        /*
+         *  beforeSave() 会触发相应的before事件
+         *  而且如果beforeSave()返回false，就可以中止更新过程。
+         */
         if (!$this->beforeSave(false)) {
             return false;
         }
         $values = $this->getDirtyAttributes($attributes);
+        /*
+         * 没有字段有修改，那么实际上是不需要更新的。【影响行数为0】
+         * 因此，直接调用afterSave()来触发相应的after事件。
+         */
         if (empty($values)) {
             $this->afterSave(false, $values);
             return 0;
         }
+        // 这里开始是实际的操作数据库逻辑
         $condition = $this->getOldPrimaryKey(true);
         $lock = $this->optimisticLock();
+        /**
+         * 如果开启了乐观锁，则将锁的值加1
+         */
         if ($lock !== null) {
             $values[$lock] = $this->$lock + 1;
             $condition[$lock] = $this->$lock;
         }
         // We do not check the return value of updateAll() because it's possible
         // that the UPDATE statement doesn't change anything and thus returns 0.
+        /*
+         * 在这里不检查 updateAll()的返回值，因为很有可能更新操作未改变任何行，因此
+         * 影响的行数为0
+         */
         $rows = $this->updateAll($values, $condition);
 
+        // 开启了乐观锁，且影响的行数为0，那么抛出一个数据过期提示？？？
         if ($lock !== null && !$rows) {
             throw new StaleObjectException('The object being updated is outdated.');
         }
 
+        // 假如设置了版本号，即开启了乐观锁，在这里重新为版本号赋值。
         if (isset($values[$lock])) {
             $this->$lock = $values[$lock];
         }
 
+        /*
+         * $changedAttributes 被更改了的属性键值对集合
+         */
         $changedAttributes = [];
         foreach ($values as $name => $value) {
             $changedAttributes[$name] = isset($this->_oldAttributes[$name]) ? $this->_oldAttributes[$name] : null;
             $this->_oldAttributes[$name] = $value;
         }
+        // 这里触发了afterSave事件
         $this->afterSave(false, $changedAttributes);
 
         return $rows;
