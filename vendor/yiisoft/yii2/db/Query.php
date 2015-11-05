@@ -211,6 +211,7 @@ class Query extends Component implements QueryInterface
      * Converts the raw query results into the format as specified by this query.
      * This method is internally used to convert the data fetched from database
      * into the format as required by this query.
+     * 将查询出的结果集转换为本对象指定的格式。
      * @param array $rows the raw query result from database
      * @return array the converted query result
      */

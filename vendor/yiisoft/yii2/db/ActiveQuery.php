@@ -209,6 +209,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * 该方法为ActiveQuery将查询到的内容 $rows 填充到ActiveReocrd中去的方法
      * @inheritdoc
      */
     public function populate($rows)
@@ -225,6 +226,11 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             $this->findWith($this->with, $models);
         }
         if (!$this->asArray) {
+            /** 
+             * 重点在这个foreach里面的afterFind()，
+             * afterFind()不干别的，就是专门调用
+             * $this->trigger(self::EVENT_AFTER_FIND) 来触发事件的。
+             */
             foreach ($models as $model) {
                 $model->afterFind();
             }
