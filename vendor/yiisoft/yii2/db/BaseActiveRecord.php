@@ -156,6 +156,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param array $attributes attribute values (name-value pairs) to be saved into the table
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
      * Please refer to [[Query::where()]] on how to specify this parameter.
+     * 查询条件
      * @return integer the number of rows updated
      * @throws NotSupportedException if not overridden
      */
@@ -572,8 +573,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Returns the attribute values that have been modified since they are loaded or saved most recently.
+     * 返回从最近的读取和保存数据库的操作到现在 这段时间内被修改过的属性值
      *
      * The comparison of new and old values is made for identical values using `===`.
+     * 比较新旧属性值使用的是严格不等于
      *
      * @param string[]|null $names the names of the attributes whose values may be returned if they are
      * changed recently. If null, [[attributes()]] will be used.
@@ -773,6 +776,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         if (!$this->beforeSave(false)) {
             return false;
         }
+        // 获取待更新的字段键值对
         $values = $this->getDirtyAttributes($attributes);
         /*
          * 没有字段有修改，那么实际上是不需要更新的。【影响行数为0】
@@ -782,14 +786,20 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $this->afterSave(false, $values);
             return 0;
         }
-        // 这里开始是实际的操作数据库逻辑
+        /** 
+         * 这里开始是实际的操作数据库逻辑
+         * 【把原来ActiveRecord的主键作为等下更新记录的条件，
+         *  也就是说，等下更新的，最多只有1个记录。】
+         */
         $condition = $this->getOldPrimaryKey(true);
         $lock = $this->optimisticLock();
         /**
          * 如果开启了乐观锁，则将锁的值加1
          */
         if ($lock !== null) {
+            // 待更新版本号为旧的版本号+1
             $values[$lock] = $this->$lock + 1;
+            // 旧的版本号为查询条件 查找条件有两个：旧的主键，旧的版本号
             $condition[$lock] = $this->$lock;
         }
         // We do not check the return value of updateAll() because it's possible
@@ -800,7 +810,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
          */
         $rows = $this->updateAll($values, $condition);
 
-        // 开启了乐观锁，且影响的行数为0，那么抛出一个数据过期提示？？？
+        // 如果已经启用了乐观锁，但是却没有完成更新，或者更新的记录数为0；
+        // 那就说明是由于 ver 不匹配，记录被修改过了，于是抛出异常。
         if ($lock !== null && !$rows) {
             throw new StaleObjectException('The object being updated is outdated.');
         }
@@ -860,13 +871,18 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Deletes the table row corresponding to this active record.
+     * 删除数据库表中与本AR对象相关的行。
      *
      * This method performs the following steps in order:
+     * 本方法按顺序执行以下几步：
      *
      * 1. call [[beforeDelete()]]. If the method returns false, it will skip the
      *    rest of the steps;
+     *    调用[[beforeDelete()]]触发删除前事件，假如返回false，则会跳过剩下步骤。
      * 2. delete the record from the database;
+     *    从数据库中删除记录。
      * 3. call [[afterDelete()]].
+     *    触发删除后事件。
      *
      * In the above step 1 and 3, events named [[EVENT_BEFORE_DELETE]] and [[EVENT_AFTER_DELETE]]
      * will be raised by the corresponding methods.
@@ -883,8 +899,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         if ($this->beforeDelete()) {
             // we do not check the return value of deleteAll() because it's possible
             // the record is already deleted in the database and thus the method will return 0
+            // 旧的版本号是主键
             $condition = $this->getOldPrimaryKey(true);
             $lock = $this->optimisticLock();
+            // 如果启用了乐观锁，那就再加一个条件
             if ($lock !== null) {
                 $condition[$lock] = $this->$lock;
             }
