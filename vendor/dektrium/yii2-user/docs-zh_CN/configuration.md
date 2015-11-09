@@ -23,7 +23,7 @@ for those messages are `success`, `info`, `danger`, `warning`.
 
 #### enableGeneratingPassword (Type: `boolean`, Default value: `false`)
 
-当本属性为`truw`时，注册页面的密码域会被隐藏，并且密码会由服务器自动生成。产生的八位密码会被发送到用户邮箱中。
+当本属性为`true`时，注册页面的密码域会被隐藏，并且密码会由服务器自动生成。产生的八位密码会被发送到用户邮箱中。
 
 ---
 

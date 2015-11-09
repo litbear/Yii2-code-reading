@@ -16,6 +16,7 @@ use yii\web\ForbiddenHttpException;
 
 /**
  * AccessControl provides simple access control based on a set of rules.
+ * AccessControl提供了基于一系列规则的简单访问控制
  *
  * AccessControl is an action filter. It will check its [[rules]] to find
  * the first rule that matches the current context variables (such as user IP address, user role).

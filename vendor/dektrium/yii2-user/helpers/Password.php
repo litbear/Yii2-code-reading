@@ -20,6 +20,7 @@ class Password
 {
     /**
      * Wrapper for yii security helper method.
+     * 由Yii安全辅助函数封装
      *
      * @param $password
      * @return string

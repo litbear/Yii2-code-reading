@@ -136,6 +136,7 @@ return array (
     'We are sorry but your confirmation token is invalid. Maybe it is expired or does not exist. You can try requesting new recovery token.' => '对不起，令牌是无效的。您可以尝试请求新的:',
     'Website' => '网站',
     'Welcome to {0}' => '欢迎来到 {0}',
+    'Welcome! Registration is complete.'=>'注册成功！欢迎你的加入。',
     'You have been sent an email with instructions on how to reset your password.' => '您收到的电子邮件将告诉您如何重置您的密码。',
     'We have received a request to change the email address for your account on {0}' => '您最近请求修改电子邮件 {0}',
     'We have received a request to reset the password for your account on {0}' => '您最近在 {0} 请求重设密码',

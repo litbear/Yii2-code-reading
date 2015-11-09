@@ -252,6 +252,7 @@ class User extends ActiveRecord implements IdentityInterface
             $this->confirmed_at = time();
         }
 
+        // 由服务器生成密码
         if ($this->module->enableGeneratingPassword) {
             $this->password = Password::generate(8);
         }
@@ -412,6 +413,7 @@ class User extends ActiveRecord implements IdentityInterface
             }
         }
 
+        // 保存前触发的事件，加密密码
         if (!empty($this->password)) {
             $this->setAttribute('password_hash', Password::hash($this->password));
         }
