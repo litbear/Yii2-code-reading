@@ -73,10 +73,15 @@ class Security extends Component
     public $derivationIterations = 100000;
     /**
      * @var string strategy, which should be used to generate password hash.
+     * 字符串，策略：
      * Available strategies:
+     * 可用策略：
      * - 'password_hash' - use of PHP `password_hash()` function with PASSWORD_DEFAULT algorithm.
      *   This option is recommended, but it requires PHP version >= 5.5.0
+     * - 'password_hash' -使用PHP的 `password_hash()` 函数与PASSWORD_DEFAULT算法，推荐本选项，
+     *   但PHP版本必须在5.5.0及以上。
      * - 'crypt' - use PHP `crypt()` function.
+     * - 'crypt' - 使用PHP原生的`crypt()`函数。
      */
     public $passwordHashStrategy = 'crypt';
     /**
@@ -515,17 +520,22 @@ class Security extends Component
 
     /**
      * Generates a secure hash from a password and a random salt.
+     * 用密码和随机加盐生成一个安全的哈希值
      *
      * The generated hash can be stored in database.
      * Later when a password needs to be validated, the hash can be fetched and passed
      * to [[validatePassword()]]. For example,
+     * 生成的哈希值可以存到数据库中，稍后验证密码时，哈希值可以传入[[validatePassword()]]中，例如：
      *
      * ~~~
      * // generates the hash (usually done during user registration or when the password is changed)
+     * // 生成哈希值（通常用在用户注册或更改密码时）
      * $hash = Yii::$app->getSecurity()->generatePasswordHash($password);
      * // ...save $hash in database...
+     * // 将哈希值保存到数据库
      *
      * // during login, validate if the password entered is correct using $hash fetched from database
+     * // 登录期间，检验输入密码的合法性
      * if (Yii::$app->getSecurity()->validatePassword($password, $hash) {
      *     // password is good
      * } else {
