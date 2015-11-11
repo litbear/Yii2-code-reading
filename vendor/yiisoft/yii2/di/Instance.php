@@ -105,7 +105,7 @@ class Instance
      *
      * If you do not specify a container, the method will first try `Yii::$app` followed by `Yii::$container`.
      * 假如你没指定容器，则此方法会依次使用 `Yii::$app` 和 `Yii::$container`
-     * 【总结：主要解决了两个问题，1，确保对象的类型——如果参数1是参数2的实例 则原样放回就行了。
+     * 【总结：主要解决了两个问题，1，确保对象的类型——如果参数1是参数2的实例 则原样返回就行了。
      * 2，选择不同的容器去处理（实例化）】
      *
      * For example,

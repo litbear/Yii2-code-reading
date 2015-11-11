@@ -16,8 +16,11 @@ use yii\web\Response;
  * Cors filter implements [Cross Origin Resource Sharing](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
  * Make sure to read carefully what CORS does and does not. CORS do not secure your API,
  * but allow the developer to grant access to third party code (ajax calls from external domain)
+ * Cors过滤器实现了跨域资源共享。在使用之前请确保你已经仔细了解了什么叫跨域资源共享，CORS不会保护你的API，
+ * 但是允许开发人员授权访问第三方代码（来自外域的Ajax调用）
  *
  * You may use CORS filter by attaching it as a behavior to a controller or module, like the following,
+ * 可以像下面这样通过为控制器或模块绑定行为来使用CORS过滤器：
  *
  * ```php
  * public function behaviors()
