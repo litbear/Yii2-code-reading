@@ -4,6 +4,7 @@ $params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'basic',
+    'language' => 'zh-CN',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
@@ -14,10 +15,10 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
-        ],
+//        'user' => [
+//            'identityClass' => 'app\models\User',
+//            'enableAutoLogin' => true,
+//        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -38,6 +39,15 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+    ],
+    'modules' => [
+        'user' => [
+            'class' => 'dektrium\user\Module',
+            'confirmWithin' => 21600,
+            'cost' => 12,
+            'admins' => ['admin'],
+            'enableConfirmation' => false,
+        ],
     ],
     'params' => $params,
 ];

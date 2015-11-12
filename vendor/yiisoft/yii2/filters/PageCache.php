@@ -17,6 +17,7 @@ use yii\web\Response;
 
 /**
  * PageCache implements server-side caching of whole pages.
+ * PageCache 实现了服务器端的整页缓存
  *
  * It is an action filter that can be added to a controller and handles the `beforeAction` event.
  *

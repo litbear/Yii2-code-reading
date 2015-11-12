@@ -457,6 +457,7 @@ class User extends Component
 
     /**
      * Redirects the user browser to the login page.
+     * 将用户浏览重定向到登录页
      *
      * Before the redirection, the current URL (if it's not an AJAX url) will be kept as [[returnUrl]] so that
      * the user browser may be redirected back to the current page after successful login.

@@ -13,6 +13,7 @@ use yii\base\Action;
 
 /**
  * HttpCache implements client-side caching by utilizing the `Last-Modified` and `Etag` HTTP headers.
+ * HttpCache 通过HTTP头 `Last-Modified` 和 `Etag`字段，的实现了客户端的缓存。
  *
  * It is an action filter that can be added to a controller and handles the `beforeAction` event.
  *
