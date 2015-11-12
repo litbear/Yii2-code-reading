@@ -479,7 +479,7 @@ class Component extends Object
      * or integers. If the former, they uniquely identify the behaviors. If the latter, the corresponding
      * behaviors are anonymous and their properties and methods will NOT be made available via the component
      * (however, the behaviors can still respond to the component's events). 
-     * 注意，行为类必须继承自Behavior类。行为的名字可以是字符串或者是证书，如果是前者，则唯一的标识行为。
+     * 注意，行为类必须继承自Behavior类。行为的名字可以是字符串或者是整数，如果是前者，则唯一的标识行为。
      * 如果是后者对应的行为是匿名的，并且，它们的属性和方法将不能通过组件使用。（然而，该行为仍然能通过
      * 组件的事件调用）
      *
@@ -755,13 +755,22 @@ class Component extends Object
         }
         /**
          * 整型就加到数组尾部
+         * 这里的整型指的就是Component::behaviors()返回的数组中的匿名元素。
+         * 本方法针对的是Component::behaviors()返回的数组中的每一个元素进行操作的
+         * [
+         *     'behaviorName' => [
+         *         'class' => 'BehaviorClass',
+         *         'property1' => 'value1',
+         *         'property2' => 'value2',
+         *     ]
+         * ]
          */
         if (is_int($name)) {
             $behavior->attach($this);
             $this->_behaviors[] = $behavior;
         } else {
             /**
-             * 非整形 就先解绑所有同名行为，再绑定传来的行为
+             * 非整型 就先解绑所有同名行为，再绑定传来的行为
              */
             if (isset($this->_behaviors[$name])) {
                 $this->_behaviors[$name]->detach();
