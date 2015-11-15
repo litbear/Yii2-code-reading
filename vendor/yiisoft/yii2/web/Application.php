@@ -33,6 +33,10 @@ class Application extends \yii\base\Application
      * The configuration is an array whose first element specifies the route of the action.
      * The rest of the array elements (key-value pairs) specify the parameters to be bound
      * to the action. For example,
+     * 数组，由用于拦截所有用户请求的路由组成的配置数组。主要在维护模式中使用，会将所有的请求交给
+     * 一个动作处理。
+     * 配置数组的第一个元素是控制器方法的路由。其余元素是以键值对形式组成的将会绑定到动作上的参数。
+     * 例如：
      *
      * ~~~
      * [
@@ -43,6 +47,7 @@ class Application extends \yii\base\Application
      * ~~~
      *
      * Defaults to null, meaning catch-all is not used.
+     * 默认为空，意味着维护模式不启用。
      */
     public $catchAll;
     /**
@@ -65,12 +70,17 @@ class Application extends \yii\base\Application
 
     /**
      * Handles the specified request.
+     * 操作指定的请求
      * @param Request $request the request to be handled
      * @return Response the resulting response
      * @throws NotFoundHttpException if the requested route is invalid
      */
     public function handleRequest($request)
     {
+        /**
+         * $this->catchAll为空就从请求对象解析路由，否则从$this->catchAll
+         * 处解析路由
+         */
         if (empty($this->catchAll)) {
             list ($route, $params) = $request->resolve();
         } else {

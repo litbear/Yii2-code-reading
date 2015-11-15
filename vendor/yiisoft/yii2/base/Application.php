@@ -342,6 +342,8 @@ abstract class Application extends Module
      * Initializes extensions and executes bootstrap components.
      * This method is called by [[init()]] after the application has been fully configured.
      * If you override this method, make sure you also call the parent implementation.
+     * 初始化扩展并解析启动组件。本方法在应用被完全配置后由[[init()]]方法调用，假如你重写了本方法，
+     * 请确保在子类方法中调用了父类的。
      */
     protected function bootstrap()
     {

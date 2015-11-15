@@ -14,12 +14,16 @@ use yii\caching\Cache;
 
 /**
  * UrlManager handles HTTP request parsing and creation of URLs based on a set of rules.
+ * UrlManager负责HTTP请求的解析和根据一系列规则（路由或配置数组）创建URL。
  *
  * UrlManager is configured as an application component in [[\yii\base\Application]] by default.
  * You can access that instance via `Yii::$app->urlManager`.
+ * UrlManager默认裴志成基类应用[[\yii\base\Application]] 的一个组件，你可以使用`Yii::$app->urlManager`
+ * 访问它。
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
+ * 你可以在应用配置中`components`元素下做如下改变以配置本组件：
  *
  * ~~~
  * 'urlManager' => [
@@ -32,10 +36,13 @@ use yii\caching\Cache;
  * ~~~
  *
  * @property string $baseUrl The base URL that is used by [[createUrl()]] to prepend to created URLs.
+ * 字符串，用于[[createUrl()]] 方法以准备创建URL
  * @property string $hostInfo The host info (e.g. "http://www.example.com") that is used by
  * [[createAbsoluteUrl()]] to prepend to created URLs.
+ * 字符串，用于 [[createAbsoluteUrl()]] 方法以准备创建URL。
  * @property string $scriptUrl The entry script URL that is used by [[createUrl()]] to prepend to created
  * URLs.
+ * 字符串，入口脚本地址，用于[[createUrl()]] 方法以准备创建URL
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -47,6 +54,8 @@ class UrlManager extends Component
      * string part of a URL, pretty URLs allow using path info to represent some of the parameters
      * and can thus produce more user-friendly URLs, such as "/news/Yii-is-released", instead of
      * "/index.php?r=news/view&id=100".
+     * 布尔值，是否开启URL美化，与将所有请求参数放在URL查询字符串中不同，本参数允许使用路径信息的形式重新
+     * 组织参数使之更加用户友好。例如用"/news/Yii-is-released"代替"/index.php?r=news/view&id=100"
      */
     public $enablePrettyUrl = false;
     /**
@@ -54,6 +63,8 @@ class UrlManager extends Component
      * requested URL must match at least one of the [[rules]] in order to be treated as a valid request.
      * Otherwise, the path info part of the request will be treated as the requested route.
      * This property is used only when [[enablePrettyUrl]] is true.
+     * 布尔值，是否开启严格解析。假如开启了严格解析，那么传来的URL必须匹配一种[[rules]]中的规则才被认为是合法。
+     * 否则，路径信息部分会被当作路由。本属性只会在[[enablePrettyUrl]] 为真的情况下才能使用。
      */
     public $enableStrictParsing = false;
     /**
@@ -61,23 +72,36 @@ class UrlManager extends Component
      * This property is used only if [[enablePrettyUrl]] is true. Each element in the array
      * is the configuration array for creating a single URL rule. The configuration will
      * be merged with [[ruleConfig]] first before it is used for creating the rule object.
+     * 数组，当[[enablePrettyUrl]] 属性为真时创建和解析URL的规则。本属性仅用于[[enablePrettyUrl]] 
+     * 为真的情况下。本属性中的每个元素都是创建一个单个URL规则对象的配置数组。配置数组在用来创建实例
+     * 之前会先与[[ruleConfig]] 覆盖合并。
      *
      * A special shortcut format can be used if a rule only specifies [[UrlRule::pattern|pattern]]
      * and [[UrlRule::route|route]]: `'pattern' => 'route'`. That is, instead of using a configuration
      * array, one can use the key to represent the pattern and the value the corresponding route.
      * For example, `'post/<id:\d+>' => 'post/view'`.
+     * 假如规则仅仅指定为[[UrlRule::pattern|pattern]]和[[UrlRule::route|route]]则可以启用一个特殊的快捷格式:
+     *  `'pattern' => 'route'`。就是说不适用配置数组，可以使用键代表模式，值代表相应的路由。
      *
      * For RESTful routing the mentioned shortcut format also allows you to specify the
      * [[UrlRule::verb|HTTP verb]] that the rule should apply for.
      * You can do that  by prepending it to the pattern, separated by space.
      * For example, `'PUT post/<id:\d+>' => 'post/update'`.
+     * 在RESTful风格路由下，提到的快捷格式同样允许你为[[UrlRule::verb|HTTP verb]]指定相应的HTTP请求方法，
+     * 例如：`'PUT post/<id:\d+>' => 'post/update'`
      * You may specify multiple verbs by separating them with comma
      * like this: `'POST,PUT post/index' => 'post/create'`.
+     * 你也可以指定多个HTTP请求方法，以逗号分隔，例如：
+     * `'POST,PUT post/index' => 'post/create'`
      * The supported verbs in the shortcut format are: GET, HEAD, POST, PUT, PATCH and DELETE.
      * Note that [[UrlRule::mode|mode]] will be set to PARSING_ONLY when specifying verb in this way
      * so you normally would not specify a verb for normal GET request.
+     * 快捷格式中支持的HTTP方法有有以下几种GET, HEAD, POST, PUT, PATCH 和 DELETE，注意，当以此种方式
+     * 指定HTTP请求方法时，[[UrlRule::mode|mode]] 属性会设为PARSING_ONLY ，止痒，自然不会为一个GET请求
+     * 指定HTTP方法了。
      *
      * Here is an example configuration for RESTful CRUD controller:
+     * 以下是为RESTful 风格增删改查控制器的示例配置：
      *
      * ~~~php
      * [
@@ -94,35 +118,45 @@ class UrlManager extends Component
      *
      * Note that if you modify this property after the UrlManager object is created, make sure
      * you populate the array with rule objects instead of rule configurations.
+     * 注意，假如你在UrlManager对象创建之后更改本属性，务必要确保填入本规则属性的是规则对象而不是规则配置。
      */
     public $rules = [];
     /**
      * @var string the URL suffix used when in 'path' format.
      * For example, ".html" can be used so that the URL looks like pointing to a static HTML page.
      * This property is used only if [[enablePrettyUrl]] is true.
+     * 字符串，在路径格式下为URL添加的后缀，例如添加.html后缀使URL看起来像静态也买你。本属性只能在
+     * [[enablePrettyUrl]] 为真的情况下使用。
      */
     public $suffix;
     /**
      * @var boolean whether to show entry script name in the constructed URL. Defaults to true.
      * This property is used only if [[enablePrettyUrl]] is true.
+     * 布尔值，决定是否在创建URL过程中显示入口脚本的文件名，默认为真，只在[[enablePrettyUrl]] 为真的
+     * 情况下可用。
      */
     public $showScriptName = true;
     /**
      * @var string the GET parameter name for route. This property is used only if [[enablePrettyUrl]] is false.
+     * 字符串，get参数中的路由参数名，本方法只在[[enablePrettyUrl]] 为假的情况下可用。
      */
     public $routeParam = 'r';
     /**
      * @var Cache|string the cache object or the application component ID of the cache object.
      * Compiled URL rules will be cached through this cache object, if it is available.
+     * 字符串表示的应用组件ID或Cache类实例，编译URL的规则会通过缓存对象被缓存，前提是缓存对象可用。
      *
      * After the UrlManager object is created, if you want to change this property,
      * you should only assign it with a cache object.
      * Set this property to false if you do not want to cache the URL rules.
+     * 在创建UrlManager 对象后，加入你想改变本属性，只能为其分配属性实例。
+     * 假如不像缓存就设为假。
      */
     public $cache = 'cache';
     /**
      * @var array the default configuration of URL rules. Individual rule configurations
      * specified via [[rules]] will take precedence when the same property of the rule is configured.
+     * 数组，URL规则类默认的配置数组。通过 [[rules]]指定的规则配置数组会覆盖本属性的默认配置（在实例化规则对象前）。
      */
     public $ruleConfig = ['class' => 'yii\web\UrlRule'];
 
@@ -139,15 +173,19 @@ class UrlManager extends Component
     {
         parent::init();
 
+        //假如未开启URL美化，或者规则是空的，则不用继续初始化了
         if (!$this->enablePrettyUrl || empty($this->rules)) {
             return;
         }
+        // 如果cache属性是字符串 则实例化之
         if (is_string($this->cache)) {
             $this->cache = Yii::$app->get($this->cache, false);
         }
+        // 进一步处理cache属性 现在该属性肯定是对象了
         if ($this->cache instanceof Cache) {
             $cacheKey = __CLASS__;
             $hash = md5(json_encode($this->rules));
+            // 缓存则取出 未缓存则放入
             if (($data = $this->cache->get($cacheKey)) !== false && isset($data[1]) && $data[1] === $hash) {
                 $this->rules = $data[0];
             } else {
@@ -155,6 +193,7 @@ class UrlManager extends Component
                 $this->cache->set($cacheKey, [$this->rules, $hash]);
             }
         } else {
+            // 如果本cache属性不是Cache类的实例也不是字符串 则构建规则
             $this->rules = $this->buildRules($this->rules);
         }
     }
@@ -186,9 +225,11 @@ class UrlManager extends Component
 
     /**
      * Builds URL rule objects from the given rule declarations.
+     * 根据定义的规则构建URL规则的实例
      * @param array $rules the rule declarations. Each array element represents a single rule declaration.
      * Please refer to [[rules]] for the acceptable rule formats.
      * @return UrlRuleInterface[] the rule objects built from the given rule declarations
+     * 根据所有配置构建出的规则UrlRuleInterface对象集合
      * @throws InvalidConfigException if a rule declaration is invalid
      */
     protected function buildRules($rules)
@@ -198,6 +239,7 @@ class UrlManager extends Component
         foreach ($rules as $key => $rule) {
             if (is_string($rule)) {
                 $rule = ['route' => $rule];
+                // 如果发现规则内手工指定了HTTP请求方式，则指定$rule['mode']
                 if (preg_match("/^((?:($verbs),)*($verbs))\\s+(.*)$/", $key, $matches)) {
                     $rule['verb'] = explode(',', $matches[1]);
                     // rules that do not apply for GET requests should not be use to create urls
@@ -208,6 +250,7 @@ class UrlManager extends Component
                 }
                 $rule['pattern'] = $key;
             }
+            // 使用得出的$rule覆盖合并ruleConfig属性并构建rule对象
             if (is_array($rule)) {
                 $rule = Yii::createObject(array_merge($this->ruleConfig, $rule));
             }

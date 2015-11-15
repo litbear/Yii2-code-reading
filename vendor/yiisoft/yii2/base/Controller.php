@@ -309,14 +309,19 @@ class Controller extends Component implements ViewContextInterface
 
     /**
      * This method is invoked right before an action is executed.
+     * 本方法在动作执行前被执行
      *
      * The method will trigger the [[EVENT_BEFORE_ACTION]] event. The return value of the method
      * will determine whether the action should continue to run.
+     * 本方法将会触发[[EVENT_BEFORE_ACTION]] 事件，本方法的返回值将会决定动作是否会继续被执行。
      *
      * In case the action should not run, the request should be handled inside of the `beforeAction` code
      * by either providing the necessary output or redirecting the request. Otherwise the response will be empty.
+     * 假如动作不会执行，那么请求将会由本方法内部的代码负责处理。处理的方式是给出必要的输出提示或者跳转请求。另外，响应
+     * 内容是空的。
      *
      * If you override this method, your code should look like the following:
+     * 假如重写了本方法，需要像这样组织代码：
      *
      * ```php
      * public function beforeAction($action)

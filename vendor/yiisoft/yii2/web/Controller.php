@@ -124,6 +124,7 @@ class Controller extends \yii\base\Controller
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
+            // 开启了防跨站请求伪造，且错误处理句柄中没错误，且请求中没有防攻击令牌 则报错
             if ($this->enableCsrfValidation && Yii::$app->getErrorHandler()->exception === null && !Yii::$app->getRequest()->validateCsrfToken()) {
                 throw new BadRequestHttpException(Yii::t('yii', 'Unable to verify your data submission.'));
             }
