@@ -133,16 +133,15 @@ if ($runAction && $this->beforeAction($action)) {
 - 可见`yii\base\Controller::runAction()`方法在执行动作之前执行了当前控制器对象的`beforeAction()`方法，该方法源代码如下：
 
 ```php
-public function afterAction($action, $result)
+public function beforeAction($action)
 {
     $event = new ActionEvent($action);
-    $event->result = $result;
-    $this->trigger(self::EVENT_AFTER_ACTION, $event);
-    return $event->result;
+    $this->trigger(self::EVENT_BEFORE_ACTION, $event);
+    return $event->isValid;
 }
 ```
 
-- 可见`yii\base\Controller::beforeAction()`方法触发了`self::EVENT_AFTER_ACTION`事件，而触发代码则调用的是父类`yii\base\Component::trigger()`方法，进一步查看`trigger()`方法如下：
+- 可见`yii\base\Controller::beforeAction()`方法触发了`self::EVENT_BEFORE_ACTION`事件，而触发代码则调用的是父类`yii\base\Component::trigger()`方法，进一步查看`trigger()`方法如下：
 
 ```php
 public function trigger($name, Event $event = null)

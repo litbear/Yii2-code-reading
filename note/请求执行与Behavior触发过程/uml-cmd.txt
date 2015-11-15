@@ -1,0 +1,11 @@
+php php-plantumlwriter write 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\web\Application.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Application.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Module.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Controller.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Component.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Behavior.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\base\Object.php 
+D:\amp\www\localhost\yii2-app-basic\vendor\yiisoft\yii2\di\ServiceLocator.php
+ > Behavior.puml  
+java -jar plantuml.jar Behavior.puml
