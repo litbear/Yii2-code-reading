@@ -71,7 +71,7 @@ class AttributeBehavior extends Behavior
      * @var mixed the value that will be assigned to the current attributes. This can be an anonymous function
      * or an arbitrary value. If the former, the return value of the function will be assigned to the attributes.
      * The signature of the function should be as follows,
-     * 将要分配给当前属性的值。可以使你敏函数或者任意的值。假如是前者，将会分配给属性函数的返回值。匿名函数的签名
+     * 将要分配给当前属性的值。可以是匿名函数或者任意的值。假如是前者，将会分配给属性函数的返回值。匿名函数的签名
      * 如下：
      *
      * ```php

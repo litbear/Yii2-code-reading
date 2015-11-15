@@ -77,6 +77,13 @@ class VerbFilter extends Behavior
      */
     public function events()
     {
+        /**
+         * 这里的数组元素[Controller::EVENT_BEFORE_ACTION => 'beforeAction']
+         * 'beforeAction'虽然是字符串，但是在调用yii\base\Behavior::on()的时候
+         * 会执行$owner->on($event, is_string($handler) ? [$this, $handler] : $handler);
+         * 这句，也就是着本行为行为将自己的一个方法绑定到了Controller的EVENT_BEFORE_ACTION
+         * 事件上。
+         */
         return [Controller::EVENT_BEFORE_ACTION => 'beforeAction'];
     }
 

@@ -75,11 +75,12 @@ class Behavior extends Object
 
     /**
      * Attaches the behavior object to the component.
-     * 绑定定位对象到组件上
+     * 绑定行为对象到组件上
      * The default implementation will set the [[owner]] property
      * and attach event handlers as declared in [[events]].
-     * 默认的实现会设置属性owner和像enents中定义的那样绑定事件句柄
+     * 默认的实现会为本行为对象设置属性owner以及像enents()方法返回的那样绑定事件句柄
      * Make sure you call the parent implementation if you override this method.
+     * 假如重写本方法，请确保调用了父类的实现。
      * @param Component $owner the component that this behavior is to be attached to.
      * 参数$owner 是一个Component实例
      * 该实例就是本行为所绑定的组件
