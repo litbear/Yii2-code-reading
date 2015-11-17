@@ -4,25 +4,25 @@ Guide to Yii2-user
 Getting Started
 ---------------
 
-- [Installation](installation.md)
-- [Configuration](configuration.md)
-- [List of available actions](available-actions.md)
+- [安装](installation.md)
+- [配置](configuration.md)
+- [可用动作列表](available-actions.md)
 
 Overriding
 ----------
 
-- [Overriding models](overriding-models.md)
-- [Overriding views](overriding-views.md)
-- [Overriding controllers](overriding-controllers.md)
+- [重写模型](overriding-models.md)
+- [重写视图](overriding-views.md)
+- [重写控制器](overriding-controllers.md)
 
 Basics
 ------
 
-- [User management](user-management.md)
-- [Authentication via social networks](social-auth.md)
-- [Mailer](mailer.md)
+- [用户管理](user-management.md)
+- [通过社交网站帐号授权](social-auth.md)
+- [Mailer工具](mailer.md)
 
 Guides
 ------
 
-- [How to add captcha](adding-captcha.md)
+- [如何添加验证码](adding-captcha.md)

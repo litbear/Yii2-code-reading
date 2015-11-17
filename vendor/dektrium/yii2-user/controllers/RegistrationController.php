@@ -25,6 +25,7 @@ use yii\widgets\ActiveForm;
 /**
  * RegistrationController is responsible for all registration process, which includes registration of a new account,
  * resending confirmation tokens, email confirmation and registration via social networks.
+ * RegistrationController类负责所有注册过程。包括新账户注册，发送确认密令，电子邮件确认和通过社交网站账户注册等等。
  *
  * @property \dektrium\user\Module $module
  *

@@ -200,7 +200,7 @@ abstract class Application extends Module
      * [[bootstrap()|bootstrapping process]]. If the class implements [[BootstrapInterface]],
      * its [[BootstrapInterface::bootstrap()|bootstrap()]] method will be also be called.
      * 上述的bootstrap键所指向的值是在应用执行初始化方法bootstrap()时被初始化的。假如该类实现了
-     * BootstrapInterface接口，那么BootstrapInterface::bootstrap()或bootstrap()将会被调用。
+     * BootstrapInterface接口，那么BootstrapInterface::bootstrap()将会被调用。
      *
      * If not set explicitly in the application config, this property will be populated with the contents of
      * `@vendor/yiisoft/extensions.php`.

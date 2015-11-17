@@ -46,6 +46,7 @@ class Bootstrap implements BootstrapInterface
     {
         /** @var $module Module */
         if ($app->hasModule('user') && ($module = $app->getModule('user')) instanceof Module) {
+            //用传来的modelmap对默认的map进行覆盖合并
             $this->_modelMap = array_merge($this->_modelMap, $module->modelMap);
             foreach ($this->_modelMap as $name => $definition) {
                 $class = "dektrium\\user\\models\\" . $name;

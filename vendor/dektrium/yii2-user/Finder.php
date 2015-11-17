@@ -16,6 +16,7 @@ use yii\db\ActiveQuery;
 
 /**
  * Finder provides some useful methods for finding active record models.
+ * Finder类为查找活动记录模型提供了一系列有用的方法。 
  *
  * @author Dmitry Erofeev <dmeroff@gmail.com>
  */
@@ -91,6 +92,7 @@ class Finder extends Object
 
     /**
      * Finds a user by the given id.
+     * 根据ID查找用户User实例
      *
      * @param  integer     $id User id to be used on search.
      * @return models\User
@@ -102,6 +104,7 @@ class Finder extends Object
 
     /**
      * Finds a user by the given username.
+     * 根据用户名查找用户User实例
      *
      * @param  string      $username Username to be used on search.
      * @return models\User
@@ -113,6 +116,7 @@ class Finder extends Object
 
     /**
      * Finds a user by the given email.
+     * 根据email查找用户User实例
      *
      * @param  string      $email Email to be used on search.
      * @return models\User
@@ -124,12 +128,14 @@ class Finder extends Object
 
     /**
      * Finds a user by the given username or email.
+     * 根据用户名或email查找用户实例
      *
      * @param  string      $usernameOrEmail Username or email to be used on search.
      * @return models\User
      */
     public function findUserByUsernameOrEmail($usernameOrEmail)
     {
+        // PHP居然自带了filter_var这东西！？
         if (filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
             return $this->findUserByEmail($usernameOrEmail);
         }
@@ -139,6 +145,7 @@ class Finder extends Object
 
     /**
      * Finds a user by the given condition.
+     * 根据给定的where条件查找\yii\db\ActiveQuery实例
      *
      * @param  mixed               $condition Condition to be used on search.
      * @return \yii\db\ActiveQuery
@@ -150,6 +157,7 @@ class Finder extends Object
 
     /**
      * Finds an account by id.
+     * 根据ID查询账户实例
      *
      * @param integer $id
      * @return models\Account|null
@@ -161,6 +169,7 @@ class Finder extends Object
 
     /**
      * Finds an account by client id and provider name.
+     * 根据程序提供者和客户端id查找账户对象
      *
      * @param string $provider
      * @param string $clientId
@@ -175,6 +184,7 @@ class Finder extends Object
     }
     /**
      * Finds a token by user id and code.
+     * 根据用户id和code查找密令
      *
      * @param  mixed  $condition
      * @return ActiveQuery
@@ -186,6 +196,7 @@ class Finder extends Object
 
     /**
      * Finds a profile by user id.
+     * 根据用户id查找用户资料
      *
      * @param integer $id
      * @return null|models\Profile
@@ -197,6 +208,7 @@ class Finder extends Object
 
     /**
      * Finds a profile
+     * 查找用户资料
      *
      * @param  mixed $condition
      * @return \yii\db\ActiveQuery

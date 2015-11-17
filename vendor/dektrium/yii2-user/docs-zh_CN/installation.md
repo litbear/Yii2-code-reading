@@ -1,21 +1,19 @@
-Installation
+安装
 ============
 
-This document will guide you through the process of installing Yii2-user using **composer**. Installation is a quick
-and easy three-step process.
+本文档会指导你如何通过**composer**安装`Yii2-user`，安装按简单，只需需要三步：
 
-Step 1: Download Yii2-user using composer
+第一步： 使用`composer`下载`Yii2-user`
 -----------------------------------------
 
-Add `"dektrium/yii2-user": "0.9.*@dev"` to the require section of your **composer.json** file and run
-`composer update` to download and install Yii2-user.
+将 `"dektrium/yii2-user": "0.9.*@dev"`添加到项目**composer.json**文件的`require`元素中，并运行`composer update` 命令下载并安装Yii2-user.
 
-Step 2: Configure your application
+第二步：配置应用
 ------------------------------------
 
-> **NOTE:** Make sure that you don't have any `user` component configuration in your config files.
+> **注意：** 确保在配置文件中不要启用 `user`应用组件（译者注：不然会无法登录）
 
-Add following lines to your main configuration file:
+向配置文件中假如以下几行：
 
 ```php
 'modules' => [
@@ -25,14 +23,12 @@ Add following lines to your main configuration file:
 ],
 ```
 
-Step 3: Update database schema
+第三步: 迁移数据库
 ------------------------------
 
-> **NOTE:** Make sure that you have properly configured **db** application component.
+> **注意：** 确保你已经正确配置了**db**用户组件（译者注：就是数据库链接）。
 
-After you downloaded and configured Yii2-user, the last thing you need to do is updating your database schema by
-applying
-the migrations:
+在下载和配置了`Yii2-user`组件之后，最后就是使用`migration`迁移数据库了：
 
 ```bash
 $ php yii migrate/up --migrationPath=@vendor/dektrium/yii2-user/migrations
@@ -41,11 +37,10 @@ $ php yii migrate/up --migrationPath=@vendor/dektrium/yii2-user/migrations
 FAQ
 ---
 
-**Installation failed. There are no files in `vendor/dektrium/yii2-user`**
+**安装失败`vendor/dektrium/yii2-user`文件夹下没有文件**
 
-*Try removing Yii2-user version constraint from composer.json, then run `composer update`. After composer finish
- removing of Yii2-user, re-add version constraint and `composer update` again.*
+*从`composer.json`文件中移除`Yii2-user`的版本约束，再次尝试运行`composer update`命令。在`composer`移除`Yii2-user`之后，重新添加版本号，再次安装。
 
-**I can't log in. After clicking login button it just redirects without logging me in.**
+**点击登录按钮无法登录，重定向到登录表单页面**
 
-*You should remove `user` component configuration from your config files.*
+*从配置文件中移除`user`用户组件*
