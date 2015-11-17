@@ -45,6 +45,7 @@ class Password
     /**
      * Generates user-friendly random password containing at least one lower case letter, one uppercase letter and one
      * digit. The remaining characters in the password are chosen at random from those three sets.
+     * 生成用户友好的8位随机密码。（就是没有易混淆的数字0，1和字母O，L，I）
      * @see https://gist.github.com/tylerhall/521810
      * @param $length
      * @return string

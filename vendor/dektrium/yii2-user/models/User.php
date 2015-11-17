@@ -205,6 +205,8 @@ class User extends ActiveRecord implements IdentityInterface
      * This method is used to create new user account. If password is not set, this method will generate new 8-char
      * password. After saving user to database, this method uses mailer component to send credentials
      * (username and password) to user via email.
+     * 本方法用于创建新用户，假如没设置密码，本方法会生成一个新的8位密密麻，在保存用户信息之后，调用mailer组件
+     * 通过电子邮件发送认证信息。
      *
      * @return bool
      */
