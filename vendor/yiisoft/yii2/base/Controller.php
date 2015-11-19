@@ -413,36 +413,52 @@ class Controller extends Component implements ViewContextInterface
 
     /**
      * Renders a view and applies layout if available.
+     * 渲染视图并对其应用布局文件
      *
      * The view to be rendered can be specified in one of the following formats:
+     * 待渲染的布局文件可以是以下几种形式之一（View类翻译过了，这里简要说明）:
      *
      * - path alias (e.g. "@app/views/site/index");
+     * - 别名
      * - absolute path within application (e.g. "//site/index"): the view name starts with double slashes.
      *   The actual view file will be looked for under the [[Application::viewPath|view path]] of the application.
+     * - 双斜线开头的，以app根目录为基准的绝对路径
      * - absolute path within module (e.g. "/site/index"): the view name starts with a single slash.
      *   The actual view file will be looked for under the [[Module::viewPath|view path]] of [[module]].
+     * - 单斜线开头的，以本模块为基准的绝对路径
      * - relative path (e.g. "index"): the actual view file will be looked for under [[viewPath]].
+     * - 相对路径
      *
      * To determine which layout should be applied, the following two steps are conducted:
+     * 判断要应用哪个模板，需要经过以下几步：
      *
      * 1. In the first step, it determines the layout name and the context module:
+     * 1. 第一步，判断模型名称和模块上下文。
      *
      * - If [[layout]] is specified as a string, use it as the layout name and [[module]] as the context module;
+     * - 判断本控制器的[[layout]]属性值是否为字符串，如果是，则使用为布局文件，并且将当前模块确定为模块上下文。
      * - If [[layout]] is null, search through all ancestor modules of this controller and find the first
      *   module whose [[Module::layout|layout]] is not null. The layout and the corresponding module
      *   are used as the layout name and the context module, respectively. If such a module is not found
      *   or the corresponding layout is not a string, it will return false, meaning no applicable layout.
+     * - 如果[[layout]]属性为空，则在该控制器的所有祖先模块中从子孙到祖先依次搜索[[layout]]属性，直到找到有字符串属性值
+     *   的，使用为布局文件，对应的模块使用为模块上下文。假如，一直没找到[[layout]]属性有值的模块，则不应用布局文件。
      *
      * 2. In the second step, it determines the actual layout file according to the previously found layout name
      *    and context module. The layout name can be:
+     * 2. 第二步，获取上一步取得的布局文件真是的路径以及模块上下文，布局文件的名称可以为：
      *
      * - a path alias (e.g. "@app/views/layouts/main");
+     * - 别名
      * - an absolute path (e.g. "/main"): the layout name starts with a slash. The actual layout file will be
      *   looked for under the [[Application::layoutPath|layout path]] of the application;
+     * - 单斜线开头的 在应用下搜索的布局文件
      * - a relative path (e.g. "main"): the actual layout file will be looked for under the
      *   [[Module::layoutPath|layout path]] of the context module.
+     * - 相对路径，在当前模块上下文处的view文件夹下的布局文件
      *
      * If the layout name does not contain a file extension, it will use the default one `.php`.
+     * 假如布局文件没有扩展名，默认为`.php`
      *
      * @param string $view the view name.
      * @param array $params the parameters (name-value pairs) that should be made available in the view.
@@ -452,12 +468,18 @@ class Controller extends Component implements ViewContextInterface
      */
     public function render($view, $params = [])
     {
+        /**
+         *  先调用View类的方法渲染相应的视图
+         * （不带布局文件）以字符串形式返回
+         */
         $content = $this->getView()->render($view, $params, $this);
+        // 再渲染内容，并返回结果
         return $this->renderContent($content);
     }
 
     /**
      * Renders a static string by applying a layout.
+     * 渲染静态字符串，并为之应用布局文件
      * @param string $content the static string being rendered
      * @return string the rendering result of the layout with the given static string as the `$content` variable.
      * If the layout is disabled, the string will be returned back.
@@ -467,6 +489,7 @@ class Controller extends Component implements ViewContextInterface
     {
         $layoutFile = $this->findLayoutFile($this->getView());
         if ($layoutFile !== false) {
+            // 再次调用renderFile()方法，渲染布局文件，并分配刚刚返回的字符串为$content变量
             return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
         } else {
             return $content;
@@ -476,6 +499,7 @@ class Controller extends Component implements ViewContextInterface
     /**
      * Renders a view without applying layout.
      * This method differs from [[render()]] in that it does not apply any layout.
+     * 不应用布局文件的渲染
      * @param string $view the view name. Please refer to [[render()]] on how to specify a view name.
      * @param array $params the parameters (name-value pairs) that should be made available in the view.
      * @return string the rendering result.
@@ -535,6 +559,7 @@ class Controller extends Component implements ViewContextInterface
 
     /**
      * Finds the applicable layout file.
+     * 找到该应用的布局文件
      * @param View $view the view object to render the layout file.
      * @return string|boolean the layout file path, or false if layout is not needed.
      * Please refer to [[render()]] on how to specify this parameter.
@@ -546,6 +571,7 @@ class Controller extends Component implements ViewContextInterface
         if (is_string($this->layout)) {
             $layout = $this->layout;
         } elseif ($this->layout === null) {
+            // 一直往上找
             while ($module !== null && $module->layout === null) {
                 $module = $module->module;
             }

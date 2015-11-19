@@ -205,6 +205,7 @@ class View extends Component
             } else {
                 throw new InvalidCallException("Unable to locate view file for view '$view': no active controller.");
             }
+        // 这里看的不太明白
         } elseif ($context instanceof ViewContextInterface) {
             $file = $context->getViewPath() . DIRECTORY_SEPARATOR . $view;
         } elseif (($currentViewFile = $this->getViewFile()) !== false) {
@@ -213,6 +214,7 @@ class View extends Component
             throw new InvalidCallException("Unable to resolve view file for view '$view': no active view context.");
         }
 
+        //有扩展名直接返回 没有扩展名，则拼接扩展名
         if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
             return $file;
         }
@@ -226,30 +228,41 @@ class View extends Component
 
     /**
      * Renders a view file.
+     * 渲染视图文件
      *
      * If [[theme]] is enabled (not null), it will try to render the themed version of the view file as long
      * as it is available.
+     * 假如开启了[[theme]]属性，则会尝试为当前模板文件渲染主题。
      *
      * The method will call [[FileHelper::localize()]] to localize the view file.
+     * 本方法会调用[[FileHelper::localize()]]方法对视图文件进行本地化
      *
      * If [[renderers|renderer]] is enabled (not null), the method will use it to render the view file.
      * Otherwise, it will simply include the view file as a normal PHP file, capture its output and
      * return it as a string.
+     * 假如开启了[[renderers|renderer]]属性（即开启了模板引擎），本方法会使用模板引擎渲染视图文件。否则，仅仅将
+     * 模板文件当做PHP脚本文件对待。捕获内同并以字符串返回。
      *
      * @param string $viewFile the view file. This can be either an absolute file path or an alias of it.
+     * 字符串，模板文件的路径， 既可以是绝对路径也可以是别名。
      * @param array $params the parameters (name-value pairs) that will be extracted and made available in the view file.
+     * 分配给模板的变量数组，键值对形式。
      * @param object $context the context that the view should use for rendering the view. If null,
      * existing [[context]] will be used.
      * @return string the rendering result
+     * 返回值为字符串，渲染的结果
      * @throws InvalidParamException if the view file does not exist
      */
     public function renderFile($viewFile, $params = [], $context = null)
     {
+        // 转换别名
         $viewFile = Yii::getAlias($viewFile);
 
+        // 制订了主题，就应用主题
         if ($this->theme !== null) {
             $viewFile = $this->theme->applyTo($viewFile);
         }
+        // 获取多语言本地化版本
         if (is_file($viewFile)) {
             $viewFile = FileHelper::localize($viewFile);
         } else {
@@ -263,9 +276,11 @@ class View extends Component
         $output = '';
         $this->_viewFiles[] = $viewFile;
 
+        // 触发渲染前事件
         if ($this->beforeRender($viewFile, $params)) {
             Yii::trace("Rendering view file: $viewFile", __METHOD__);
             $ext = pathinfo($viewFile, PATHINFO_EXTENSION);
+            // 判断是否设置了对应的模板引擎，并使用模板引擎解码
             if (isset($this->renderers[$ext])) {
                 if (is_array($this->renderers[$ext]) || is_string($this->renderers[$ext])) {
                     $this->renderers[$ext] = Yii::createObject($this->renderers[$ext]);
@@ -276,9 +291,14 @@ class View extends Component
             } else {
                 $output = $this->renderPhpFile($viewFile, $params);
             }
+            // 渲染后事件
             $this->afterRender($viewFile, $params, $output);
         }
 
+        /**
+         * 这里使用array_pop将数组最后一个单元弹出，
+         * 应该是解决嵌套视图渲染的顺序问题的
+         */
         array_pop($this->_viewFiles);
         $this->context = $oldContext;
 

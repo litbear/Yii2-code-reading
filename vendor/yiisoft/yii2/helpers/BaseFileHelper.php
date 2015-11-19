@@ -70,6 +70,7 @@ class BaseFileHelper
 
     /**
      * Returns the localized version of a specified file.
+     * 返回本地化后的文件
      *
      * The searching is based on the specified language code. In particular,
      * a file with the same name will be looked for under the subdirectory
@@ -77,23 +78,30 @@ class BaseFileHelper
      * and language code "zh-CN", the localized file will be looked for as
      * "path/to/zh-CN/view.php". If the file is not found, it will try a fallback with just a language code that is
      * "zh" i.e. "path/to/zh/view.php". If it is not found as well the original file will be returned.
+     * 以指定的语言代码搜索文件，一般来说，会搜索视图文件就下以语言代码命名的文件夹下的同名文件。
+     * 例如"path/to/view.php"文件的中文版本在"path/to/zh-CN/view.php"处。如果没找到，
+     * 则会试着调用回调函数找zh文件夹下的同名文件，假如还没有招到，则返回源文件。
      *
      * If the target and the source language codes are the same,
      * the original file will be returned.
+     * 假如目标文件与源文件一致，则还会返回源文件。
      *
      * @param string $file the original file
      * @param string $language the target language that the file should be localized to.
      * If not set, the value of [[\yii\base\Application::language]] will be used.
      * @param string $sourceLanguage the language that the original file is in.
      * If not set, the value of [[\yii\base\Application::sourceLanguage]] will be used.
+     * 源文件语言，假如未设置，则使用应用配置中的语言代码。
      * @return string the matching localized file, or the original file if the localized version is not found.
      * If the target and the source language codes are the same, the original file will be returned.
      */
     public static function localize($file, $language = null, $sourceLanguage = null)
     {
+        // 确定目标文件语言
         if ($language === null) {
             $language = Yii::$app->language;
         }
+        // 确定源文件语言
         if ($sourceLanguage === null) {
             $sourceLanguage = Yii::$app->sourceLanguage;
         }
@@ -104,6 +112,7 @@ class BaseFileHelper
         if (is_file($desiredFile)) {
             return $desiredFile;
         } else {
+            // 尝试截取语言代码前两位再次拼接
             $language = substr($language, 0, 2);
             if ($language === $sourceLanguage) {
                 return $file;

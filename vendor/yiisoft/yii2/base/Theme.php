@@ -124,6 +124,7 @@ class Theme extends Component
     /**
      * Converts a file to a themed file if possible.
      * If there is no corresponding themed file, the original file will be returned.
+     * 将文件转换为带主题的文件，假如没有对应的主题文件，则返回源文件
      * @param string $path the file to be themed
      * @return string the themed file, or the original file if the themed version is not available.
      * @throws InvalidConfigException if [[basePath]] is not set
@@ -174,6 +175,7 @@ class Theme extends Component
 
     /**
      * Converts a relative file path into an absolute one using [[basePath]].
+     * 使用[[basePath]]方法将相对路径转换为绝对路径
      * @param string $path the relative file path to be converted.
      * @return string the absolute file path
      * @throws InvalidConfigException if [[baseUrl]] is not set
