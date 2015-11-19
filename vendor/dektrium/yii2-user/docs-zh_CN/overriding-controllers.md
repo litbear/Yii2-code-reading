@@ -8,8 +8,7 @@ Step 1: 创建新的控制器
 
 首先，在你自己的命名空间下创建新的控制器（推荐使用 `app\controllers\user`），并从你想要使用的类继承，
 
-例如，假如你想重写`AdminController`类，你需要创建`app\controllers\user\AdminController` 并继承自
-it from `dektrium\user\controllers\AdminController`：
+例如，假如你想重写`AdminController`类，你需要创建`app\controllers\user\AdminController` 并继承自`dektrium\user\controllers\AdminController`：
 
 ```php
 namespace app\controllers\user;

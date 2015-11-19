@@ -15,11 +15,14 @@ use yii\widgets\FragmentCache;
 
 /**
  * View represents a view object in the MVC pattern.
+ * View类代表了MVC模式中的视图对象
  *
  * View provides a set of methods (e.g. [[render()]]) for rendering purpose.
+ * View类提供了一系列的方法以达到渲染的目的。
  *
  * @property string|boolean $viewFile The view file currently being rendered. False if no view file is being
  * rendered. This property is read-only.
+ * 字符串或布尔值，当前被渲染的俄视图文件。假如当前没有文件被渲染，则为false，只读属性。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -45,16 +48,19 @@ class View extends Component
 
     /**
      * @var ViewContextInterface the context under which the [[renderFile()]] method is being invoked.
+     * ViewContextInterface接口的实例， 被调用的[[renderFile()]] 方法内的内容
      */
     public $context;
     /**
      * @var mixed custom parameters that are shared among view templates.
+     * 在视图模版内被分享的用户参数
      */
     public $params = [];
     /**
      * @var array a list of available renderers indexed by their corresponding supported file extensions.
      * Each renderer may be a view renderer object or the configuration for creating the renderer object.
      * For example, the following configuration enables both Smarty and Twig view renderers:
+     * 可用模版引擎集合，键值对形式，键是模版文件的扩展名，值是模版引擎对象或者模版引擎的配置数组。例如：
      *
      * ~~~
      * [
@@ -65,15 +71,18 @@ class View extends Component
      *
      * If no renderer is available for the given view file, the view file will be treated as a normal PHP
      * and rendered via [[renderPhpFile()]].
+     * 假如没有可用的模版引擎，则会被当成默认的PHP文件，由[[renderPhpFile()]]方法渲染。
      */
     public $renderers;
     /**
      * @var string the default view file extension. This will be appended to view file names if they don't have file extensions.
+     * 默认视图文件的扩展名。假如指定视图文件时没有指定扩展名，则在文件名后面附加默认扩展名。
      */
     public $defaultExtension = 'php';
     /**
      * @var Theme|array|string the theme object or the configuration for creating the theme object.
      * If not set, it means theming is not enabled.
+     * Theme类实例或配置数组或字符串，配置数组是用来创建Theme类实例的，假如未设置本属性，则意味着不开启主题。
      */
     public $theme;
     /**
@@ -81,24 +90,29 @@ class View extends Component
      * are the corresponding block content. You can call [[beginBlock()]] and [[endBlock()]]
      * to capture small fragments of a view. They can be later accessed somewhere else
      * through this property.
+     * 命名输出块的集合。键值对形式，键是块的名称，值是相应块的内容。可以通过调用[[beginBlock()]]
+     * 和[[endBlock()]]方法获得视图的小片段。稍后可通过本属性访问相应的块。
      */
     public $blocks;
     /**
      * @var array a list of currently active fragment cache widgets. This property
      * is used internally to implement the content caching feature. Do not modify it directly.
      * @internal
+     * 当前激活的碎片缓存集合，本属性被用于内部实现缓存功能。不要直接修改本属性。
      */
     public $cacheStack = [];
     /**
      * @var array a list of placeholders for embedding dynamic contents. This property
      * is used internally to implement the content caching feature. Do not modify it directly.
      * @internal
+     * 待嵌入动态内容的占位符，被属性被用于内部实现缓存功能，不要直接修改本属性。
      */
     public $dynamicPlaceholders = [];
 
     /**
      * @var array the view files currently being rendered. There may be multiple view files being
      * rendered at a moment because one view may be rendered within another.
+     * 当前被渲染的视图文件数组，因为视图的包含关系，也许会同一时间会包含多个视图文件。
      */
     private $_viewFiles = [];
 
@@ -109,6 +123,7 @@ class View extends Component
     public function init()
     {
         parent::init();
+        //除了调用父类的初始化之外方法之外，还要实例化Theme类
         if (is_array($this->theme)) {
             if (!isset($this->theme['class'])) {
                 $this->theme['class'] = 'yii\base\Theme';
@@ -121,18 +136,27 @@ class View extends Component
 
     /**
      * Renders a view.
+     * 渲染视图
      *
      * The view to be rendered can be specified in one of the following formats:
+     * 视图可以使用以下几种格式的路径渲染：
      *
      * - path alias (e.g. "@app/views/site/index");
+     * - 路径别名。
      * - absolute path within application (e.g. "//site/index"): the view name starts with double slashes.
      *   The actual view file will be looked for under the [[Application::viewPath|view path]] of the application.
+     * - 以应用文件夹为准的绝对路径：以双斜线开头的视图文件，会去[[Application::viewPath|view path]] 属性下去找
      * - absolute path within current module (e.g. "/site/index"): the view name starts with a single slash.
      *   The actual view file will be looked for under the [[Module::viewPath|view path]] of the [[Controller::module|current module]].
+     * - 以当前模块为准的相对路径：以单斜线开头的，从本模块的[[Module::viewPath|view path]] 属性或者[[Controller::module|current module]]
+     *   属性中去找，子类具有优先权。
      * - relative view (e.g. "index"): the view name does not start with `@` or `/`. The corresponding view file will be
      *   looked for under the [[ViewContextInterface::getViewPath()|view path]] of the view `$context`.
      *   If `$context` is not given, it will be looked for under the directory containing the view currently
      *   being rendered (i.e., this happens when rendering a view within another view).
+     * - 相对视图：既不是以`@`也不是以单斜线开头的视图路径。 视图文件路径由上下文的 
+     *   [[yii\base\ViewContextInterface::getViewPath()|view path]] 开始，这种主要用在控制器和小部件中渲染视图，
+     *   例如：如果上下文为控制器SiteController，site/about 对应到 @app/views/site/about.php。
      *
      * @param string $view the view name.
      * @param array $params the parameters (name-value pairs) that will be extracted and made available in the view file.
@@ -140,6 +164,7 @@ class View extends Component
      * in the view. If the context implements [[ViewContextInterface]], it may also be used to locate
      * the view file corresponding to a relative view name.
      * @return string the rendering result
+     * 返回值是字符串，渲染的结果。
      * @throws InvalidParamException if the view cannot be resolved or the view file does not exist.
      * @see renderFile()
      */
@@ -151,12 +176,17 @@ class View extends Component
 
     /**
      * Finds the view file based on the given view name.
+     * 根据给定的视图名称找真实的视图文件
      * @param string $view the view name or the path alias of the view file. Please refer to [[render()]]
      * on how to specify this parameter.
+     * 从[[render()]]传来的未经处理的视图路径名
      * @param object $context the context to be assigned to the view and can later be accessed via [[context]]
      * in the view. If the context implements [[ViewContextInterface]], it may also be used to locate
      * the view file corresponding to a relative view name.
+     * 待分配到视图中的内容，稍后在视图中可以用[[context]]访问。假如[[context]]实现自[[ViewContextInterface]]
+     * 则可以被用来定位视图文件。【没看懂】
      * @return string the view file path. Note that the file may not exist.
+     * 返回视图文件的真实路径。注意，也可能是不存在的，
      * @throws InvalidCallException if a relative view name is given while there is no active context to
      * determine the corresponding view file.
      */
@@ -306,12 +336,16 @@ class View extends Component
 
     /**
      * Renders a view file as a PHP script.
+     * 渲染PHP脚本视图文件
      *
      * This method treats the view file as a PHP script and includes the file.
      * It extracts the given parameters and makes them available in the view file.
      * The method captures the output of the included view file and returns it as a string.
+     * 本方法将视图文件当作PHP脚本，并引入文件。将给定的参数分配到视图文件中使之在视图
+     * 文件中可用。本方法从视图文件中获取内容，渲染后，以字符串返回。
      *
      * This method should mainly be called by view renderer or [[renderFile()]].
+     * 本方法主要由[[renderFile()]]方法调用
      *
      * @param string $_file_ the view file.
      * @param array $_params_ the parameters (name-value pairs) that will be extracted and made available in the view file.

@@ -46,7 +46,16 @@ $config = [
             'confirmWithin' => 21600,
             'cost' => 12,
             'admins' => ['admin'],
+            // 重写控制器
             'enableConfirmation' => false,
+            'controllerMap' => [
+                'admin' => 'app\controllers\user\AdminController',
+                'profile' => 'app\controllers\user\ProfileController',
+                'recovery' => 'app\controllers\user\RecoveryController',
+                'registration' => 'app\controllers\user\RegistrationController',
+                'security' => 'app\controllers\user\SecurityController',
+                'setting' => 'app\controllers\user\SettingsController',
+            ],
         ],
     ],
     'params' => $params,
