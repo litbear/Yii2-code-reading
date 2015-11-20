@@ -16,15 +16,19 @@ use yii\helpers\StringHelper;
 
 /**
  * The web Response class represents an HTTP response
+ * 响应HTTP请求的类
  *
  * It holds the [[headers]], [[cookies]] and [[content]] that is to be sent to the client.
  * It also controls the HTTP [[statusCode|status code]].
+ * 本类控制了HTTP头，cookies和内容向客户端的输出，同样控制HTTP的状态码。
  *
  * Response is configured as an application component in [[\yii\web\Application]] by default.
  * You can access that instance via `Yii::$app->response`.
+ * Response类可以被当作一个应用组件进行配置，并且使用`Yii::$app->response`进行访问
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
+ * 你可以通过向应用配置文件的`components`元素下加入以下内容以修改本类的配置：
  *
  * ~~~
  * 'response' => [
@@ -35,23 +39,37 @@ use yii\helpers\StringHelper;
  * ~~~
  *
  * @property CookieCollection $cookies The cookie collection. This property is read-only.
+ * CookieCollection 类实例，cookie管理对象，只读属性。
  * @property string $downloadHeaders The attachment file name. This property is write-only.
+ * 字符串，附件文件名，只写属性。
  * @property HeaderCollection $headers The header collection. This property is read-only.
+ * HeaderCollection 类实例，HTTP头的管理对象，只读属性。
  * @property boolean $isClientError Whether this response indicates a client error. This property is
  * read-only.
+ * 布尔值，判断响应是否指示一个客户端错误，只读属性。
  * @property boolean $isEmpty Whether this response is empty. This property is read-only.
+ * 布尔值，判断响应是否为空，只读属性。
  * @property boolean $isForbidden Whether this response indicates the current request is forbidden. This
  * property is read-only.
+ * 布尔值，判断响应是否禁止本次请求，只读属性。
  * @property boolean $isInformational Whether this response is informational. This property is read-only.
+ * 布尔值，判断响应是否是信息性的，只读属性。
  * @property boolean $isInvalid Whether this response has a valid [[statusCode]]. This property is read-only.
+ * 布尔值，通过[[statusCode]]判断响应是否是合法的，只读属性。
  * @property boolean $isNotFound Whether this response indicates the currently requested resource is not
  * found. This property is read-only.
+ * 布尔值，判断响应是否指示当前请求的资源未找到，只读属性。
  * @property boolean $isOk Whether this response is OK. This property is read-only.
+ * 布尔值，判断响应是否是OK的，只读属性。
  * @property boolean $isRedirection Whether this response is a redirection. This property is read-only.
+ * 布尔值，判断响应是否是重定向的，只读属性。
  * @property boolean $isServerError Whether this response indicates a server error. This property is
  * read-only.
+ * 布尔值，判断响应是否发生服务器错误，只读属性。
  * @property boolean $isSuccessful Whether this response is successful. This property is read-only.
+ * 布尔值，判断响应是否是成功的，只读属性。
  * @property integer $statusCode The HTTP status code to send with the response.
+ * 整型，HTTP状态码。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Carsten Brandt <mail@cebe.cc>
@@ -61,15 +79,19 @@ class Response extends \yii\base\Response
 {
     /**
      * @event ResponseEvent an event that is triggered at the beginning of [[send()]].
+     * 发送前事件名称
      */
     const EVENT_BEFORE_SEND = 'beforeSend';
     /**
      * @event ResponseEvent an event that is triggered at the end of [[send()]].
+     * 发送后事件名称
      */
     const EVENT_AFTER_SEND = 'afterSend';
     /**
      * @event ResponseEvent an event that is triggered right after [[prepare()]] is called in [[send()]].
      * You may respond to this event to filter the response content before it is sent to the client.
+     * 在[[prepare()]]方法执行后触发的事件名称，在[[send()]]中调用。可能需要响应本事件以在将响应内容发送到
+     * 客户端前对其进行过滤。
      */
     const EVENT_AFTER_PREPARE = 'afterPrepare';
     const FORMAT_RAW = 'raw';
@@ -82,51 +104,67 @@ class Response extends \yii\base\Response
      * @var string the response format. This determines how to convert [[data]] into [[content]]
      * when the latter is not set. The value of this property must be one of the keys declared in the [[formatters] array.
      * By default, the following formats are supported:
+     * 字符串，响应的格式，本属性决定了在 [[content]]属性未设置时如何将[[data]]属性转换为[[content]]属性，
+     * 本属性的值必须是[[formatters]数组中定义的键，默认支持以下几种格式。
      *
      * - [[FORMAT_RAW]]: the data will be treated as the response content without any conversion.
      *   No extra HTTP header will be added.
+     * - [[FORMAT_RAW]]: data属性会被当作响应内容不加转换，不增加额外的HTTP头。
      * - [[FORMAT_HTML]]: the data will be treated as the response content without any conversion.
      *   The "Content-Type" header will set as "text/html".
+     * - [[FORMAT_HTML]]: data属性会被当作响应内容不加转换，但"Content-Type"HTTP头会被设置为"text/html"
      * - [[FORMAT_JSON]]: the data will be converted into JSON format, and the "Content-Type"
      *   header will be set as "application/json".
+     * - [[FORMAT_JSON]]: data属性会被转换为JSON格式，并且"Content-Type"HTTP头会被设置为"application/json"
      * - [[FORMAT_JSONP]]: the data will be converted into JSONP format, and the "Content-Type"
      *   header will be set as "text/javascript". Note that in this case `$data` must be an array
      *   with "data" and "callback" elements. The former refers to the actual data to be sent,
      *   while the latter refers to the name of the JavaScript callback.
+     * - [[FORMAT_JSONP]]: data属性会被转换为JSONP格式，并且"Content-Type"HTTP头会被设置为"text/javascript"
+     *   注意，如果选择了这种格式，`$data`变量中必须含有"data"元素和"callback" 元素，前者是被发送的数据，后者
+     *   是JavaScript的回调函数名。
      * - [[FORMAT_XML]]: the data will be converted into XML format. Please refer to [[XmlResponseFormatter]]
      *   for more details.
+     * - [[FORMAT_XML]]: data属性会被转换为XML格式，请参考[[XmlResponseFormatter]]获取更多细节。
      *
      * You may customize the formatting process or support additional formats by configuring [[formatters]].
+     * 可以通过配置[[formatters]]定制更多格式。
      * @see formatters
      */
     public $format = self::FORMAT_HTML;
     /**
      * @var string the MIME type (e.g. `application/json`) from the request ACCEPT header chosen for this response.
      * This property is mainly set by [[\yii\filters\ContentNegotiator]].
+     * 字符串，从请求头ACCEPT字段获取的MINE类型，本属性主要由[[\yii\filters\ContentNegotiator]]设置
      */
     public $acceptMimeType;
     /**
      * @var array the parameters (e.g. `['q' => 1, 'version' => '1.0']`) associated with the [[acceptMimeType|chosen MIME type]].
      * This is a list of name-value pairs associated with [[acceptMimeType]] from the ACCEPT HTTP header.
      * This property is mainly set by [[\yii\filters\ContentNegotiator]].
+     * 数组，与[[acceptMimeType|chosen MIME type]]相关的参数，本属性是与从HTTP头ACCEPT字段出获得的[[acceptMimeType]]属性
+     * 相关的键值对集合
      */
     public $acceptParams = [];
     /**
      * @var array the formatters for converting data into the response content of the specified [[format]].
      * The array keys are the format names, and the array values are the corresponding configurations
      * for creating the formatter objects.
+     * 数组，转换data属性的目标格式的集合。数组元素名为格式名，元素值为创造指定的格式对象的配置数组。
      * @see format
      */
     public $formatters = [];
     /**
      * @var mixed the original response data. When this is not null, it will be converted into [[content]]
      * according to [[format]] when the response is being sent out.
+     * 多种格式，原始的响应信息。本属性不为空时，在发送响应的时候，将会以[[format]]属性格式转换为[[content]]属性
      * @see content
      */
     public $data;
     /**
      * @var string the response content. When [[data]] is not null, it will be converted into [[content]]
      * according to [[format]] when the response is being sent out.
+     * 字符串，响应内容。[[data]]属性不为空时，将会在发送响应时按照[[format]]被转换为[[content]]
      * @see data
      */
     public $content;
@@ -134,11 +172,14 @@ class Response extends \yii\base\Response
      * @var resource|array the stream to be sent. This can be a stream handle or an array of stream handle,
      * the begin position and the end position. Note that when this property is set, the [[data]] and [[content]]
      * properties will be ignored by [[send()]].
+     * 资源或者数组，发送的数据流。可以是数据流句柄或者数据流句柄组成的数组，数据流开始位置和结束位置。注意，当设置
+     * 本属性时，[[send()]]方法将会忽略[[data]] 和 [[content]]属性
      */
     public $stream;
     /**
      * @var string the charset of the text response. If not set, it will use
      * the value of [[Application::charset]].
+     * 字符串，响应内容的字符集，使用[[Application::charset]]的值。
      */
     public $charset;
     /**
@@ -149,14 +190,17 @@ class Response extends \yii\base\Response
     /**
      * @var string the version of the HTTP protocol to use. If not set, it will be determined via `$_SERVER['SERVER_PROTOCOL']`,
      * or '1.1' if that is not available.
+     * HTTP协议版本，未设置本属性，则由全局变量`$_SERVER['SERVER_PROTOCOL']决定，或者'1.1'版本不可用。
      */
     public $version;
     /**
      * @var boolean whether the response has been sent. If this is true, calling [[send()]] will do nothing.
+     * 布尔值，判断响应是否被发送，如果值为true，则调用[[send()]]不会做任何事。
      */
     public $isSent = false;
     /**
      * @var array list of HTTP status codes and the corresponding texts
+     * HTTP状态码及响应描述的集合
      */
     public static $httpStatuses = [
         100 => 'Continue',
@@ -228,10 +272,12 @@ class Response extends \yii\base\Response
 
     /**
      * @var integer the HTTP status code to send with the response.
+     * 向客户端发送的响应码
      */
     private $_statusCode = 200;
     /**
      * @var HeaderCollection
+     * HTTP头集合
      */
     private $_headers;
 
@@ -241,6 +287,7 @@ class Response extends \yii\base\Response
      */
     public function init()
     {
+        // 确定HTTP版本号
         if ($this->version === null) {
             if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0') {
                 $this->version = '1.0';
@@ -248,14 +295,17 @@ class Response extends \yii\base\Response
                 $this->version = '1.1';
             }
         }
+        // 确定响应字符集
         if ($this->charset === null) {
             $this->charset = Yii::$app->charset;
         }
+        // 确定响应内容格式，与默认格式列表覆盖合并
         $this->formatters = array_merge($this->defaultFormatters(), $this->formatters);
     }
 
     /**
      * @return integer the HTTP status code to send with the response.
+     * 获取HTTP状态码
      */
     public function getStatusCode()
     {
@@ -265,12 +315,14 @@ class Response extends \yii\base\Response
     /**
      * Sets the response status code.
      * This method will set the corresponding status text if `$text` is null.
+     * 设置HTTP响应状态码，本方法将会在`$text`为空的情况下设置响应的装填文字。
      * @param integer $value the status code
      * @param string $text the status text. If not set, it will be set automatically based on the status code.
      * @throws InvalidParamException if the status code is invalid.
      */
     public function setStatusCode($value, $text = null)
     {
+        // 默认状态码200
         if ($value === null) {
             $value = 200;
         }
@@ -288,6 +340,7 @@ class Response extends \yii\base\Response
     /**
      * Returns the header collection.
      * The header collection contains the currently registered HTTP headers.
+     * 返回一个HTTP响应头集合对象，响应头集合对象包含了当前注册的HTTP响应头
      * @return HeaderCollection the header collection
      */
     public function getHeaders()
@@ -306,11 +359,17 @@ class Response extends \yii\base\Response
         if ($this->isSent) {
             return;
         }
+        // 触发发送前事件
         $this->trigger(self::EVENT_BEFORE_SEND);
+        // 将data转换为content
         $this->prepare();
+        // 触发准备后事件
         $this->trigger(self::EVENT_AFTER_PREPARE);
+        // 发送响应头和cookies
         $this->sendHeaders();
+        // 发送响应内容，根据stream讨论发送的方式
         $this->sendContent();
+        // 触发响应后事件
         $this->trigger(self::EVENT_AFTER_SEND);
         $this->isSent = true;
     }
@@ -332,16 +391,20 @@ class Response extends \yii\base\Response
 
     /**
      * Sends the response headers to the client
+     * 向客户端发送响应头
      */
     protected function sendHeaders()
     {
+        // 发送过响应头，则跳过
         if (headers_sent()) {
             return;
         }
+        // 填写响应状态码和响应状态描述
         $statusCode = $this->getStatusCode();
         header("HTTP/{$this->version} $statusCode {$this->statusText}");
         if ($this->_headers) {
             $headers = $this->getHeaders();
+            // 获取已注册的所有HTTP响应头，遍历并以覆盖的方式设置
             foreach ($headers as $name => $values) {
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
                 // set replace for first occurrence of header but false afterwards to allow multiple
@@ -352,11 +415,13 @@ class Response extends \yii\base\Response
                 }
             }
         }
+        // 向客户端发送cookies
         $this->sendCookies();
     }
 
     /**
      * Sends the cookies to the client.
+     * 向客户端发送cookies
      */
     protected function sendCookies()
     {
@@ -364,15 +429,18 @@ class Response extends \yii\base\Response
             return;
         }
         $request = Yii::$app->getRequest();
+        // 必须要有cookies加密算子
         if ($request->enableCookieValidation) {
             if ($request->cookieValidationKey == '') {
                 throw new InvalidConfigException(get_class($request) . '::cookieValidationKey must be configured with a secret key.');
             }
             $validationKey = $request->cookieValidationKey;
         }
+        // 遍历所有cookies加密并设置之
         foreach ($this->getCookies() as $cookie) {
             $value = $cookie->value;
             if ($cookie->expire != 1  && isset($validationKey)) {
+                // 安全类很繁杂，单独看
                 $value = Yii::$app->getSecurity()->hashData(serialize([$cookie->name, $value]), $validationKey);
             }
             setcookie($cookie->name, $value, $cookie->expire, $cookie->path, $cookie->domain, $cookie->secure, $cookie->httpOnly);
@@ -381,16 +449,21 @@ class Response extends \yii\base\Response
 
     /**
      * Sends the response content to the client
+     * 向客户端发送响应内容
      */
     protected function sendContent()
     {
+        // 没设置发送（局部数据流）就直接echo出来
         if ($this->stream === null) {
+            // 吐槽：看了半天，用的居然是echo……不然还能是什么呢？
             echo $this->content;
 
             return;
         }
 
+        // 设置脚本执行的最大时间
         set_time_limit(0); // Reset time limit for big files
+        // 设置响应分块的大小
         $chunkSize = 8 * 1024 * 1024; // 8MB per chunk
 
         if (is_array($this->stream)) {
@@ -799,17 +872,21 @@ class Response extends \yii\base\Response
     /**
      * Returns the cookie collection.
      * Through the returned cookie collection, you add or remove cookies as follows,
+     * 返回cookie集合，通过cookie管理集合，你需要向下面这样添加或移除cookies
      *
      * ~~~
      * // add a cookie
+     * // 添加cookies
      * $response->cookies->add(new Cookie([
      *     'name' => $name,
      *     'value' => $value,
      * ]);
      *
      * // remove a cookie
+     * // 移除cookies
      * $response->cookies->remove('name');
      * // alternatively
+     * // 如下亦可
      * unset($response->cookies['name']);
      * ~~~
      *
@@ -825,6 +902,7 @@ class Response extends \yii\base\Response
 
     /**
      * @return boolean whether this response has a valid [[statusCode]].
+     * 布尔值，判断本次响应是否含有无效的状态码
      */
     public function getIsInvalid()
     {
@@ -922,24 +1000,30 @@ class Response extends \yii\base\Response
     /**
      * Prepares for sending the response.
      * The default implementation will convert [[data]] into [[content]] and set headers accordingly.
+     * 发送响应前的准备，默认的实现是将[[data]] 属性转换为[[content]] 属性，并设置HTTP响应头。
      * @throws InvalidConfigException if the formatter for the specified format is invalid or [[format]] is not supported
      */
     protected function prepare()
     {
+        // stream属性不为空则会跳过本方法
         if ($this->stream !== null) {
             return;
         }
 
+        // 如果指定的格式在格式列表中能找到则进行处理
         if (isset($this->formatters[$this->format])) {
             $formatter = $this->formatters[$this->format];
+            // 实例化格式转换器
             if (!is_object($formatter)) {
                 $this->formatters[$this->format] = $formatter = Yii::createObject($formatter);
             }
+            // 格式转换器必须是ResponseFormatterInterface的实例
             if ($formatter instanceof ResponseFormatterInterface) {
                 $formatter->format($this);
             } else {
                 throw new InvalidConfigException("The '{$this->format}' response formatter is invalid. It must implement the ResponseFormatterInterface.");
             }
+            // 在格式列表中找不到，则使用data原样输出
         } elseif ($this->format === self::FORMAT_RAW) {
             if ($this->data !== null) {
                 $this->content = $this->data;
@@ -948,6 +1032,7 @@ class Response extends \yii\base\Response
             throw new InvalidConfigException("Unsupported response format: {$this->format}");
         }
 
+        // 转换后的content元素不能是数组，如果是对象，则调用对象自身的__toString()方法
         if (is_array($this->content)) {
             throw new InvalidParamException("Response content must not be an array.");
         } elseif (is_object($this->content)) {

@@ -13,6 +13,7 @@ use ArrayIterator;
 
 /**
  * HeaderCollection is used by [[Response]] to maintain the currently registered HTTP headers.
+ * HeaderCollection 类被[[Response]]对象用来维护当前注册的HTTP响应头
  *
  * @property integer $count The number of headers in the collection. This property is read-only.
  * @property ArrayIterator $iterator An iterator for traversing the headers in the collection. This property
