@@ -12,12 +12,17 @@ use ReflectionClass;
 
 /**
  * Widget is the base class for widgets.
+ * Widget类是小部件的基类
  *
  * @property string $id ID of the widget.
+ * 字符串，小部件的id
  * @property \yii\web\View $view The view object that can be used to render views or view files. Note that the
  * type of this property differs in getter and setter. See [[getView()]] and [[setView()]] for details.
+ * \yii\web\View 视图实例，试图对象可以用来渲染视图或视图文件。注意，本属性的设置与读取方法不同，阅读两个方法
+ * 获取更多信息。
  * @property string $viewPath The directory containing the view files for this widget. This property is
  * read-only.
+ * 字符串，包含本小部件视图文件的文件夹。只读属性。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -26,17 +31,21 @@ class Widget extends Component implements ViewContextInterface
 {
     /**
      * @var integer a counter used to generate [[id]] for widgets.
+     * 整型 用于生成id的计数器
      * @internal
      */
     public static $counter = 0;
     /**
      * @var string the prefix to the automatically generated widget IDs.
+     * 字符串，自动生成小部件ID的前缀
      * @see getId()
+     * 参见getId()方法
      */
     public static $autoIdPrefix = 'w';
     /**
      * @var Widget[] the widgets that are currently being rendered (not ended). This property
      * is maintained by [[begin()]] and [[end()]] methods.
+     * Widget类组成的数组。
      * @internal
      */
     public static $stack = [];
@@ -44,8 +53,10 @@ class Widget extends Component implements ViewContextInterface
 
     /**
      * Begins a widget.
+     * 开始创建一个小部件
      * This method creates an instance of the calling class. It will apply the configuration
      * to the created instance. A matching [[end()]] call should be called later.
+     * 本方法创建一个调用本方法的类实例，并用给定的配置数组实例化。与本方法匹配的end()方法将在稍后调用。
      * @param array $config name-value pairs that will be used to initialize the object properties
      * @return static the newly created widget instance
      */
@@ -54,6 +65,7 @@ class Widget extends Component implements ViewContextInterface
         $config['class'] = get_called_class();
         /* @var $widget Widget */
         $widget = Yii::createObject($config);
+        // 缓存小部件Widget或其子类实例
         static::$stack[] = $widget;
 
         return $widget;
@@ -62,14 +74,18 @@ class Widget extends Component implements ViewContextInterface
     /**
      * Ends a widget.
      * Note that the rendering result of the widget is directly echoed out.
+     * 结束小部件。注意，小部件的渲染结果江北直接echo出来
      * @return static the widget instance that is ended.
      * @throws InvalidCallException if [[begin()]] and [[end()]] calls are not properly nested
      */
     public static function end()
     {
         if (!empty(static::$stack)) {
+            // 从缓存栈中取出，后进后出
             $widget = array_pop(static::$stack);
+            // 调用begin()和调用end()的类必须是一个
             if (get_class($widget) === get_called_class()) {
+                // 运行子类的run()方法（本类也没有run）
                 echo $widget->run();
                 return $widget;
             } else {

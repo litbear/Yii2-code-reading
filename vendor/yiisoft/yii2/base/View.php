@@ -22,7 +22,7 @@ use yii\widgets\FragmentCache;
  *
  * @property string|boolean $viewFile The view file currently being rendered. False if no view file is being
  * rendered. This property is read-only.
- * 字符串或布尔值，当前被渲染的俄视图文件。假如当前没有文件被渲染，则为false，只读属性。
+ * 字符串或布尔值，当前被渲染的视图文件。假如当前没有文件被渲染，则为false，只读属性。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
