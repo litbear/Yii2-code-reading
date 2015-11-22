@@ -28,15 +28,19 @@ class ActionFilter extends Behavior
      * @var array list of action IDs that this filter should apply to. If this property is not set,
      * then the filter applies to all actions, unless they are listed in [[except]].
      * If an action ID appears in both [[only]] and [[except]], this filter will NOT apply to it.
+     * 数组，要应用送做过滤器的控制器动作ID的集合，假如未设置本属性，则动作过滤器会应用所有[[except]]属性以外
+     * 的动作，假如有动作ID既出现在[[only]]属性中也出现在[[except]]属性中，则控制器不会对其经行处理。
      *
      * Note that if the filter is attached to a module, the action IDs should also include child module IDs (if any)
      * and controller IDs.
+     * 注意，假如动作过滤器绑定在模块之上，则控制器动作集合中的元素要包括模块ID和控制器ID
      *
      * @see except
      */
     public $only;
     /**
      * @var array list of action IDs that this filter should not apply to.
+     * 要排除过滤器的控制器动作列表
      * @see only
      */
     public $except = [];

@@ -102,6 +102,7 @@ class Instance
      *
      * The reference may be specified as a string or an Instance object. If the former,
      * it will be treated as a component ID, a class/interface name or an alias, depending on the container type.
+     * 引用可以是字符串或是一个实例对象，假如是前者，则会被当作是组件ID，类名或者接口名挥着别名，这取决于容器类型。
      *
      * If you do not specify a container, the method will first try `Yii::$app` followed by `Yii::$container`.
      * 假如你没指定容器，则此方法会依次使用 `Yii::$app` 和 `Yii::$container`
