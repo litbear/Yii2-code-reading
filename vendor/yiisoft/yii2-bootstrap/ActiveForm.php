@@ -13,6 +13,7 @@ use yii\base\InvalidConfigException;
 
 /**
  * A Bootstrap 3 enhanced version of [[\yii\widgets\ActiveForm]].
+ * [[\yii\widgets\ActiveForm]]活动表单基类的Bootstrap3增强版
  *
  * This class mainly adds the [[layout]] property to choose a Bootstrap 3 form layout.
  * So for example to render a horizontal form you would:

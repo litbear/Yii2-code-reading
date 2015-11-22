@@ -16,12 +16,16 @@ use yii\helpers\Url;
 
 /**
  * AssetManager manages asset bundle configuration and loading.
+ * AssetManager静态资源管理器类管理者资源包的配置和加载
  *
  * AssetManager is configured as an application component in [[\yii\web\Application]] by default.
  * You can access that instance via `Yii::$app->assetManager`.
+ * AssetManager类默认作为一个应用组件配置在[[\yii\web\Application]]中，可以使用Yii::$app->assetManager`
+ * 访问之
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as shown in the following example:
+ * 可以在应用配置文件的components`元素中添加如下代码配置之：
  *
  * ```php
  * 'assetManager' => [
@@ -33,6 +37,7 @@ use yii\helpers\Url;
  *
  * @property AssetConverterInterface $converter The asset converter. Note that the type of this property
  * differs in getter and setter. See [[getConverter()]] and [[setConverter()]] for details.
+ * AssetConverterInterface类实例，静态资源转换器。注意，本属性getter和setter方法的不同。更多详情参见 [[getConverter()]]和[[setConverter()]]方法
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -43,16 +48,22 @@ class AssetManager extends Component
      * @var array|boolean list of asset bundle configurations. This property is provided to customize asset bundles.
      * When a bundle is being loaded by [[getBundle()]], if it has a corresponding configuration specified here,
      * the configuration will be applied to the bundle.
+     * 数组或布尔值，静态资源包的配置数组集合。本属性提供了静态资源包的个性化。当资源包被[[getBundle()]]方法加载后
+     * 如果在本属性中制订了相应的配置数组。配置将会应用到包对象中。
      *
      * The array keys are the asset bundle names, which typically are asset bundle class names without leading backslash.
      * The array values are the corresponding configurations. If a value is false, it means the corresponding asset
      * bundle is disabled and [[getBundle()]] should return null.
+     * 本属性为键值对形式，键位资源包的名字，即相应的包的全限定名不加开头的额反斜线。数组的值是相应的配置数组。
+     * 假如值为false，则表示禁用相应的包。[[getBundle()]]方法将返回null。
      *
      * If this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
      * will always return null.
+     * 假如本属性为false，则意味着搜友的资源包特性都会被禁用， [[getBundle()]]所有返回值都为null
      *
      * The following example shows how to disable the bootstrap css file used by Bootstrap widgets
      * (because you want to use your own styles):
+     * 下面的代码演示了如何禁用用于bootstrap小部件的css文件。
      *
      * ~~~
      * [
@@ -65,14 +76,17 @@ class AssetManager extends Component
     public $bundles = [];
     /**
      * @var string the root directory storing the published asset files.
+     * 字符串，储存发布资源文件的根文件夹
      */
     public $basePath = '@webroot/assets';
     /**
      * @var string the base URL through which the published asset files can be accessed.
+     * 字符串，访问静态资源文件的基本URL地址
      */
     public $baseUrl = '@web/assets';
     /**
      * @var array mapping from source asset files (keys) to target asset files (values).
+     * 键值对形式数组，源锦源文件为键，目标资源文件为值。
      *
      * This property is provided to support fixing incorrect asset file paths in some asset bundles.
      * When an asset bundle is registered with a view, each relative asset file in its [[AssetBundle::css|css]]
@@ -80,6 +94,7 @@ class AssetManager extends Component
      * to be the last part of an asset file (which is prefixed with [[AssetBundle::sourcePath]] if available),
      * the corresponding value will replace the asset and be registered with the view.
      * For example, an asset file `my/path/to/jquery.js` matches a key `jquery.js`.
+     * 本属性用来修正资源包中错误的资源文件路径。
      *
      * Note that the target asset files should be absolute URLs, domain relative URLs (starting from '/') or paths
      * relative to [[baseUrl]] and [[basePath]].

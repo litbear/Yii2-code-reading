@@ -13,13 +13,17 @@ use Yii;
 
 /**
  * AssetBundle represents a collection of asset files, such as CSS, JS, images.
+ * AssetBundle资源包类表示一系列CSS，JS，图片等静态资源的集合。
  *
  * Each asset bundle has a unique name that globally identifies it among all asset bundles used in an application.
  * The name is the [fully qualified class name](http://php.net/manual/en/language.namespaces.rules.php)
  * of the class representing it.
+ * 每个资源包都有一个在应用内所有资源包中唯一识别的名称。名字就是类的全限定名
+ *
  *
  * An asset bundle can depend on other asset bundles. When registering an asset bundle
  * with a view, all its dependent asset bundles will be automatically registered.
+ * 资源包可以依赖其他资源包。当向视图注册资源包的时候，依赖的资源包会被自动注册。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -138,6 +142,7 @@ class AssetBundle extends Object
 
     /**
      * Registers the CSS and JS files with the given view.
+     * 为给定的视图注册CSS和JS文件
      * @param \yii\web\View $view the view that the asset files are to be registered with.
      */
     public function registerAssetFiles($view)

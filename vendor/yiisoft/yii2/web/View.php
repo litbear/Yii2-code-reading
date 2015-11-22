@@ -14,14 +14,18 @@ use yii\base\InvalidConfigException;
 
 /**
  * View represents a view object in the MVC pattern.
+ * View类代表了MVC模式中的视图类
  *
  * View provides a set of methods (e.g. [[render()]]) for rendering purpose.
+ * 视图类提供了一系列的渲染方法
  *
  * View is configured as an application component in [[\yii\base\Application]] by default.
  * You can access that instance via `Yii::$app->view`.
+ * 视图类默认是[[\yii\base\Application]]的一个应用组件。可以使用Yii::$app->view`方法访问之。
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
+ * 你可以在主配置文件的'components`元素下配置它：
  *
  * ~~~
  * 'view' => [
@@ -35,6 +39,7 @@ use yii\base\InvalidConfigException;
  *
  * @property \yii\web\AssetManager $assetManager The asset manager. Defaults to the "assetManager" application
  * component.
+ * \yii\web\AssetManager 资源管理器类实例。默认为"assetManager"应用组件。
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -43,87 +48,105 @@ class View extends \yii\base\View
 {
     /**
      * @event Event an event that is triggered by [[beginBody()]].
+     * 开始渲染body标签时触发的事件名
      */
     const EVENT_BEGIN_BODY = 'beginBody';
     /**
      * @event Event an event that is triggered by [[endBody()]].
+     * body标签结束时触发的事件名
      */
     const EVENT_END_BODY = 'endBody';
     /**
      * The location of registered JavaScript code block or files.
      * This means the location is in the head section.
+     * 插入JS代码块或JS文件的位置，1为在head标签内
      */
     const POS_HEAD = 1;
     /**
      * The location of registered JavaScript code block or files.
      * This means the location is at the beginning of the body section.
+     * 2为在body标签的开始处
      */
     const POS_BEGIN = 2;
     /**
      * The location of registered JavaScript code block or files.
      * This means the location is at the end of the body section.
+     * 3为在body标签的尾部
      */
     const POS_END = 3;
     /**
      * The location of registered JavaScript code block.
      * This means the JavaScript code block will be enclosed within `jQuery(document).ready()`.
+     * JS代码块被`jQuery(document).ready()`包裹
      */
     const POS_READY = 4;
     /**
      * The location of registered JavaScript code block.
      * This means the JavaScript code block will be enclosed within `jQuery(window).load()`.
+     * JS代码块被jQuery(window).load()`包裹
      */
     const POS_LOAD = 5;
     /**
      * This is internally used as the placeholder for receiving the content registered for the head section.
+     * head标签内的占位符
      */
     const PH_HEAD = '<![CDATA[YII-BLOCK-HEAD]]>';
     /**
      * This is internally used as the placeholder for receiving the content registered for the beginning of the body section.
+     * body标签前的占位符
      */
     const PH_BODY_BEGIN = '<![CDATA[YII-BLOCK-BODY-BEGIN]]>';
     /**
      * This is internally used as the placeholder for receiving the content registered for the end of the body section.
+     * body标签结尾处的占位符
      */
     const PH_BODY_END = '<![CDATA[YII-BLOCK-BODY-END]]>';
 
     /**
      * @var AssetBundle[] list of the registered asset bundles. The keys are the bundle names, and the values
      * are the registered [[AssetBundle]] objects.
+     * 注册的资源包集合。键值对形式，键是资源包名，值是注册的资源包对象。
      * @see registerAssetBundle()
      */
     public $assetBundles = [];
     /**
      * @var string the page title
+     * 页面标题
      */
     public $title;
     /**
      * @var array the registered meta tags.
+     * 数组，注册的元数据标签集合
      * @see registerMetaTag()
      */
     public $metaTags;
     /**
      * @var array the registered link tags.
+     * 数组，注册的链接标签集合
      * @see registerLinkTag()
      */
     public $linkTags;
     /**
      * @var array the registered CSS code blocks.
+     * 数组，注册的CSS代码块集合
      * @see registerCss()
      */
     public $css;
     /**
      * @var array the registered CSS files.
+     * 数组，注册的CSS文件集合
      * @see registerCssFile()
      */
     public $cssFiles;
     /**
      * @var array the registered JS code blocks
+     * 数组，注册的JS代码块集合
      * @see registerJs()
      */
     public $js;
     /**
      * @var array the registered JS files.
+     * 数组，注册的JS文件集合
      * @see registerJsFile()
      */
     public $jsFiles;
@@ -133,6 +156,7 @@ class View extends \yii\base\View
 
     /**
      * Marks the position of an HTML head section.
+     * 标记HTML代码的head标签位置
      */
     public function head()
     {
@@ -141,6 +165,7 @@ class View extends \yii\base\View
 
     /**
      * Marks the beginning of an HTML body section.
+     * 标记body标签开始的位置
      */
     public function beginBody()
     {
@@ -150,6 +175,7 @@ class View extends \yii\base\View
 
     /**
      * Marks the ending of an HTML body section.
+     * 标记body标签结束的位置
      */
     public function endBody()
     {
@@ -249,7 +275,9 @@ class View extends \yii\base\View
     /**
      * Registers all files provided by an asset bundle including depending bundles files.
      * Removes a bundle from [[assetBundles]] once files are registered.
+     * 注册所有资源包提供的文件，包括依赖的包文件。移除来自[[assetBundles]]方法曾经被注册过的包
      * @param string $name name of the bundle to register
+     * 字符串，待注册资源包的名
      */
     protected function registerAssetFiles($name)
     {

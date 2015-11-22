@@ -434,6 +434,7 @@ class View extends Component
      * @param string $id the block ID.
      * @param boolean $renderInPlace whether to render the block content in place.
      * Defaults to false, meaning the captured block will not be displayed.
+     * 布尔值，是否呈现视图块中的内容，默认为false，意味着捕获视图块而不显示。
      * @return Block the Block widget instance
      */
     public function beginBlock($id, $renderInPlace = false)
