@@ -41,46 +41,63 @@ class DbManager extends BaseManager
      * After the DbManager object is created, if you want to change this property, you should only assign it
      * with a DB connection object.
      * Starting from version 2.0.2, this can also be a configuration array for creating the object.
+     * Connection实例或数组或字符串。数据库链接对象，或数据库链接的应用组件ID，在本对象穿件后，假如你想改变本属性的值，
+     * 只能为其分配一个数据库链接对象。在2.0.2版本之后，也可以接受一个用于创建对象的配置数组。
      */
     public $db = 'db';
     /**
      * @var string the name of the table storing authorization items. Defaults to "auth_item".
+     * 字符串，用于存放认证项目的表名，默认为"auth_item"
      */
     public $itemTable = '{{%auth_item}}';
     /**
      * @var string the name of the table storing authorization item hierarchy. Defaults to "auth_item_child".
+     * 字符串，用于存放认证项目层次结构的表名，默认为"auth_item_child"
      */
     public $itemChildTable = '{{%auth_item_child}}';
     /**
      * @var string the name of the table storing authorization item assignments. Defaults to "auth_assignment".
+     * 字符串，用于存放认证项目分配关系的表名，默认为"auth_assignment"
      */
     public $assignmentTable = '{{%auth_assignment}}';
     /**
      * @var string the name of the table storing rules. Defaults to "auth_rule".
+     * 字符串，用于存放规则的表名。默认为"auth_rule"
      */
     public $ruleTable = '{{%auth_rule}}';
     /**
      * @var Cache|array|string the cache used to improve RBAC performance. This can be one of the following:
+     * Cache实例，数组或字符串，本属性（缓存）用于改善RBAC的性能。本属性值可以是以下之一：
      *
      * - an application component ID (e.g. `cache`)
+     * - 一个用户组件ID
      * - a configuration array
+     * - 配置数组
      * - a [[\yii\caching\Cache]] object
+     * - [[\yii\caching\Cache]]类的实例
      *
      * When this is not set, it means caching is not enabled.
+     * 假如未设定本属性，则表示未开启缓存
      *
      * Note that by enabling RBAC cache, all auth items, rules and auth item parent-child relationships will
      * be cached and loaded into memory. This will improve the performance of RBAC permission check. However,
      * it does require extra memory and as a result may not be appropriate if your RBAC system contains too many
      * auth items. You should seek other RBAC implementations (e.g. RBAC based on Redis storage) in this case.
+     * 注意：开启RBAC缓存后，所有的认证项目、规则，和认证项目的父子关系都会被缓存和载入到内存中。此举会改善RBAC验证的
+     * 性能。然而，这需要额外的内存，并且当你的RBAC系统包含很多认证项目时会不适宜，假如这样的话，你需要寻找其他的（必须
+     * 基于Redis储存的）RBAC插件。
      *
      * Also note that if you modify RBAC items, rules or parent-child relationships from outside of this component,
      * you have to manually call [[invalidateCache()]] to ensure data consistency.
+     * 还请注意：假如你在本应用组件之外更改了RBAC系统的认证项目，规则，或者认证项目的父子关系。则需要调用[[invalidateCache()]]
+     * 方法确保数据的一致性。
      *
      * @since 2.0.3
      */
     public $cache;
     /**
      * @var string the key used to store RBAC data in cache
+     * 在缓存中保存RBAC数据的键
      * @see cache
      * @since 2.0.3
      */
@@ -88,14 +105,17 @@ class DbManager extends BaseManager
 
     /**
      * @var Item[] all auth items (name => Item)
+     * 所有的认证项目组建成的键值对集合
      */
     protected $items;
     /**
      * @var Rule[] all auth rules (name => Rule)
+     * 所有的授权规则组成的键值对集合
      */
     protected $rules;
     /**
      * @var array auth item parent-child relationships (childName => list of parents)
+     * 认证项目的父子关系组成的集合 (childName => list of parents)
      */
     protected $parents;
 
@@ -103,6 +123,7 @@ class DbManager extends BaseManager
     /**
      * Initializes the application component.
      * This method overrides the parent implementation by establishing the database connection.
+     * 初始化本应用组件
      */
     public function init()
     {
@@ -130,6 +151,7 @@ class DbManager extends BaseManager
     /**
      * Performs access check for the specified user based on the data loaded from cache.
      * This method is internally called by [[checkAccess()]] when [[cache]] is enabled.
+     * 从缓存载入权限数据，以执行权限验证。本方法在缓存开启时，由 [[checkAccess()]] 方法内部调用
      * @param string|integer $user the user ID. This should can be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].
      * @param string $itemName the name of the operation that need access check
@@ -172,6 +194,7 @@ class DbManager extends BaseManager
     /**
      * Performs access check for the specified user.
      * This method is internally called by [[checkAccess()]].
+     * 为指定的用户执行权限认证。本方法由[[checkAccess()]]方法内部调用。
      * @param string|integer $user the user ID. This should can be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].
      * @param string $itemName the name of the operation that need access check
@@ -242,6 +265,7 @@ class DbManager extends BaseManager
     /**
      * Returns a value indicating whether the database supports cascading update and delete.
      * The default implementation will return false for SQLite database and true for all other databases.
+     * 判断数据库是否支持级联更新和级联删除。默认实现逻辑是，除了SQLite数据库外，其他数据库都支持
      * @return boolean whether the database supports cascading update and delete.
      */
     protected function supportsCascadeUpdate()
@@ -426,6 +450,7 @@ class DbManager extends BaseManager
 
     /**
      * Populates an auth item with the data fetched from database
+     * 以数据库中取出的数据填充一个认证项目
      * @param array $row the data from the auth item table
      * @return Item the populated auth item instance (either Role or Permission)
      */
@@ -528,6 +553,7 @@ class DbManager extends BaseManager
 
     /**
      * Returns the children for every parent.
+     * 返回多个子认证项目的所有父认证项目
      * @return array the children list. Each array key is a parent item name,
      * and the corresponding array value is a list of child item names.
      */
@@ -543,6 +569,7 @@ class DbManager extends BaseManager
 
     /**
      * Recursively finds all children and grand children of the specified item.
+     * 为指定的认证项目递归地找出所有子孙认证项目
      * @param string $name the name of the item whose children are to be looked for.
      * @param array $childrenList the child list built via [[getChildrenList()]]
      * @param array $result the children and grand children (in array keys)
@@ -726,6 +753,7 @@ class DbManager extends BaseManager
 
     /**
      * Checks whether there is a loop in the authorization item hierarchy.
+     * 检查给定的授权项目层次结构是否是循环的
      * @param Item $parent the parent item
      * @param Item $child the child item to be added to the hierarchy
      * @return boolean whether a loop exists
@@ -874,6 +902,9 @@ class DbManager extends BaseManager
         $this->db->createCommand()->delete($this->assignmentTable)->execute();
     }
 
+    /**
+     * 清空缓存，保证数据一致性
+     */
     public function invalidateCache()
     {
         if ($this->cache !== null) {
@@ -884,6 +915,10 @@ class DbManager extends BaseManager
         }
     }
 
+    /**
+     * 从缓存加载授权信息，包括认证项目集合、
+     * 授权规则集合、认证项目的父子关系集合
+     */
     public function loadFromCache()
     {
         if ($this->items !== null || !$this->cache instanceof Cache) {

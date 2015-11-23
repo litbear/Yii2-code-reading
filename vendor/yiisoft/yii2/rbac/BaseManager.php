@@ -13,6 +13,7 @@ use yii\base\InvalidParamException;
 
 /**
  * BaseManager is a base class implementing [[ManagerInterface]] for RBAC management.
+ * BaseManager 是为RBAC管理实现[[ManagerInterface]] 接口的基类
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
@@ -21,12 +22,14 @@ abstract class BaseManager extends Component implements ManagerInterface
 {
     /**
      * @var array a list of role names that are assigned to every user automatically without calling [[assign()]].
+     * 数组，返回无需调用[[assign()]]，直接自动分配给每一个用户的角色 构成的列表
      */
     public $defaultRoles = [];
 
 
     /**
      * Returns the named auth item.
+     * 返回指定名称的认证项目
      * @param string $name the auth item name.
      * @return Item the auth item corresponding to the specified name. Null is returned if no such item.
      */
@@ -34,6 +37,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Returns the items of the specified type.
+     * 返回指定类型的认证项目集合
      * @param integer $type the auth item type (either [[Item::TYPE_ROLE]] or [[Item::TYPE_PERMISSION]]
      * @return Item[] the auth items of the specified type.
      */
@@ -41,6 +45,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Adds an auth item to the RBAC system.
+     * 向RBAC系统中添加一个授权项目
      * @param Item $item the item to add
      * @return boolean whether the auth item is successfully added to the system
      * @throws \Exception if data validation or saving fails (such as the name of the role or permission is not unique)
@@ -49,6 +54,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Adds a rule to the RBAC system.
+     * 向RBAC系统中添加规则
      * @param Rule $rule the rule to add
      * @return boolean whether the rule is successfully added to the system
      * @throws \Exception if data validation or saving fails (such as the name of the rule is not unique)
@@ -57,6 +63,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Removes an auth item from the RBAC system.
+     * 从RBAC系统中移除一个授权项目
      * @param Item $item the item to remove
      * @return boolean whether the role or permission is successfully removed
      * @throws \Exception if data validation or saving fails (such as the name of the role or permission is not unique)
@@ -65,6 +72,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Removes a rule from the RBAC system.
+     * 从RBAC移动中移除一个规则
      * @param Rule $rule the rule to remove
      * @return boolean whether the rule is successfully removed
      * @throws \Exception if data validation or saving fails (such as the name of the rule is not unique)
@@ -73,6 +81,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Updates an auth item in the RBAC system.
+     * 修改一个RBAC系统中的授权项目
      * @param string $name the name of the item being updated
      * @param Item $item the updated item
      * @return boolean whether the auth item is successfully updated
@@ -82,6 +91,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Updates a rule to the RBAC system.
+     * 修改一个RBAC系统中的规则
      * @param string $name the name of the rule being updated
      * @param Rule $rule the updated rule
      * @return boolean whether the rule is successfully updated
@@ -91,6 +101,7 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * @inheritdoc
+     * 
      */
     public function createRole($name)
     {
@@ -187,9 +198,11 @@ abstract class BaseManager extends Component implements ManagerInterface
 
     /**
      * Executes the rule associated with the specified auth item.
+     * 解析与指定授权项目相关的规则
      *
      * If the item does not specify a rule, this method will return true. Otherwise, it will
      * return the value of [[Rule::execute()]].
+     * 假如该授权项目没有相关的规则，本方法会返回true，否则，会返回[[Rule::execute()]]方法的值
      *
      * @param string|integer $user the user ID. This should be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].
