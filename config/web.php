@@ -38,6 +38,14 @@ $config = [
                 ],
             ],
         ],
+        // 重写Yii2-user的视图
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@dektrium/user/views' => '@app/views/yii2-user'
+                ],
+            ],
+        ],
         'db' => require(__DIR__ . '/db.php'),
     ],
     'modules' => [
@@ -48,6 +56,7 @@ $config = [
             'admins' => ['admin'],
             // 重写控制器
             'enableConfirmation' => false,
+            // 重写Yii2-user的控制器
             'controllerMap' => [
                 'admin' => 'app\controllers\user\AdminController',
                 'profile' => 'app\controllers\user\ProfileController',
@@ -55,6 +64,19 @@ $config = [
                 'registration' => 'app\controllers\user\RegistrationController',
                 'security' => 'app\controllers\user\SecurityController',
                 'setting' => 'app\controllers\user\SettingsController',
+            ],
+            // 重写Yii2-user的模型
+            'modelMap' => [
+                'UserSearch' => 'app\models\user\UserSearch',
+                'User' => 'app\models\user\User',
+                'Token' => 'app\models\user\Token',
+                'SettingsForm' => 'app\models\user\SettingsForm',
+                'ResendForm' => 'app\models\user\ResendForm',
+                'RegistrationForm' => 'app\models\user\RegistrationForm',
+                'RecoveryForm' => 'app\models\user\RecoveryForm',
+                'Profile' => 'app\models\user\Profile',
+                'LoginForm' => 'app\models\user\LoginForm',
+                'Account' => 'app\models\user\Account',
             ],
         ],
     ],
