@@ -335,6 +335,7 @@ class BaseUrl
     /**
      * Returns a value indicating whether a URL is relative.
      * A relative URL does not have host info part.
+     * 判断给定的URL是否是相对地址。相对地址没有host info部分
      * @param string $url the URL to be checked
      * @return boolean whether the URL is relative
      */

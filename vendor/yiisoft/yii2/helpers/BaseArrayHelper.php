@@ -210,8 +210,10 @@ class BaseArrayHelper
     /**
      * Removes an item from an array and returns the value. If the key does not exist in the array, the default value
      * will be returned instead.
+     * 从数组中移出指定的元素并返回，假如指定的元素不存在，则会返回默认值：
      *
      * Usage examples,
+     * 使用示例：
      *
      * ~~~
      * // $array = ['type' => 'A', 'options' => [1, 2]];
