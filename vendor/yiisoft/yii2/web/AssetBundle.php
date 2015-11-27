@@ -160,6 +160,9 @@ class AssetBundle extends Object
      * Publishes the asset bundle if its source code is not under Web-accessible directory.
      * It will also try to convert non-CSS or JS files (e.g. LESS, Sass) into the corresponding
      * CSS or JS files using [[AssetManager::converter|asset converter]].
+     * 假如静态资源包的代码文件不再web服务软件可访问的文件夹下，发布相应的静态资源代码。
+     * 本方法同样会将css和js的预处理语言通过[[AssetManager::converter|asset converter]]
+     * 方法转换为原生的语言。
      * @param AssetManager $am the asset manager to perform the asset publishing
      */
     public function publish($am)

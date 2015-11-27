@@ -234,14 +234,20 @@ class AssetManager extends Component
 
     /**
      * Returns the named asset bundle.
+     * 根据给定的名称返回相应的静态资源包。
      *
      * This method will first look for the bundle in [[bundles]]. If not found,
      * it will treat `$name` as the class of the asset bundle and create a new instance of it.
+     * 本方法首先会在[[bundles]]属性中查找静态资源包，如果没找到，则会把`$name`参数当作资源包的
+     * 类名，并实例化一个新的对象。
      *
      * @param string $name the class name of the asset bundle (without the leading backslash)
+     * 字符串，静态资源包的全限定类名，不包括开头的反斜线。
      * @param boolean $publish whether to publish the asset files in the asset bundle before it is returned.
      * If you set this false, you must manually call `AssetBundle::publish()` to publish the asset files.
      * @return AssetBundle the asset bundle instance
+     * 布尔值，在返回静态资源包前是否发布它。假如设置为false，则必须手动调用`AssetBundle::publish()`方法
+     * 发布静态资源文件。
      * @throws InvalidConfigException if $name does not refer to a valid asset bundle
      */
     public function getBundle($name, $publish = true)
@@ -263,10 +269,14 @@ class AssetManager extends Component
 
     /**
      * Loads asset bundle class by name
+     * 根据名称，加载静态资源包。
      *
      * @param string $name bundle name
+     * 字符串，资源包包名
      * @param array $config bundle object configuration
+     * 数组，资源包对象的配置数组。
      * @param boolean $publish if bundle should be published
+     * 布尔值，是否发布资源包。
      * @return AssetBundle
      * @throws InvalidConfigException if configuration isn't valid
      */
@@ -381,6 +391,7 @@ class AssetManager extends Component
 
     /**
      * Returns the asset converter.
+     * 返回静态资源转换器，（用于转换css与js的预处理语言）
      * @return AssetConverterInterface the asset converter.
      */
     public function getConverter()

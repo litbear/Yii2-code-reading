@@ -25,8 +25,11 @@ class AssetConverter extends Component implements AssetConverterInterface
      * @var array the commands that are used to perform the asset conversion.
      * The keys are the asset file extension names, and the values are the corresponding
      * target script types (either "css" or "js") and the commands used for the conversion.
+     * 用于执行静态资源转换的命令数组，键值对形式，键为待处理文件扩展名，值为
+     * ['目标文件扩展名' => 相应的转换命令]。
      *
      * You may also use a path alias to specify the location of the command:
+     * 在命令中同样可以使用路径别名：
      *
      * ```php
      * [
@@ -47,6 +50,8 @@ class AssetConverter extends Component implements AssetConverterInterface
      * You may want to set this to be `true` during the development stage to make sure the converted
      * assets are always up-to-date. Do not set this to true on production servers as it will
      * significantly degrade the performance.
+     * 布尔值，决定了当目标文件存在时，是否执行强制转换。在开发阶段，你可能需要设为true以保证文件的一致性。
+     * 在生产环境时，请不要设为true，因为会降低性能。
      */
     public $forceConvert = false;
 
@@ -65,6 +70,7 @@ class AssetConverter extends Component implements AssetConverterInterface
             if (isset($this->commands[$ext])) {
                 list ($ext, $command) = $this->commands[$ext];
                 $result = substr($asset, 0, $pos + 1) . $ext;
+                // 比较修改时间 如果修改时间晚于编译时间 则编译
                 if ($this->forceConvert || @filemtime("$basePath/$result") < @filemtime("$basePath/$asset")) {
                     $this->runCommand($command, $basePath, $asset, $result);
                 }
@@ -78,6 +84,7 @@ class AssetConverter extends Component implements AssetConverterInterface
 
     /**
      * Runs a command to convert asset files.
+     * 执行编译静态资源的命令
      * @param string $command the command to run. If prefixed with an `@` it will be treated as a path alias.
      * @param string $basePath asset base path and command working directory
      * @param string $asset the name of the asset file

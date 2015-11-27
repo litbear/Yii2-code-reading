@@ -242,6 +242,7 @@ class View extends \yii\base\View
 
     /**
      * Registers the asset manager being used by this view object.
+     * 注册本对象使用的静态资源管理器。
      * @return \yii\web\AssetManager the asset manager. Defaults to the "assetManager" application component.
      */
     public function getAssetManager()
@@ -297,6 +298,7 @@ class View extends \yii\base\View
     /**
      * Registers the named asset bundle.
      * All dependent asset bundles will be registered.
+     * 根据指定名称注册静态资源包。递归注册所有依赖的静态资源包
      * @param string $name the class name of the asset bundle (without the leading backslash)
      * @param integer|null $position if set, this forces a minimum position for javascript files.
      * This will adjust depending assets javascript file position or fail if requirement can not be met.
@@ -341,8 +343,10 @@ class View extends \yii\base\View
 
     /**
      * Registers a meta tag.
-     *
+     * 注册meta标签
+     * 
      * For example, a description meta tag can be added like the following:
+     * 例如，一个description的meta标签可以像下面这样添加：
      *
      * ```php
      * $view->registerMetaTag([
@@ -352,6 +356,7 @@ class View extends \yii\base\View
      * ```
      *
      * will result in the meta tag `<meta name="description" content="This website is about funny raccoons.">`.
+     * 会返回如下字符串结果： `<meta name="description" content="This website is about funny raccoons.">`.
      *
      * @param array $options the HTML attributes for the meta tag.
      * @param string $key the key that identifies the meta tag. If two meta tags are registered
@@ -369,18 +374,22 @@ class View extends \yii\base\View
 
     /**
      * Registers a link tag.
+     * 注册link标签
      *
      * For example, a link tag for a custom [favicon](http://www.w3.org/2005/10/howto-favicon)
      * can be added like the following:
+     * 例如，定制小图标标签，可以写成下面这样：
      *
      * ```php
      * $view->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/myicon.png']);
      * ```
      *
      * which will result in the following HTML: `<link rel="icon" type="image/png" href="/myicon.png">`.
+     * 渲染后的HTML标签为`<link rel="icon" type="image/png" href="/myicon.png">`
      *
      * **Note:** To register link tags for CSS stylesheets, use [[registerCssFile()]] instead, which
      * has more options for this kind of link tag.
+     * 注意：为CSS注册link标签，要使用[[registerCssFile()]]，其方法可以提供更多的配置项
      *
      * @param array $options the HTML attributes for the link tag.
      * @param string $key the key that identifies the link tag. If two link tags are registered
@@ -412,15 +421,22 @@ class View extends \yii\base\View
 
     /**
      * Registers a CSS file.
+     * 注册CSS文件
      * @param string $url the CSS file to be registered.
+     * 字符串，待注册的css文件
      * @param array $options the HTML attributes for the link tag. Please refer to [[Html::cssFile()]] for
      * the supported options. The following options are specially handled and are not treated as HTML attributes:
+     * 数组，link标签的属性组成的数组。更多细节参考[[Html::cssFile()]]方法。以下属性不会被当成HTML属性，并且会被
+     * 特殊对待。
      *
      * - `depends`: array, specifies the names of the asset bundles that this CSS file depends on.
+     * - `depends`: 数组，本css文件依赖的静态资源包。
      *
      * @param string $key the key that identifies the CSS script file. If null, it will use
      * $url as the key. If two CSS files are registered with the same key, the latter
      * will overwrite the former.
+     * 字符串，识别css文件的标识。假如为空，则会使用$url参数当作标识。假如两个CSS文件使用了
+     * 同意个标识，则后者会覆盖前者。
      */
     public function registerCssFile($url, $options = [], $key = null)
     {
@@ -429,8 +445,10 @@ class View extends \yii\base\View
         $depends = ArrayHelper::remove($options, 'depends', []);
 
         if (empty($depends)) {
+            // 没有依赖关系就直接生成
             $this->cssFiles[$key] = Html::cssFile($url, $options);
         } else {
+            // 否则调用静态资源管理器注册依赖的资源包
             $this->getAssetManager()->bundles[$key] = new AssetBundle([
                 'baseUrl' => '',
                 'css' => [strncmp($url, '//', 2) === 0 ? $url : ltrim($url, '/')],
@@ -509,6 +527,7 @@ class View extends \yii\base\View
     /**
      * Renders the content to be inserted in the head section.
      * The content is rendered using the registered meta tags, link tags, CSS/JS code blocks and files.
+     * 渲染插入head标签的内容。被渲染的内容由注册的meta标签，link标签，CSS/JS代码块或文件组成。
      * @return string the rendered content
      */
     protected function renderHeadHtml()
@@ -527,9 +546,11 @@ class View extends \yii\base\View
         if (!empty($this->css)) {
             $lines[] = implode("\n", $this->css);
         }
+        // 插入位置注册在head位置的js文件
         if (!empty($this->jsFiles[self::POS_HEAD])) {
             $lines[] = implode("\n", $this->jsFiles[self::POS_HEAD]);
         }
+        // 插入位置注册在head位置的js代码块
         if (!empty($this->js[self::POS_HEAD])) {
             $lines[] = Html::script(implode("\n", $this->js[self::POS_HEAD]), ['type' => 'text/javascript']);
         }

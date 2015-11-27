@@ -49,6 +49,7 @@ class BaseHtml
     /**
      * @var array the preferred order of attributes in a tag. This mainly affects the order of the attributes
      * that are rendered by [[renderTagAttributes()]].
+     * 数组，标签属性的优先顺序，主要影响由[[renderTagAttributes()]]方法渲染的属性顺序
      */
     public static $attributeOrder = [
         'type',
@@ -84,6 +85,7 @@ class BaseHtml
      * @var array list of tag attributes that should be specially handled when their values are of array type.
      * In particular, if the value of the `data` attribute is `['name' => 'xyz', 'age' => 13]`, two attributes
      * will be generated instead of one: `data-name="xyz" data-age="13"`.
+     * 数组，当属性值为数组时，需要被特殊处理的属性名。例子就不翻了
      * @since 2.0.3
      */
     public static $dataAttributes = ['data', 'data-ng', 'ng'];
@@ -119,17 +121,26 @@ class BaseHtml
 
     /**
      * Generates a complete HTML tag.
+     * 生成完整的HTML标签
      * @param string $name the tag name
+     * 字符串，标签名
      * @param string $content the content to be enclosed between the start and end tags. It will not be HTML-encoded.
      * If this is coming from end users, you should consider [[encode()]] it to prevent XSS attacks.
+     * 字符串，开始标签和闭合标签内部的内容。标签内部的内容不会经过HTML编码，假如这里的数据来自于终端用户，你必须使用
+     * encode()进行转义以阻止XSS攻击。
      * @param array $options the HTML tag attributes (HTML options) in terms of name-value pairs.
      * These will be rendered as the attributes of the resulting tag. The values will be HTML-encoded using [[encode()]].
      * If a value is null, the corresponding attribute will not be rendered.
+     * 数组，HTML标签的属性组成的键值对数组。本参数值会被渲染成标签属性，属性值将会使用encode()方法进行HTML编码。假如属性值
+     * 为空，则相应的属性不会被渲染。
      *
      * For example when using `['class' => 'my-class', 'target' => '_blank', 'value' => null]` it will result in the
      * html attributes rendered like this: `class="my-class" target="_blank"`.
+     * 例如，当使用`['class' => 'my-class', 'target' => '_blank', 'value' => null]` 时，则会生成
+     * `<TagName class="my-class" target="_blank">`
      *
      * See [[renderTagAttributes()]] for details on how attributes are being rendered.
+     * 更多渲染属性的细节请参见[[renderTagAttributes()]]方法
      *
      * @return string the generated HTML tag
      * @see beginTag()
@@ -1721,13 +1732,18 @@ class BaseHtml
 
     /**
      * Renders the HTML tag attributes.
+     * 渲染HTML标签属性
      *
      * Attributes whose values are of boolean type will be treated as
      * [boolean attributes](http://www.w3.org/TR/html5/infrastructure.html#boolean-attributes).
+     * 值为布尔值的属性将向链接中描述的那样处理
+     * [boolean attributes](http://www.w3.org/TR/html5/infrastructure.html#boolean-attributes)。
      *
      * Attributes whose values are null will not be rendered.
+     * 属性值为null的不会被渲染
      *
      * The values of attributes will be HTML-encoded using [[encode()]].
+     * 属性值会使用encode()方法被进行HTML编码
      *
      * The "data" attribute is specially handled when it is receiving an array value. In this case,
      * the array will be "expanded" and a list data attributes will be rendered. For example,
@@ -1735,14 +1751,22 @@ class BaseHtml
      * `data-id="1" data-name="yii"`.
      * Additionally `'data' => ['params' => ['id' => 1, 'name' => 'yii'], 'status' => 'ok']` will be rendered as:
      * `data-params='{"id":1,"name":"yii"}' data-status="ok"`.
+     * data属性值的类型为数组时，会被特殊处理。因此，数组会被展开渲染，例如`'data' => ['id' => 1, 'name' => 'yii']`,
+     * 会被渲染为`data-id="1" data-name="yii"`。
+     * 此外，`'data' => ['params' => ['id' => 1, 'name' => 'yii'], 'status' => 'ok']` 会被渲染为：
+     * `data-params='{"id":1,"name":"yii"}' data-status="ok"`
      *
      * @param array $attributes attributes to be rendered. The attribute values will be HTML-encoded using [[encode()]].
+     * 数组，待渲染的属性，属性值会被HTML编码
      * @return string the rendering result. If the attributes are not empty, they will be rendered
      * into a string with a leading white space (so that it can be directly appended to the tag name
      * in a tag. If there is no attribute, an empty string will be returned.
+     * 字符串，渲染结果，假如属性数组参数不为空，则渲染结果的前面会包含一个空格（这样就能直接与标签名拼接了）
+     * 假如属性数组参数为空，则会返回空字符串。
      */
     public static function renderTagAttributes($attributes)
     {
+        // 按照静态属性$attributeOrder中的顺序进行排序，其余不问
         if (count($attributes) > 1) {
             $sorted = [];
             foreach (static::$attributeOrder as $name) {
@@ -1755,11 +1779,14 @@ class BaseHtml
 
         $html = '';
         foreach ($attributes as $name => $value) {
+            // 属性值为布尔值
             if (is_bool($value)) {
                 if ($value) {
                     $html .= " $name";
                 }
+                // 属性值为数组
             } elseif (is_array($value)) {
+                // 在$dataAttributes属性中，则特殊处理之
                 if (in_array($name, static::$dataAttributes)) {
                     foreach ($value as $n => $v) {
                         if (is_array($v)) {
@@ -1768,11 +1795,13 @@ class BaseHtml
                             $html .= " $name-$n=\"" . static::encode($v) . '"';
                         }
                     }
+                    // 属性值为数组 且属性名为class 则拼接为字符串
                 } elseif ($name === 'class') {
                     if (empty($value)) {
                         continue;
                     }
                     $html .= " $name=\"" . static::encode(implode(' ', $value)) . '"';
+                    // 属性值为数组 且属性名为style 则使用静态方法处理之
                 } elseif ($name === 'style') {
                     if (empty($value)) {
                         continue;
@@ -1781,6 +1810,7 @@ class BaseHtml
                 } else {
                     $html .= " $name='" . Json::htmlEncode($value) . "'";
                 }
+                // 属性值不为空
             } elseif ($value !== null) {
                 $html .= " $name=\"" . static::encode($value) . '"';
             }
@@ -1930,8 +1960,10 @@ class BaseHtml
 
     /**
      * Converts a CSS style array into a string representation.
+     * 将css数组转换为字符串
      *
      * For example,
+     * 例如：
      *
      * ```php
      * print_r(Html::cssStyleFromArray(['width' => '100px', 'height' => '200px']));
@@ -1949,6 +1981,7 @@ class BaseHtml
             $result .= "$name: $value; ";
         }
         // return null if empty to avoid rendering the "style" attribute
+        // 返回null 以防进一步处理
         return $result === '' ? null : rtrim($result);
     }
 
