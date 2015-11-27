@@ -309,12 +309,14 @@ class View extends \yii\base\View
      */
     public function registerAssetBundle($name, $position = null)
     {
+        // 资源包未被缓存 则创建之
         if (!isset($this->assetBundles[$name])) {
             $am = $this->getAssetManager();
             $bundle = $am->getBundle($name);
             $this->assetBundles[$name] = false;
             // register dependencies
             $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;
+            // 还有依赖 则递归调用
             foreach ($bundle->depends as $dep) {
                 $this->registerAssetBundle($dep, $pos);
             }
@@ -322,6 +324,7 @@ class View extends \yii\base\View
         } elseif ($this->assetBundles[$name] === false) {
             throw new InvalidConfigException("A circular dependency is detected for bundle '$name'.");
         } else {
+            // 资源包被缓存了 则取出
             $bundle = $this->assetBundles[$name];
         }
 
