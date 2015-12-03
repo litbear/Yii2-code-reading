@@ -303,6 +303,7 @@ class View extends \yii\base\View
      * @param integer|null $position if set, this forces a minimum position for javascript files.
      * This will adjust depending assets javascript file position or fail if requirement can not be met.
      * If this is null, asset bundles position settings will not be changed.
+     * 整型或空，静态资源包在页面中的位置（头部，body开头或者body结束）。【其他暂时没看懂】
      * See [[registerJsFile]] for more details on javascript position.
      * @return AssetBundle the registered asset bundle instance
      * @throws InvalidConfigException if the asset bundle does not exist or a circular dependency is detected
@@ -313,6 +314,7 @@ class View extends \yii\base\View
         if (!isset($this->assetBundles[$name])) {
             $am = $this->getAssetManager();
             $bundle = $am->getBundle($name);
+            // 注意，在这里为每一个新放入缓存的资源包类都设为了false
             $this->assetBundles[$name] = false;
             // register dependencies
             $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;
@@ -491,21 +493,32 @@ class View extends \yii\base\View
 
     /**
      * Registers a JS file.
+     * 为视图注册JS文件
      * @param string $url the JS file to be registered.
+     * 字符串，待注册的js文件
      * @param array $options the HTML attributes for the script tag. The following options are specially handled
      * and are not treated as HTML attributes:
+     * 数组，script标签的属性组成的数组。以下两种选项会被特殊对待，不会当作HTML标签属性。
      *
      * - `depends`: array, specifies the names of the asset bundles that this JS file depends on.
+     * - `depends`: 数组，本js文件以来的静态资源包包名。
      * - `position`: specifies where the JS script tag should be inserted in a page. The possible values are:
      *     * [[POS_HEAD]]: in the head section
      *     * [[POS_BEGIN]]: at the beginning of the body section
      *     * [[POS_END]]: at the end of the body section. This is the default value.
+     * - `position`: 位置，用以指出js标签在代码块的中位置。
+     *     * [[POS_HEAD]]: head标签内
+     *     * [[POS_BEGIN]]: body标签开头
+     *     * [[POS_END]]: 默认值，body标签尾部。.
      *
      * Please refer to [[Html::jsFile()]] for other supported options.
+     * 详情参见[[Html::jsFile()]] 方法。
      *
      * @param string $key the key that identifies the JS script file. If null, it will use
      * $url as the key. If two JS files are registered with the same key, the latter
      * will overwrite the former.
+     * 字符串，识别js文件的键名，加入为空，则会使用$url参数做键名。假如两个js文件的键名相同
+     * 则后者会覆盖前者。
      */
     public function registerJsFile($url, $options = [], $key = null)
     {

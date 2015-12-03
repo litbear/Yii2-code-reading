@@ -104,39 +104,50 @@ class AssetBundle extends Object
      * - a relative path representing a local asset (e.g. `js/main.js`). The actual file path of a local
      *   asset can be determined by prefixing [[basePath]] to the relative path, and the actual URL
      *   of the asset can be determined by prefixing [[baseUrl]] to the relative path.
-     * - 本地资源的相对UEL地址，
+     * - 本地资源的相对UEL地址，【这段没看懂】
      *
      * Note that only forward slash "/" should be used as directory separators.
+     * 注意，正斜线仅被用于文件路径分隔符。
      */
     public $js = [];
     /**
      * @var array list of CSS files that this bundle contains. Each CSS file can be specified
      * in one of the three formats as explained in [[js]].
+     * 数组，本资源包包含的CSS文件列表。css文件也可以被指定为JS文件的那三种类型。
+     * 注意，正斜线仅被用于文件路径分隔符。
      *
      * Note that only forward slash "/" can be used as directory separator.
+     * 注意，正斜线仅被用于文件路径分隔符。
      */
     public $css = [];
     /**
      * @var array the options that will be passed to [[View::registerJsFile()]]
      * when registering the JS files in this bundle.
+     * 数组，把js文件注册到本资源包时，将被传递到 [[View::registerJsFile()]]方法中的选项，
      */
     public $jsOptions = [];
     /**
      * @var array the options that will be passed to [[View::registerCssFile()]]
      * when registering the CSS files in this bundle.
+     * 数组，把CSS文件注册到本资源包时，将被传递到 [[View::registerCssFile()]]方法中的选项，
      */
     public $cssOptions = [];
     /**
      * @var array the options to be passed to [[AssetManager::publish()]] when the asset bundle
      * is being published. This property is used only when [[sourcePath]] is set.
+     * 数组，发布资源包时，传递到[[AssetManager::publish()]]方法中的选项。本属性仅在[[sourcePath]]属性不为空
+     * 时生效。
      */
     public $publishOptions = [];
 
 
     /**
      * Registers this asset bundle with a view.
+     * 将本静态资源包注册到一个视图对象中。
      * @param View $view the view to be registered with
+     * View类实例，本资源包被注册到的View类实例。
      * @return static the registered asset bundle instance
+     * 被注册到视图中的静态资源包实例。
      */
     public static function register($view)
     {
@@ -146,6 +157,7 @@ class AssetBundle extends Object
     /**
      * Initializes the bundle.
      * If you override this method, make sure you call the parent implementation in the last.
+     * 初始化静态资源包，确保最终调用了所有父类实现
      */
     public function init()
     {

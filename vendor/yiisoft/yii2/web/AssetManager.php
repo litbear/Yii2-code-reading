@@ -295,6 +295,7 @@ class AssetManager extends Component
 
     /**
      * Loads dummy bundle by name
+     * 根据名称加载虚拟包
      *
      * @param string $name
      * @return AssetBundle
@@ -615,14 +616,18 @@ class AssetManager extends Component
     /**
      * Generate a CRC32 hash for the directory path. Collisions are higher
      * than MD5 but generates a much smaller hash string.
+     * 为文件夹路径生成CRC32哈希值，比MD5算法碰撞几率更高，但是生成的哈希值
+     * 更短
      * @param string $path string to be hashed.
      * @return string hashed string.
      */
     protected function hash($path)
     {
+        // 如果绑定了哈希回调函数 则用绑定的哈希回调函数处理之
         if (is_callable($this->hashCallback)) {
             return call_user_func($this->hashCallback, $path);
         }
+        // 默认情况下使用CRC32处理
         $path = (is_file($path) ? dirname($path) : $path) . filemtime($path);
         return sprintf('%x', crc32($path . Yii::getVersion()));
     }
