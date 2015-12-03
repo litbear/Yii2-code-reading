@@ -33,39 +33,55 @@ class AssetBundle extends Object
     /**
      * @var string the directory that contains the source asset files for this asset bundle.
      * A source asset file is a file that is part of your source code repository of your Web application.
+     * 字符串，包含本资源包所有静态资源文件的文件夹。静态资源文件是你web应用源代码库的一部分。
      *
      * You must set this property if the directory containing the source asset files is not Web accessible.
      * By setting this property, [[AssetManager]] will publish the source asset files
      * to a Web-accessible directory automatically when the asset bundle is registered on a page.
+     * 如果包含静态资源文件的文件夹对web服务软件是不可读的，那么你必须设置这个属性，通过设置本属性，
+     * 静态资源管理器会在向页面注册静态资源包的时候自动地将静态资源文件的源文件（预编译代码，SCSS等等）
+     * 发布到web服务软件可访问的文件夹下。
      *
      * If you do not set this property, it means the source asset files are located under [[basePath]].
+     * 假如你没有设置本属性，就意味着静态资源文件位于[[basePath]]属性指向的文件夹下。
      *
      * You can use either a directory or an alias of the directory.
+     * 本属性可使用绝对文件路径或者路径别名。
      * @see $publishOptions
      */
     public $sourcePath;
     /**
      * @var string the Web-accessible directory that contains the asset files in this bundle.
+     * 字符串，对web服务软件可读的，包含处理后的静态资源文件包的文件夹。
      *
      * If [[sourcePath]] is set, this property will be *overwritten* by [[AssetManager]]
      * when it publishes the asset files from [[sourcePath]].
+     * 假如设置了[[sourcePath]] 属性，本属性会被静态资源管理器对象（在发布来自[[sourcePath]] 
+     * 的文件时）覆盖。
      *
      * You can use either a directory or an alias of the directory.
+     * 可以使用别名。
      */
     public $basePath;
     /**
      * @var string the base URL for the relative asset files listed in [[js]] and [[css]].
+     * 字符串，静态资源文件的基本URL地址
      *
      * If [[sourcePath]] is set, this property will be *overwritten* by [[AssetManager]]
      * when it publishes the asset files from [[sourcePath]].
+     * 假如设置了[[sourcePath]] 属性，本属性会被静态资源管理器对象（在发布来自[[sourcePath]] 
+     * 的文件时）覆盖。
      *
      * You can use either a URL or an alias of the URL.
+     * 可以使用别名。
      */
     public $baseUrl;
     /**
      * @var array list of bundle class names that this bundle depends on.
+     * 数组，当前静态资源库依赖的其他资源库类名。
      *
      * For example:
+     * 例如：
      *
      * ```php
      * public $depends = [
@@ -78,13 +94,17 @@ class AssetBundle extends Object
     /**
      * @var array list of JavaScript files that this bundle contains. Each JavaScript file can be
      * specified in one of the following formats:
+     * 数组，本资源包包含的JS文件列表，每个JS文件都可以指定为如下格式之一：
      *
      * - an absolute URL representing an external asset. For example,
      *   `http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js` or
      *   `//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js`.
+     * - 外部资源的绝对URL地址，例如：`http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js` 或者
+     *   `//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js`.
      * - a relative path representing a local asset (e.g. `js/main.js`). The actual file path of a local
      *   asset can be determined by prefixing [[basePath]] to the relative path, and the actual URL
      *   of the asset can be determined by prefixing [[baseUrl]] to the relative path.
+     * - 本地资源的相对UEL地址，
      *
      * Note that only forward slash "/" should be used as directory separators.
      */
