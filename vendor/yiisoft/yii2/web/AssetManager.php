@@ -54,12 +54,12 @@ class AssetManager extends Component
      * The array keys are the asset bundle names, which typically are asset bundle class names without leading backslash.
      * The array values are the corresponding configurations. If a value is false, it means the corresponding asset
      * bundle is disabled and [[getBundle()]] should return null.
-     * 本属性为键值对形式，键位资源包的名字，即相应的包的全限定名不加开头的额反斜线。数组的值是相应的配置数组。
+     * 本属性为键值对形式，键位资源包的名字，即相应的包的全限定名不加开头的反斜线。数组的值是相应的配置数组。
      * 假如值为false，则表示禁用相应的包。[[getBundle()]]方法将返回null。
      *
      * If this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
      * will always return null.
-     * 假如本属性为false，则意味着搜友的资源包特性都会被禁用， [[getBundle()]]所有返回值都为null
+     * 假如本属性为false，则意味着所有的资源包特性都会被禁用， [[getBundle()]]所有返回值都为null
      *
      * The following example shows how to disable the bootstrap css file used by Bootstrap widgets
      * (because you want to use your own styles):
@@ -252,6 +252,10 @@ class AssetManager extends Component
      */
     public function getBundle($name, $publish = true)
     {
+        /**
+         *  $this->bundles为false 则意味着禁用资源包
+         * 所以返回一个空的资源包
+         */
         if ($this->bundles === false) {
             return $this->loadDummyBundle($name);
         } elseif (!isset($this->bundles[$name])) {
