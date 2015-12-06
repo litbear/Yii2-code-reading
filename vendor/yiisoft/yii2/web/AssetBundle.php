@@ -196,6 +196,7 @@ class AssetBundle extends Object
      * 本方法同样会将css和js的预处理语言通过[[AssetManager::converter|asset converter]]
      * 方法转换为原生的语言。
      * @param AssetManager $am the asset manager to perform the asset publishing
+     * AssetManager 执行资源发布的静态资源包管理器实例。
      */
     public function publish($am)
     {

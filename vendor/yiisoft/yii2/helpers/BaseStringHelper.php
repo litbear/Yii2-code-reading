@@ -23,6 +23,7 @@ class BaseStringHelper
     /**
      * Returns the number of bytes in the given string.
      * This method ensures the string is treated as a byte array by using `mb_strlen()`.
+     * 返回给定字符串的字节数。本方法使用`mb_strlen()`方法以确保字符串被当作以一字节为单位的数组
      * @param string $string the string being measured for length
      * @return integer the number of bytes in the given string.
      */
@@ -34,6 +35,8 @@ class BaseStringHelper
     /**
      * Returns the portion of string specified by the start and length parameters.
      * This method ensures the string is treated as a byte array by using `mb_substr()`.
+     * 根据开始和长度参数，返回多字节字符串的一部分。本方法使用`mb_strlen()`方法以确保
+     * 字符串被当作以一字节为单位的数组
      * @param string $string the input string. Must be one character or longer.
      * @param integer $start the starting position
      * @param integer $length the desired portion length. If not specified or `null`, there will be

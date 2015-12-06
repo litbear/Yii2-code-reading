@@ -122,13 +122,17 @@ class AssetManager extends Component
      * asset files are copied to [[basePath]]. Using symbolic links has the benefit that the published
      * assets will always be consistent with the source assets and there is no copy operation required.
      * This is especially useful during development.
+     * 布尔值，是否对发布的静态资源文件使用符号链接。默认为false。意味着静态资源文件会被复制到[[basePath]]
+     * 下，使用符号链接可以将预编译后的静态文件不经复制直接硬链接到静态资源文件夹，省去了复制。
      *
      * However, there are special requirements for hosting environments in order to use symbolic links.
      * In particular, symbolic links are supported only on Linux/Unix, and Windows Vista/2008 or greater.
+     * 然而硬链接只支持Linux/Unix与Vista 及Server 2008 以上的系统。
      *
      * Moreover, some Web servers need to be properly configured so that the linked assets are accessible
      * to Web users. For example, for Apache Web server, the following configuration directive should be added
      * for the Web folder:
+     * 此外，web服务软件需要进一步的配置以支持符号链接。例如Apache服务器应该加入以下内容：
      *
      * ~~~
      * Options FollowSymLinks
@@ -426,25 +430,34 @@ class AssetManager extends Component
 
     /**
      * @var array published assets
+     * 已经被发布的静态资源
      */
     private $_published = [];
 
     /**
      * Publishes a file or a directory.
+     * 发布文件或者文件夹
      *
      * This method will copy the specified file or directory to [[basePath]] so that
      * it can be accessed via the Web server.
+     * 本方法会将指定文件或文件夹复制到[[basePath]]文件夹之下，以使他们能被web服务软件
+     * 可以读取他们
      *
      * If the asset is a file, its file modification time will be checked to avoid
      * unnecessary file copying.
+     * 假如静态资源是个文件，则会检查文件的修改时间以避免不必要的复制。
      *
      * If the asset is a directory, all files and subdirectories under it will be published recursively.
      * Note, in case $forceCopy is false the method only checks the existence of the target
      * directory to avoid repetitive copying (which is very expensive).
+     * 假如静态资源是文件夹，则所有的文件和子文件夹都会被递归发布。注意：如果$forceCopy参数为false
+     * 则本方法会检查目标文件的存在性，并避免不必要的复制。
      *
      * By default, when publishing a directory, subdirectories and files whose name starts with a dot "."
      * will NOT be published. If you want to change this behavior, you may specify the "beforeCopy" option
      * as explained in the `$options` parameter.
+     * 默认情况下，发布文件夹时，子文件夹和文件中以`.`开头的不会被发布，假如你想改变这种行为，可以配置
+     *  "beforeCopy" 事件的选项。
      *
      * Note: On rare scenario, a race condition can develop that will lead to a
      * one-time-manifestation of a non-critical problem in the creation of the directory
@@ -452,21 +465,31 @@ class AssetManager extends Component
      * in advance all the resources that are supposed to trigger a 'publish()' call, and doing
      * that in the application deployment phase, before system goes live. See more in the following
      * discussion: http://code.google.com/p/yii/issues/detail?id=2579
+     * 注意，在十分罕见的情况下，（大概意思）争相创建文件夹会导致错误，所以尽量在开发阶段一次性把静态
+     * 资源发布完。
      *
      * @param string $path the asset (file or directory) to be published
+     * 字符串，待发布的静态资源文件或文件夹
      * @param array $options the options to be applied when publishing a directory.
      * The following options are supported:
+     * 数组，发布文件夹时将被应用的配置，以下是支持的配置参数：
      *
      * - only: array, list of patterns that the file paths should match if they want to be copied.
+     * - only: 数组，指定将要被复制的文件路径集合。
      * - except: array, list of patterns that the files or directories should match if they want to be excluded from being copied.
+     * - except: 数组，指定将会被排除的文件路径集合。
      * - caseSensitive: boolean, whether patterns specified at "only" or "except" should be case sensitive. Defaults to true.
+     * - caseSensitive: 布尔值， "only" 或 "except" 选项中的路径是否区分大小写，默认为true 区分。
      * - beforeCopy: callback, a PHP callback that is called before copying each sub-directory or file.
      *   This overrides [[beforeCopy]] if set.
+     * - beforeCopy: 回调函数，在复制文件或子文件夹之前会被调用的回调函数。
      * - afterCopy: callback, a PHP callback that is called after a sub-directory or file is successfully copied.
      *   This overrides [[afterCopy]] if set.
+     * - afterCopy: 回调函数，在复制文件或子文件夹之后会被调用的回调函数。
      * - forceCopy: boolean, whether the directory being published should be copied even if
      *   it is found in the target directory. This option is used only when publishing a directory.
      *   This overrides [[forceCopy]] if set.
+     * - forceCopy: 布尔值，在目标文件存在的情况下是否强制覆盖。
      *
      * @return array the path (directory or file path) and the URL that the asset is published as.
      * @throws InvalidParamException if the asset to be published does not exist.
@@ -492,8 +515,11 @@ class AssetManager extends Component
 
     /**
      * Publishes a file.
+     * 发布文件
      * @param string $src the asset file to be published
+     * 字符串，待发布的静态资源文件
      * @return array the path and the URL that the asset is published as.
+     * 数组，静态资源发布后的路径和URL地址
      * @throws InvalidParamException if the asset to be published does not exist.
      */
     protected function publishFile($src)
@@ -503,6 +529,7 @@ class AssetManager extends Component
         $dstDir = $this->basePath . DIRECTORY_SEPARATOR . $dir;
         $dstFile = $dstDir . DIRECTORY_SEPARATOR . $fileName;
 
+        // 创建文件所在的文件夹，递归创建不存在的父文件夹
         if (!is_dir($dstDir)) {
             FileHelper::createDirectory($dstDir, $this->dirMode, true);
         }
@@ -523,9 +550,12 @@ class AssetManager extends Component
 
     /**
      * Publishes a directory.
+     * 发布文件夹
      * @param string $src the asset directory to be published
+     * 字符串，代发不的文件夹路径。
      * @param array $options the options to be applied when publishing a directory.
      * The following options are supported:
+     * 数组，发布文件夹时应用的配置选项：
      *
      * - only: array, list of patterns that the file paths should match if they want to be copied.
      * - except: array, list of patterns that the files or directories should match if they want to be excluded from being copied.
@@ -537,6 +567,8 @@ class AssetManager extends Component
      * - forceCopy: boolean, whether the directory being published should be copied even if
      *   it is found in the target directory. This option is used only when publishing a directory.
      *   This overrides [[forceCopy]] if set.
+     *   和上面的都一样就不翻译了，有一点疑问，所谓的覆盖文件夹，是仅仅覆盖文件夹还是连同根文件夹下的文件与子文件夹
+     *   一起覆盖？
      *
      * @return array the path directory and the URL that the asset is published as.
      * @throws InvalidParamException if the asset to be published does not exist.

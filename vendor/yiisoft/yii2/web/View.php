@@ -306,6 +306,7 @@ class View extends \yii\base\View
      * 整型或空，静态资源包在页面中的位置（头部，body开头或者body结束）。【其他暂时没看懂】
      * See [[registerJsFile]] for more details on javascript position.
      * @return AssetBundle the registered asset bundle instance
+     * faAssetBundle 实例。注册了静态资源包的静态资源管理器实例。
      * @throws InvalidConfigException if the asset bundle does not exist or a circular dependency is detected
      */
     public function registerAssetBundle($name, $position = null)
@@ -314,7 +315,12 @@ class View extends \yii\base\View
         if (!isset($this->assetBundles[$name])) {
             $am = $this->getAssetManager();
             $bundle = $am->getBundle($name);
-            // 注意，在这里为每一个新放入缓存的资源包类都设为了false
+            /**
+             * 注意，在这里为每一个新放入缓存的资源包类在开始时都设为了false
+             * 而后寻找该资源包依赖的资源包。直至到依赖树最底端的资源包都被
+             * 实例化并配置之后才将视图对象中本资源包的缓存由false改为相应的
+             * 实例引用。
+             */
             $this->assetBundles[$name] = false;
             // register dependencies
             $pos = isset($bundle->jsOptions['position']) ? $bundle->jsOptions['position'] : null;
