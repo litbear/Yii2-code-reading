@@ -429,10 +429,14 @@ class Security extends Component
     /**
      * Generates specified number of random bytes.
      * Note that output may not be ASCII.
+     * 生成指定长度的随机字节，注意，输出并不是ASCII格式
      * @see generateRandomString() if you need a string.
+     * 假如要输出字符串，请参见generateRandomString()方法
      *
      * @param integer $length the number of bytes to generate
+     * 整型，待输出字节数的长度
      * @return string the generated random bytes
+     * 字符串，生成的随机字节
      * @throws InvalidConfigException if OpenSSL extension is required (e.g. on Windows) but not installed.
      * @throws Exception on failure.
      */
@@ -440,20 +444,31 @@ class Security extends Component
     {
         /*
          * Strategy
+         * 策略：
          *
          * The most common platform is Linux, on which /dev/urandom is the best choice. Many other OSs
          * implement a device called /dev/urandom for Linux compat and it is good too. So if there is
          * a /dev/urandom then it is our first choice regardless of OS.
+         * 最常见的平台是Linux平台，其上的随机数生成器/dev/urandom是最好的选择了。许多其他的操作系统
+         * 实现了名为/dev/urandom的与Linux兼容的设备，同样非常好，所以，直到有随机数生成器，就是我们的
+         * 首选。
          *
          * Nearly all other modern Unix-like systems (the BSDs, Unixes and OS X) have a /dev/random
          * that is a good choice. If we didn't get bytes from /dev/urandom then we try this next but
          * only if the system is not Linux. Do not try to read /dev/random on Linux.
+         * 几乎所有的现代类Unix操作系统(如 BSDs, Unixes 和 OS X)都有随机数生成器，都可以拿来用。假如
+         * 没有随机数生成器，则仅在系统也不是Linux的情况下才进行下一步。不要试图在Linux下访问/dev/random 
          *
          * Finally, OpenSSL can supply CSPR bytes. It is our last resort. On Windows this reads from
          * CryptGenRandom, which is the right thing to do. On other systems that don't have a Unix-like
          * /dev/urandom, it will deliver bytes from its own CSPRNG that is seeded from kernel sources
          * of randomness. Even though it is fast, we don't generally prefer OpenSSL over /dev/urandom
          * because an RNG in user space memory is undesirable.
+         * 最终，OpenSSL可以支持CSPR 字节，这是最后的手段了。在Windows系统中从CryptGenRandom处读取随机数。
+         * 说说大意吧，在其他没有/dev/urandom随机数生成其的系统中，使用CryptGenRandom可以收到系统本身的
+         * 为随机数生成器，虽然这个生成器很快，但在有/dev/urandom的情况下还是不建议使用，因为CryptGenRandom
+         * 得到的是用户态的随机数生成器（可能会在应用程序间共享相同的状态？）
+         * 
          *
          * For background, see http://sockpuppet.org/blog/2014/02/25/safely-generate-random-numbers/
          */
