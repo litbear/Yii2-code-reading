@@ -175,7 +175,8 @@ class View extends \yii\base\View
 
     /**
      * Marks the ending of an HTML body section.
-     * 标记body标签结束的位置
+     * 标记body标签结束的位置【视图注册资源包之后，应该是在
+     * 这个方法中对资源包进行写入到输出流的操作】
      */
     public function endBody()
     {
@@ -282,14 +283,20 @@ class View extends \yii\base\View
      */
     protected function registerAssetFiles($name)
     {
+        // 在注册的资源包列表里没找到，则返回。
         if (!isset($this->assetBundles[$name])) {
             return;
         }
         $bundle = $this->assetBundles[$name];
         if ($bundle) {
+            // 递归写入依赖的资源包
             foreach ($bundle->depends as $dep) {
                 $this->registerAssetFiles($dep);
             }
+            /**
+             *  真正执行写入操作的应该是调用了每个资源包的
+             * $bundle->registerAssetFiles()方法
+             */
             $bundle->registerAssetFiles($this);
         }
         unset($this->assetBundles[$name]);

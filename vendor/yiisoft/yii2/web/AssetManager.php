@@ -86,7 +86,7 @@ class AssetManager extends Component
     public $baseUrl = '@web/assets';
     /**
      * @var array mapping from source asset files (keys) to target asset files (values).
-     * 键值对形式数组，源锦源文件为键，目标资源文件为值。
+     * 键值对形式数组，源静态文件为键，目标资源文件为值。
      *
      * This property is provided to support fixing incorrect asset file paths in some asset bundles.
      * When an asset bundle is registered with a view, each relative asset file in its [[AssetBundle::css|css]]
@@ -94,13 +94,20 @@ class AssetManager extends Component
      * to be the last part of an asset file (which is prefixed with [[AssetBundle::sourcePath]] if available),
      * the corresponding value will replace the asset and be registered with the view.
      * For example, an asset file `my/path/to/jquery.js` matches a key `jquery.js`.
-     * 本属性用来修正资源包中错误的资源文件路径。
+     * 本属性用来修正资源包中错误的资源文件路径。当静态资源包被注册到视图中时，每个在 [[AssetBundle::css|css]]属性和
+     * [[AssetBundle::js|js]]属性数组中的静态资源文件会对照本map属性进行检查。假如某个键被发现是另一个静态资源文件的
+     * 的结尾（假如可能的话，会被加上[[AssetBundle::sourcePath]]属性为前缀），则该键对应的值会被静态资源文件替代，并
+     * 被注册到视图中，例如，静态资源文件`my/path/to/jquery.js`匹配键`jquery.js`
      *
      * Note that the target asset files should be absolute URLs, domain relative URLs (starting from '/') or paths
      * relative to [[baseUrl]] and [[basePath]].
+     * 注意，目标静态资源文件应为绝对URL地址，相对域名地址（以正斜线开头）或者相对于 [[baseUrl]] 和 [[basePath]]两个
+     * 属性的路径。
      *
      * In the following example, any assets ending with `jquery.min.js` will be replaced with `jquery/dist/jquery.js`
      * which is relative to [[baseUrl]] and [[basePath]].
+     * 在下面的例子中，每个以`jquery.min.js`结尾的静态资源文件都会被替换成`jquery/dist/jquery.js`，也就是相对于 [[baseUrl]] 
+     * 和 [[basePath]]属性的相对路径。
      *
      * ```php
      * [
@@ -109,6 +116,7 @@ class AssetManager extends Component
      * ```
      *
      * You may also use aliases while specifying map value, for example:
+     * 同样，可以在值中使用别名，例如：
      *
      * ```php
      * [
@@ -324,31 +332,45 @@ class AssetManager extends Component
     /**
      * Returns the actual URL for the specified asset.
      * The actual URL is obtained by prepending either [[baseUrl]] or [[AssetManager::baseUrl]] to the given asset path.
+     * 为指定的静态资源返回真是的URL地址。真实的URL由静态资源管理器的[[AssetManager::baseUrl]]属性或静态资源包的[[baseUrl]]
+     * 属性决定。
      * @param AssetBundle $bundle the asset bundle which the asset file belongs to
+     * AssetBundle 静态资源包实例，静态资源文件属于的静态资源包
      * @param string $asset the asset path. This should be one of the assets listed in [[js]] or [[css]].
+     * 字符串，静态资源的文件路径，应该是静态资源包的[[js]]属性或是[[css]]属性
      * @return string the actual URL for the specified asset.
+     * 指定静态资源的URL地址
      */
     public function getAssetUrl($bundle, $asset)
     {
+        // 本静态资源管理器中的assetMap属性取到了，则进一步处理
         if (($actualAsset = $this->resolveAsset($bundle, $asset)) !== false) {
+            // 以别名开头 则处理别名
             if (strncmp($actualAsset, '@web/', 5) === 0) {
                 $asset = substr($actualAsset, 5);
                 $basePath = Yii::getAlias("@webroot");
                 $baseUrl = Yii::getAlias("@web");
             } else {
+                // 否则以本对象的basePath，和baseUrl属性处理
                 $asset = Yii::getAlias($actualAsset);
                 $basePath = $this->basePath;
                 $baseUrl = $this->baseUrl;
             }
+            // 本静态资源管理器没取到地址 则使用包中的basePath，和baseUrl
         } else {
             $basePath = $bundle->basePath;
             $baseUrl = $bundle->baseUrl;
         }
 
+        // 如果 此时不是相对URL路径，且以正斜线开头 则返回就可以了
         if (!Url::isRelative($asset) || strncmp($asset, '/', 1) === 0) {
             return $asset;
         }
 
+        /**
+         * 如果是相对URL路径，且不以正斜线开头 则进行讨论
+         * 需要加修改时间参数 就加修改时间
+         */
         if ($this->appendTimestamp && ($timestamp = @filemtime("$basePath/$asset")) > 0) {
             return "$baseUrl/$asset?v=$timestamp";
         } else {
@@ -378,6 +400,7 @@ class AssetManager extends Component
      */
     protected function resolveAsset($bundle, $asset)
     {
+        // assetMap属性中找到则返回
         if (isset($this->assetMap[$asset])) {
             return $this->assetMap[$asset];
         }
@@ -386,6 +409,7 @@ class AssetManager extends Component
         }
 
         $n = mb_strlen($asset);
+        // 遍历assetMap 对比结尾，找到以$asset结尾的，则返回之
         foreach ($this->assetMap as $from => $to) {
             $n2 = mb_strlen($from);
             if ($n2 <= $n && substr_compare($asset, $from, $n - $n2, $n2) === 0) {
@@ -393,6 +417,7 @@ class AssetManager extends Component
             }
         }
 
+        // 都没找到则返回false
         return false;
     }
 
