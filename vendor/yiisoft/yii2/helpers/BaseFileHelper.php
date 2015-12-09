@@ -37,11 +37,16 @@ class BaseFileHelper
     /**
      * Normalizes a file/directory path.
      * The normalization does the following work:
+     * 规范化文件路径，本方法主要做了以下工作：
      *
      * - Convert all directory separators into `DIRECTORY_SEPARATOR` (e.g. "\a/b\c" becomes "/a/b/c")
+     * - 将所有的文件分夹隔符替换为`DIRECTORY_SEPARATOR`常量，都替换为正斜线
      * - Remove trailing directory separators (e.g. "/a/b/c/" becomes "/a/b/c")
+     * - 移除结尾的文件夹分隔符
      * - Turn multiple consecutive slashes into a single one (e.g. "/a///b/c" becomes "/a/b/c")
+     * - 将多个连续的正斜线转换为正斜线
      * - Remove ".." and "." based on their meanings (e.g. "/a/./b/../c" becomes "/a/c")
+     * - 根据意义转义父文件夹“..”或当前文件夹“.”
      *
      * @param string $path the file/directory path to be normalized
      * @param string $ds the directory separator to be used in the normalized result. Defaults to `DIRECTORY_SEPARATOR`.
@@ -49,6 +54,7 @@ class BaseFileHelper
      */
     public static function normalizePath($path, $ds = DIRECTORY_SEPARATOR)
     {
+        // 将正斜线和反斜线都替换为文件夹分隔符常量，并移除最右侧的文件夹分隔符
         $path = rtrim(strtr($path, '/\\', $ds . $ds), $ds);
         if (strpos($ds . $path, "{$ds}.") === false && strpos($path, "{$ds}{$ds}") === false) {
             return $path;
@@ -56,11 +62,16 @@ class BaseFileHelper
         // the path may contain ".", ".." or double slashes, need to clean them up
         $parts = [];
         foreach (explode($ds, $path) as $part) {
+            // 如果当前元素为“..”，且当前路径数组不为空，且路径数组最后一个元素也不是“..”
             if ($part === '..' && !empty($parts) && end($parts) !== '..') {
+                // 则弹出数组最后一个元素，表示进入父文件夹
                 array_pop($parts);
+                // 如果当前元素为“.”，或（当前元素为空字符串，且当前路径数组不为空）
             } elseif ($part === '.' || $part === '' && !empty($parts)) {
+                // 就是，如果遇到双正斜线或者“.”则删除之
                 continue;
             } else {
+                // 其余的依次放进路径数组
                 $parts[] = $part;
             }
         }

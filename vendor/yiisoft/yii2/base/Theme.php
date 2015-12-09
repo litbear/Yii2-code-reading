@@ -132,6 +132,7 @@ class Theme extends Component
     public function applyTo($path)
     {
         $pathMap = $this->pathMap;
+        // 针对未注入pathMap映射参数的处理
         if (empty($pathMap)) {
             if (($basePath = $this->getBasePath()) === null) {
                 throw new InvalidConfigException('The "basePath" property must be set.');
@@ -143,6 +144,7 @@ class Theme extends Component
 
         foreach ($pathMap as $from => $tos) {
             $from = FileHelper::normalizePath(Yii::getAlias($from)) . DIRECTORY_SEPARATOR;
+            // $path以$from开头
             if (strpos($path, $from) === 0) {
                 $n = strlen($from);
                 foreach ((array) $tos as $to) {

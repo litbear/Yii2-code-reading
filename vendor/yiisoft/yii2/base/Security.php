@@ -491,6 +491,8 @@ class Security extends Component
 
         // If we are not on Linux and there is a /dev/random device then we have a BSD or Unix device
         // that won't block. It's not safe to read from /dev/random on Linux.
+        // 如果不是Linux系统，但是实现了随机数生成器，同样使用随机数生成器
+        // 只有在Linux系统下/dev/random与/dev/urandom不同，其他类Unix系统中用哪个都一样
         if (PHP_OS !== 'Linux' && @file_exists('/dev/random')) {
             $handle = fopen('/dev/random', 'r');
             if ($handle !== false) {
@@ -503,6 +505,7 @@ class Security extends Component
             return StringHelper::byteSubstr($bytes, 0, $length);
         }
 
+        // 如果不是类Unix系统，则使用openssl的方法生成
         if (!extension_loaded('openssl')) {
             throw new InvalidConfigException('The OpenSSL PHP extension is not installed.');
         }
@@ -519,8 +522,11 @@ class Security extends Component
     /**
      * Generates a random string of specified length.
      * The string generated matches [A-Za-z0-9_-]+ and is transparent to URL-encoding.
+     * 生成制定长度的随机字符串，该字符串由大小写字母，数组下划线及中横线组成，可以通过
+     * URL编码传输
      *
      * @param integer $length the length of the key in characters
+     * 随机key的长度
      * @return string the generated random key
      * @throws InvalidConfigException if OpenSSL extension is needed but not installed.
      * @throws Exception on failure.
