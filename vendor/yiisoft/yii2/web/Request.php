@@ -13,69 +13,115 @@ use yii\helpers\StringHelper;
 
 /**
  * The web Request class represents an HTTP request
+ * HTTP请求封装类
  *
  * It encapsulates the $_SERVER variable and resolves its inconsistency among different Web servers.
  * Also it provides an interface to retrieve request parameters from $_POST, $_GET, $_COOKIES and REST
  * parameters sent via other HTTP methods like PUT or DELETE.
+ * 本类封装了$_SERVER 全局变量，并且屏蔽了他们在不同web服务软件之间的差异。本来同样提供了通过PUT，DELETE
+ * 等其他HTTP方法获取$_POST, $_GET, $_COOKIES 和 REST风格参数的方法。
  *
  * Request is configured as an application component in [[\yii\web\Application]] by default.
  * You can access that instance via `Yii::$app->request`.
+ * Request请求类被当作[[\yii\web\Application]]的默认应用组件，可以通过`Yii::$app->request`访问之。
  *
  * @property string $absoluteUrl The currently requested absolute URL. This property is read-only.
+ * 字符串，当前请求的绝对URL路径，只读属性。
  * @property array $acceptableContentTypes The content types ordered by the quality score. Types with the
  * highest scores will be returned first. The array keys are the content types, while the array values are the
  * corresponding quality score and other parameters as given in the header.
+ * 数组，接受的内容类型组成的键值对数组，内容类型按质量评分排序，平分高的会优先返回。数组的键是内容类型，数组的
+ * 值是对应的质量评分和其他header参数。
  * @property array $acceptableLanguages The languages ordered by the preference level. The first element
  * represents the most preferred language.
+ * 数组，接受的语言，语言以优先级排列，第一个元素优先级最高
  * @property string $authPassword The password sent via HTTP authentication, null if the password is not
  * given. This property is read-only.
+ * 字符串，HTTP认证密码，没有给出密码则为null。只读属性。
  * @property string $authUser The username sent via HTTP authentication, null if the username is not given.
  * This property is read-only.
+ * 字符串，HTTP认证用户名，未给出则为null ，只读属性。
  * @property string $baseUrl The relative URL for the application.
+ * 字符串，相对URL地址
  * @property array $bodyParams The request parameters given in the request body.
+ * 数组，请求体内的参数集合
  * @property string $contentType Request content-type. Null is returned if this information is not available.
  * This property is read-only.
+ * 数组，请求内容类型，假如本属性不可用，则返回null。只读属性。
  * @property CookieCollection $cookies The cookie collection. This property is read-only.
+ * CookieCollection 实例，cookie集合，只读属性。
  * @property string $csrfToken The token used to perform CSRF validation. This property is read-only.
+ * 字符串，防止伪造跨站请求的令牌，只读属性。
  * @property string $csrfTokenFromHeader The CSRF token sent via [[CSRF_HEADER]] by browser. Null is returned
  * if no such header is sent. This property is read-only.
+ * 字符串，通过浏览器[[CSRF_HEADER]]发送的防止跨站请求伪造的密钥，假如没发送该header，则返回null，只读属性。
  * @property array $eTags The entity tags. This property is read-only.
+ * 数组，实体标签，只读属性
  * @property HeaderCollection $headers The header collection. This property is read-only.
+ * HeaderCollection实例，请求头集合，只读属性。
  * @property string $hostInfo Schema and hostname part (with port number if needed) of the request URL (e.g.
  * `http://www.yiiframework.com`).
+ * 字符串，请求URL的主机信息，必要时加端口号、
  * @property boolean $isAjax Whether this is an AJAX (XMLHttpRequest) request. This property is read-only.
+ * 布尔值，当前请求是否为ajax请求
  * @property boolean $isDelete Whether this is a DELETE request. This property is read-only.
+ * 布尔值，当前请求方法是否为DELETE，只读属性。
  * @property boolean $isFlash Whether this is an Adobe Flash or Adobe Flex request. This property is
  * read-only.
+ * 布尔值，当前请求是否是 Adobe Flash 或 Adobe Flex发出的，只读属性。
  * @property boolean $isGet Whether this is a GET request. This property is read-only.
+ * 布尔值，当前请求方法是否为GET，只读属性。
  * @property boolean $isHead Whether this is a HEAD request. This property is read-only.
+ * 布尔值，当前请求方法是否为HEAD，只读属性。
  * @property boolean $isOptions Whether this is a OPTIONS request. This property is read-only.
+ * 布尔值，当前请求方法是否为OPTIONS，只读属性
  * @property boolean $isPatch Whether this is a PATCH request. This property is read-only.
+ * 布尔值，当前请求方法是否为PATCH，只读属性
  * @property boolean $isPjax Whether this is a PJAX request. This property is read-only.
+ * 布尔值，当前请求是否为PJAX，只读属性
  * @property boolean $isPost Whether this is a POST request. This property is read-only.
+ * 布尔值，当前请求方法是否为POST，只读属性
  * @property boolean $isPut Whether this is a PUT request. This property is read-only.
+ * 布尔值，当前请求方法是否为PUT，只读属性
  * @property boolean $isSecureConnection If the request is sent via secure channel (https). This property is
  * read-only.
+ * 布尔值，当前请求是否为HTTPS，只读属性。
  * @property string $method Request method, such as GET, POST, HEAD, PUT, PATCH, DELETE. The value returned is
  * turned into upper case. This property is read-only.
+ * 字符串，当前请求的HTTP请求方法，例如GET, POST, HEAD, PUT, PATCH, DELETE，返回值会转换为大写，只读属性。
  * @property string $pathInfo Part of the request URL that is after the entry script and before the question
  * mark. Note, the returned path info is already URL-decoded.
+ * 字符串，路径信息，请求URL的入口脚本之后，问号之前的信息。注意，返回的路径信息已经被URL解码了
  * @property integer $port Port number for insecure requests.
+ * 整型，不安全请求的端口号
  * @property array $queryParams The request GET parameter values.
+ * 数组，GET请求的查询参数
  * @property string $queryString Part of the request URL that is after the question mark. This property is
  * read-only.
+ * 字符串，请求URL中问号之后的查询字符串。只读属性。
  * @property string $rawBody The request body. This property is read-only.
+ * 字符串，请求体，只读属性。
  * @property string $referrer URL referrer, null if not present. This property is read-only.
+ * 字符串，URL请求来源，没有则返回null，只读属性。
  * @property string $scriptFile The entry script file path.
+ * 字符串，入口脚本文件路径。
  * @property string $scriptUrl The relative URL of the entry script.
+ * 字符串，入口脚本文件的相对URL地址。
  * @property integer $securePort Port number for secure requests.
+ * 整型，安全请求的端口号。
  * @property string $serverName Server name. This property is read-only.
+ * 字符串，服务器名称，只读属性。
  * @property integer $serverPort Server port number. This property is read-only.
+ * 整型，服务器端口号，只读属性。
  * @property string $url The currently requested relative URL. Note that the URI returned is URL-encoded.
+ * 字符串，当前请求的相对URL地址，注意，返回的URI经过解码
  * @property string $userAgent User agent, null if not present. This property is read-only.
+ * 字符串，用户代理信息，假如没有则返回null，只读属性。
  * @property string $userHost User host name, null if cannot be determined. This property is read-only.
+ * 字符串，用户主机名，假如无法判断，则返回null，只读属性。
  * @property string $userIP User IP address. Null is returned if the user IP address cannot be detected. This
  * property is read-only.
+ * 字符串，用户IP，假如用户IP无法获取，则返回null
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
