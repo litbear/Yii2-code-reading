@@ -190,11 +190,12 @@ class Request extends \yii\base\Request
      * The array keys are the request `Content-Types`, and the array values are the
      * corresponding configurations for [[Yii::createObject|creating the parser objects]].
      * A parser must implement the [[RequestParserInterface]].
-     * 存放用于转换http请求体内容解析器的数组，该数组的键是请求的`Content-Types`
-     * 值是[[Yii::createObject|creating the parser objects]]用于构建对象的配置数组
+     * 本属性存放用于解析未经处理的http请求体的 解析器的数组，该数组的键是请求的类型`Content-Types`
+     * 值是用于构建该类型解析器的配置数组。
      * 解析器必须实现[[RequestParserInterface]]数组
      *
      * To enable parsing for JSON requests you can use the [[JsonParser]] class like in the following example:
+     * 想要使用解析器解析JSON请求，你可以像下面代码这项配置JsonParser解析器
      *
      * ```
      * [
@@ -204,6 +205,7 @@ class Request extends \yii\base\Request
      *
      * To register a parser for parsing all request types you can use `'*'` as the array key.
      * This one will be used as a fallback in case no other types match.
+     * 可以配置键为`'*'`的解析器以处理所有类型的请求。
      *
      * @see getBodyParams()
      */
@@ -254,7 +256,12 @@ class Request extends \yii\base\Request
         if ($this->_headers === null) {
             // $this->_headers是一个HeaderCollection实例
             $this->_headers = new HeaderCollection;
-            //用两种方式尝试获取请求头
+            /** 
+             * 用两种方式尝试获取请求头
+             * getallheaders()函数为apache_request_headers()的别名。
+             * 必须在Apache环境下才能使用。而http_get_request_headers()
+             * 方法则需要安装pecl_http扩展
+             */
             if (function_exists('getallheaders')) {
                 $headers = getallheaders();
             } elseif (function_exists('http_get_request_headers')) {
@@ -369,6 +376,7 @@ class Request extends \yii\base\Request
      * AJAX请求是通过 X_REQUESTED_WITH 消息头来判断的
      *
      * Note that jQuery doesn't set the header in case of cross domain
+     * 注意。如果在跨域的情况下，jQuery不会设置header头
      * requests: https://stackoverflow.com/questions/8163703/cross-domain-ajax-doesnt-send-x-requested-with-header
      *
      * @return boolean whether this is an AJAX (XMLHttpRequest) request.
@@ -405,6 +413,7 @@ class Request extends \yii\base\Request
     /**
      * Returns the raw HTTP request body.
      * 获取未经处理的HTTP请求体
+     * 注意，这里不包含二进制文件数据
      * @return string the request body
      */
     public function getRawBody()
@@ -418,6 +427,7 @@ class Request extends \yii\base\Request
 
     /**
      * Sets the raw HTTP request body, this method is mainly used by test scripts to simulate raw HTTP requests.
+     * 本方法述要用于测试脚本模拟纯HTTP请求
      * @param $rawBody
      */
     public function setRawBody($rawBody)
@@ -429,11 +439,15 @@ class Request extends \yii\base\Request
 
     /**
      * Returns the request parameters given in the request body.
+     * 返回请求体中的请求参数
      *
      * Request parameters are determined using the parsers configured in [[parsers]] property.
      * If no parsers are configured for the current [[contentType]] it uses the PHP function `mb_parse_str()`
      * to parse the [[rawBody|request body]].
+     * 请求参数由配置在[[parsers]] 中的解析器解析。假如对当前的请求类型没有对应的解析器。则会使用
+     * 原生PHP方法 `mb_parse_str()`解析请求体
      * @return array the request parameters given in the request body.
+     * 键值对形式的请求体参数
      * @throws \yii\base\InvalidConfigException if a registered parser does not implement the [[RequestParserInterface]].
      * @see getMethod()
      * @see getBodyParam()
@@ -505,6 +519,7 @@ class Request extends \yii\base\Request
 
     /**
      * Sets the request body parameters.
+     * 设置请求体参数
      * @param array $values the request body parameters (name-value pairs)
      * @see getBodyParam()
      * @see getBodyParams()
@@ -517,7 +532,7 @@ class Request extends \yii\base\Request
     /**
      * Returns the named request body parameter value.
      * If the parameter does not exist, the second parameter passed to this method will be returned.
-     * 获取指定的post值，如果不存在则返回默认值
+     * 获取指定的请求体参数值，如果不存在则返回默认值
      * @param string $name the parameter name
      * @param mixed $defaultValue the default parameter value if the parameter does not exist.
      * @return mixed the parameter value
@@ -571,6 +586,7 @@ class Request extends \yii\base\Request
 
     /**
      * Sets the request [[queryString]] parameters.
+     * 设置请求的查询字符串
      * @param array $values the request query parameters (name-value pairs)
      * @see getQueryParam()
      * @see getQueryParams()
@@ -620,6 +636,9 @@ class Request extends \yii\base\Request
      * The returned URL does not have an ending slash.
      * By default this is determined based on the user request information.
      * You may explicitly specify it by setting the [[setHostInfo()|hostInfo]] property.
+     * 返回当前URL的协议和主机部分信息。返回的URL不会包含结尾的正斜线
+     * 默认情况下返回值取决于用户的请求信息。可以通过[[setHostInfo()|hostInfo]] 
+     * 属性显式地指定。
      * @return string schema and hostname part (with port number if needed) of the request URL (e.g. `http://www.yiiframework.com`)
      * @see setHostInfo()
      */
@@ -646,6 +665,7 @@ class Request extends \yii\base\Request
      * Sets the schema and host part of the application URL.
      * This setter is provided in case the schema and hostname cannot be determined
      * on certain Web servers.
+     * 设置主机信息
      * @param string $value the schema and host part of the application URL. The trailing slashes will be removed.
      */
     public function setHostInfo($value)
@@ -688,14 +708,26 @@ class Request extends \yii\base\Request
      * Returns the relative URL of the entry script.
      * 返回入口脚本的相对URL地址
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
+     * 本方法的实现方式参考了ZF中的Zend_Controller_Request_Http方法
      * @return string the relative URL of the entry script.
      * @throws InvalidConfigException if unable to determine the entry script URL
      */
     public function getScriptUrl()
     {
         if ($this->_scriptUrl === null) {
+            // 入口脚本的文件路径
             $scriptFile = $this->getScriptFile();
+            // 脚本文件名
             $scriptName = basename($scriptFile);
+            /**
+             * PHP_SELF、 SCRIPT_NAME、 REQUEST_URI区别
+             * http://www.cnblogs.com/zcy_soft/archive/2010/10/16/1853239.html
+             * php $_SERVER['orig_script_name']相关
+             * 要知道PHP当前是通过CGI来运行，还是在Apache内部运行，可以检查一下环境变量orig_script_name。
+             * 如果PHP通过CGI来运行，这个变量的值就是/Php/Php.exe。
+             * 如果Apache将PHP脚本作为模块来运行，该变量的值应该是/Phptest.php
+             * http://www.cnblogs.com/ainiaa/archive/2010/11/02/1866871.html
+             */
             if (basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
                 $this->_scriptUrl = $_SERVER['SCRIPT_NAME'];
             } elseif (basename($_SERVER['PHP_SELF']) === $scriptName) {
@@ -718,6 +750,7 @@ class Request extends \yii\base\Request
      * Sets the relative URL for the application entry script.
      * This setter is provided in case the entry script URL cannot be determined
      * on certain Web servers.
+     * 设置当前应用入口文件的相对URL地址
      * @param string $value the relative URL for the application entry script.
      */
     public function setScriptUrl($value)
@@ -730,6 +763,7 @@ class Request extends \yii\base\Request
     /**
      * Returns the entry script file path.
      * The default implementation will simply return `$_SERVER['SCRIPT_FILENAME']`.
+     * 返回入口脚本文件的路径，默认返回`$_SERVER['SCRIPT_FILENAME']`
      * @return string the entry script file path
      */
     public function getScriptFile()
@@ -742,6 +776,7 @@ class Request extends \yii\base\Request
      * The entry script file path normally can be obtained from `$_SERVER['SCRIPT_FILENAME']`.
      * If your server configuration does not return the correct value, you may configure
      * this property to make it right.
+     * 设置入口文件路径，默认从`$_SERVER['SCRIPT_FILENAME']`处获得
      * @param string $value the entry script file path.
      */
     public function setScriptFile($value)
@@ -772,6 +807,7 @@ class Request extends \yii\base\Request
     /**
      * Sets the path info of the current request.
      * This method is mainly provided for testing purpose.
+     * 获取当前请求的路径信息
      * @param string $value the path info of the current request
      */
     public function setPathInfo($value)
@@ -783,6 +819,7 @@ class Request extends \yii\base\Request
      * Resolves the path info part of the currently requested URL.
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting slashes are both removed (ending slashes will be kept).
+     * 从当前请求的URL中解析路径信息。路径信息就是入口脚本之后，问号之前的内容。移除开头的正斜线，保留结尾的
      * @return string part of the request URL that is after the entry script and before the question mark.
      * Note, the returned path info is decoded.
      * @throws InvalidConfigException if the path info cannot be determined due to unexpected server configuration
@@ -927,10 +964,17 @@ class Request extends \yii\base\Request
 
     /**
      * Return if the request is sent via secure channel (https).
+     * 返回当前请求是否是通过安全频道发送的，即是否是HTTPS
      * @return boolean if the request is sent via secure channel (https)
      */
     public function getIsSecureConnection()
     {
+        /**
+         * 逻辑：
+         * (设置了$_SERVER['HTTPS']，且(不分大小写比较，值为on，或者值为1))
+         * 或者
+         * (设置了$_SERVER['HTTP_X_FORWARDED_PROTO']，且不分大小写比较，其值为https)
+         */
         return isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] == 1)
             || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;
     }
@@ -1011,6 +1055,7 @@ class Request extends \yii\base\Request
      * Returns the port to use for insecure requests.
      * Defaults to 80, or the port specified by the server if the current
      * request is insecure.
+     * 返回普通请求的端口号，默认为80，可以自己指定
      * @return integer port number for insecure requests.
      * @see setPort()
      */
@@ -1043,6 +1088,7 @@ class Request extends \yii\base\Request
      * Returns the port to use for secure requests.
      * Defaults to 443, or the port specified by the server if the current
      * request is secure.
+     * 返回安全请求使用的端口号，默认为443，或者手动指定
      * @return integer port number for secure requests.
      * @see setSecurePort()
      */
@@ -1059,6 +1105,7 @@ class Request extends \yii\base\Request
      * Sets the port to use for secure requests.
      * This setter is provided in case a custom port is necessary for certain
      * server configurations.
+     * 手动指定安全访问的端口
      * @param integer $value port number.
      */
     public function setSecurePort($value)
@@ -1119,6 +1166,7 @@ class Request extends \yii\base\Request
 
     /**
      * Returns request content-type
+     * 获取当前请求的请求类型，即header头content-type
      * The Content-Type header field indicates the MIME type of the data
      * contained in [[getRawBody()]] or, in the case of the HEAD method, the
      * media type that would have been sent had the request been a GET.
