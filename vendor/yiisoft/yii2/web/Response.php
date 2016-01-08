@@ -474,6 +474,7 @@ class Response extends \yii\base\Response
                     $chunkSize = $end - $pos + 1;
                 }
                 echo fread($handle, $chunkSize);
+                // 释放内存，否则会触发php内存溢出异常
                 flush(); // Free up memory. Otherwise large files will trigger PHP's memory limit.
             }
             fclose($handle);

@@ -91,6 +91,7 @@ class Application extends \yii\base\Application
         try {
             Yii::trace("Route requested: '$route'", __METHOD__);
             $this->requestedRoute = $route;
+            // runAction()的返回值类型为 Response 或 Response->data属性的值
             $result = $this->runAction($route, $params);
             if ($result instanceof Response) {
                 return $result;
