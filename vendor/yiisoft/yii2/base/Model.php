@@ -220,7 +220,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
      * By default, an active attribute is considered safe and can be massively assigned.
      * If an attribute should NOT be massively assigned (thus considered unsafe),
      * please prefix the attribute with an exclamation character (e.g. `'!rank'`).
-     * 默认情况下，活动属性被认为是安全的，可大规模赋值的。据爱如一个属性不能被大规模赋值，
+     * 默认情况下，活动属性被认为是安全的，可大规模赋值的。假如一个属性不能被大规模赋值，
      * 请在它的前面加一个叹号前缀。
      *
      * The default implementation of this method will return all scenarios found in the [[rules()]]
@@ -228,7 +228,7 @@ class Model extends Component implements IteratorAggregate, ArrayAccess, Arrayab
      * found in the [[rules()]]. Each scenario will be associated with the attributes that
      * are being validated by the validation rules that apply to the scenario.
      * 本方法的默认实现会返回在rules()方法中找到的所有声明的情境。名叫[[SCENARIO_DEFAULT]] 的默认
-     * 情境会被包含在 在rules()方法中找到的属性中，每个情境都会被关联待属性。
+     * 情境会被包含在 在rules()方法中找到的属性中，每个情境都会被关联该属性。
      *
      * @return array a list of scenarios and the corresponding active attributes.
      */

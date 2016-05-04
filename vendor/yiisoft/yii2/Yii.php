@@ -23,7 +23,7 @@ class Yii extends \yii\BaseYii
 }
 /**
  * spl_autoload_register() 函数第三个参数为true则
- * 会将Yii::autoload 置于自动加载函数队列之首 有思安使用
+ * 会将Yii::autoload 置于自动加载函数队列之首 优先使用
  */
 spl_autoload_register(['Yii', 'autoload'], true, true);
 //引入同文件夹下的class.php文件 此文件返回类的集合

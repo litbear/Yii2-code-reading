@@ -15,13 +15,18 @@ use yii\web\MethodNotAllowedHttpException;
 
 /**
  * VerbFilter is an action filter that filters by HTTP request methods.
+ * 动词过滤器可以过滤掉不希望使用的HTTP请求方法
  *
  * It allows to define allowed HTTP request methods for each action and will throw
  * an HTTP 405 error when the method is not allowed.
+ * 本类可以为每个动作(action)定于允许的HTTP请求方法。当使用不被允许的方法请求时，会
+ * 抛出405错误
  *
  * To use VerbFilter, declare it in the `behaviors()` method of your controller class.
  * For example, the following declarations will define a typical set of allowed
  * request methods for REST CRUD actions.
+ * 使用本过滤器，可以在你的控制器类的`behaviors()` 方法中定义配置数组。例如，以下代码
+ * 定义了对REST风格CURD动作允许的请求方法的集合。
  *
  * ~~~
  * public function behaviors()
