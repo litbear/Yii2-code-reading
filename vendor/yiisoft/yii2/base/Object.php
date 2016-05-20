@@ -12,7 +12,7 @@ use Yii;
 /**
  * 三个直接子类：[[\yii\base\Component]] [[\yii\base\Event]] [[\yii\base\Behavior]]
  * Object is the base class that implements the *property* feature.
- * Object类是实现__getter(),__set()与属性结合使用这一特点的基类
+ * Object类是实现__getter(),__setter()与属性结合使用这一特点的基类
  *
  * A property is defined by a getter method (e.g. `getLabel`), and/or a setter method (e.g. `setLabel`). For example,
  * the following getter and setter methods define a property named `label`:
@@ -37,11 +37,14 @@ use Yii;
  *
  * A property can be accessed like a member variable of an object. Reading or writing a property will cause the invocation
  * of the corresponding getter or setter method. For example,
+ * 属性可以像对象成员变量一样被访问。读取或设置属性会引起对应的getter或setter方法的调用，例如：
  *
  * ~~~
  * // equivalent to $label = $object->getLabel();
+ * // 等价于使用 $label = $object->getLabel();
  * $label = $object->label;
  * // equivalent to $object->setLabel('abc');
+ * // 等价于使用 $object->setLabel('abc');
  * $object->label = 'abc';
  * ~~~
  *
@@ -67,7 +70,7 @@ use Yii;
  * In the above, both Step 2 and 3 occur at the end of the class constructor. It is recommended that
  * you perform object initialization in the `init()` method because at that stage, the object configuration
  * is already applied.
- * 以上步骤总，2,3步发生在对象构造方法执行完毕之后。在这里推荐你在类的init()方法中初始化对象，应为在进行这一步时
+ * 以上步骤中，2,3步发生在对象构造方法执行完毕之后。在这里推荐你在类的init()方法中初始化对象，应为在进行这一步时
  * 独享已经配置完成
  *
  * In order to ensure the above life cycles, if a child class of Object needs to override the constructor,

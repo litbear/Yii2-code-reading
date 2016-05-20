@@ -33,7 +33,7 @@ use Yii;
  * 内的php调用会被按照绑定时的顺序依次执行
  *
  * To attach an event handler to an event, call [[on()]]:
- * 当为事件定一个事件句柄时，会调用on()函数
+ * 当为事件绑定事件句柄时，会调用on()函数
  *
  * ~~~
  * $post->on('update', function ($event) {

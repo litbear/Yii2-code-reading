@@ -10,7 +10,7 @@ namespace yii\base;
 /**
  * Configurable is the interface that should be implemented by classes who support configuring
  * its properties through the last parameter to its constructor.
- * Configurable 是一个支持通过构造器最后一个函数配额制对象的接口
+ * Configurable 是一个支持通过构造器最后一个函数配制对象的接口
  *
  * The interface does not declare any method. Classes implementing this interface must declare their constructors
  * like the following:

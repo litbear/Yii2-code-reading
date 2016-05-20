@@ -108,8 +108,8 @@ class Event extends Object
     public static function on($class, $name, $handler, $data = null, $append = true)
     {
         /**
-         * 去掉类全限定名前面的'\'，队列为空或不追加，则新增一个元素
-         * 追加则使用array_unshift提到第一位
+         * 去掉类全限定名前面的'\'，队列为空或追加append，则追加append一个元素
+         * 不追加(prepend)则使用array_unshift提到第一位
          */
         $class = ltrim($class, '\\');
         if ($append || empty(self::$_events[$name][$class])) {
