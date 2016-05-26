@@ -18,13 +18,13 @@ namespace yii\base;
  * If an event handler sets [[handled]] to be true, the rest of the
  * uninvoked handlers will no longer be called to handle the event.
  * 本类将所有事件相关的参数封装为一个类。sender属性用来表示谁绑定了
- * 事件。handled属性用来表示本事件是否已处理，假如一个事件句柄的handled
- * 属性值为true，那么剩下的为被执行的句柄将不再被本事件调用
+ * 事件(宿主类)。handled属性用来表示本事件是否已处理，假如一个事件句柄的handled
+ * 属性值为true，那么剩下的未被执行的句柄将不再被调用
  * 
  * 
  * Additionally, when attaching an event handler, extra data may be passed
  * and be available via the [[data]] property when the event handler is invoked.
- * 此外，当事件句柄被绑定时，额外的数据会被传入，并且当事件句柄被执行时，可以动过
+ * 此外，当事件句柄被绑定时，额外的数据会被传入，并且当事件句柄被执行时，可以通过
  * 该类的data属性访问到
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
