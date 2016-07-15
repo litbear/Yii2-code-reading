@@ -205,7 +205,7 @@ class View extends Component
             } else {
                 throw new InvalidCallException("Unable to locate view file for view '$view': no active controller.");
             }
-        // 这里看的不太明白
+        // 根据不同的类型 获取路径
         } elseif ($context instanceof ViewContextInterface) {
             $file = $context->getViewPath() . DIRECTORY_SEPARATOR . $view;
         } elseif (($currentViewFile = $this->getViewFile()) !== false) {

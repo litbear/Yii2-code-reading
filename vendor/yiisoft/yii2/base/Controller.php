@@ -527,6 +527,8 @@ class Controller extends Component implements ViewContextInterface
      * The [[render()]], [[renderPartial()]] and [[renderFile()]] methods will use
      * this view object to implement the actual view rendering.
      * If not set, it will default to the "view" application component.
+     * 返回可以用来渲染视图或视图文件的view对象。[[render()]], [[renderPartial()]] 
+     * 和 [[renderFile()]]方法会使用该view对象实现真正的视图渲染过程
      * @return View|\yii\web\View the view object that can be used to render views or view files.
      */
     public function getView()

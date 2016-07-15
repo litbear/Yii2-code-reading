@@ -104,7 +104,7 @@ class AssetBundle extends Object
      * - a relative path representing a local asset (e.g. `js/main.js`). The actual file path of a local
      *   asset can be determined by prefixing [[basePath]] to the relative path, and the actual URL
      *   of the asset can be determined by prefixing [[baseUrl]] to the relative path.
-     * - 本地资源的相对UEL地址，【这段没看懂】
+     * - 本地资源的相对URL地址，【这段没看懂】
      *
      * Note that only forward slash "/" should be used as directory separators.
      * 注意，正斜线仅被用于文件路径分隔符。
