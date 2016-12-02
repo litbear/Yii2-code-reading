@@ -262,6 +262,7 @@ class View extends \yii\base\View
 
     /**
      * Clears up the registered meta tags, link tags, css/js scripts and files.
+     * 清除所有已注册的元标签，链接标签，以及静态资源文件
      */
     public function clear()
     {

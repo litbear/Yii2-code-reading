@@ -19,10 +19,13 @@ use yii\base\Model;
 
 /**
  * The GridView widget is used to display data in a grid.
+ * GridView widget用于以网格形式呈现数据
  *
  * It provides features like [[sorter|sorting]], [[pager|paging]] and also [[filterModel|filtering]] the data.
+ * 该widget提供了排序，分页及过滤等功能
  *
  * A basic usage looks like the following:
+ * 基本用例如下：
  *
  * ```php
  * <?= GridView::widget([

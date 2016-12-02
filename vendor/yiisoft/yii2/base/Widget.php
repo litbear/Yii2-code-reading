@@ -113,11 +113,12 @@ class Widget extends Component implements ViewContextInterface
         ob_implicit_flush(false);
         try {
             /* @var $widget Widget */
+            // 获取widget子类的类名
             $config['class'] = get_called_class();
             $widget = Yii::createObject($config);
             /**
              * 不论是使用了Widgrt::widget()方法还是使用了Widget::end()方法，
-             * 最后都会调用Widget::run(0方法，而小部件基类中没有写run()方法
+             * 最后都会调用Widget::run()方法，而小部件基类中没有写run()方法
              * 因此，基本可以断定小部件基类是不能够单独使用的。
              */
             $out = $widget->run();
@@ -168,7 +169,7 @@ class Widget extends Component implements ViewContextInterface
      * The [[render()]] and [[renderFile()]] methods will use
      * this view object to implement the actual view rendering.
      * If not set, it will default to the "view" application component.
-     * 返回用来渲染视图或视图文件的视图实例。笨类的[[render()]]和[[renderFile()]]
+     * 返回用来渲染视图或视图文件的视图实例。本类的[[render()]]和[[renderFile()]]
      * 方法会使用该视图实例实现真正的视图渲染工作。
      * @return \yii\web\View the view object that can be used to render views or view files.
      */

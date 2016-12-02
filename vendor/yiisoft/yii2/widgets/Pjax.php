@@ -93,6 +93,7 @@ class Pjax extends Widget
      */
     public function init()
     {
+        // 如果小部件没有id，则生成一个，默认就是w+数字，递增
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
         }
@@ -105,6 +106,7 @@ class Pjax extends Widget
             $view->beginPage();
             $view->head();
             $view->beginBody();
+            // 创建title标签
             if ($view->title !== null) {
                 echo Html::tag('title', Html::encode($view->title));
             }
@@ -150,6 +152,8 @@ class Pjax extends Widget
 
     /**
      * @return boolean whether the current request requires pjax response from this widget
+     * 判断当前请求是否是Pjax请求
+     * 除了需要有X-Pjax请求头，还要求请求的html标签ID必须和当前widget的ID相等
      */
     protected function requiresPjax()
     {
@@ -160,6 +164,7 @@ class Pjax extends Widget
 
     /**
      * Registers the needed JavaScript.
+     * 注册所需的JavaScript
      */
     public function registerClientScript()
     {

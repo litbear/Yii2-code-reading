@@ -241,7 +241,7 @@ class View extends Component
      * Otherwise, it will simply include the view file as a normal PHP file, capture its output and
      * return it as a string.
      * 假如开启了[[renderers|renderer]]属性（即开启了模板引擎），本方法会使用模板引擎渲染视图文件。否则，仅仅将
-     * 模板文件当做PHP脚本文件对待。捕获内同并以字符串返回。
+     * 模板文件当做PHP脚本文件对待。捕获内容并以字符串返回。
      *
      * @param string $viewFile the view file. This can be either an absolute file path or an alias of it.
      * 字符串，模板文件的路径， 既可以是绝对路径也可以是别名。
@@ -532,6 +532,8 @@ class View extends Component
 
     /**
      * Marks the beginning of a page.
+     * 标记页面的开始
+     * 当然，这个页面不一定是HTML页面
      */
     public function beginPage()
     {
