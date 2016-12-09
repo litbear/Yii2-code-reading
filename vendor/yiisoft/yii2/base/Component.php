@@ -510,6 +510,7 @@ class Component extends Object
 
     /**
      * Attaches an event handler to an event.
+     * 向事件绑定一个事件句柄
      *
      * The event handler must be a valid PHP callback. The following are
      * some examples:
@@ -550,6 +551,7 @@ class Component extends Object
 
     /**
      * Detaches an existing event handler from this component.
+     * 从当前组件解绑一个已存在的事件句柄
      * This method is the opposite of [[on()]].
      * @param string $name event name
      * @param callable $handler the event handler to be removed.
@@ -583,6 +585,7 @@ class Component extends Object
 
     /**
      * Triggers an event.
+     * 触发事件
      * This method represents the happening of an event. It invokes
      * all attached handlers for the event including class-level handlers.
      * @param string $name the event name
@@ -617,11 +620,6 @@ class Component extends Object
             }
         }
         // invoke class-level attached handlers
-        // 最后，把配置好的对象Event $event对象传给静态方法
-        // Event::trigger。
-        // 重点：上面其实已经把对象级别的事件执行完了
-        // 下面执行的就是类级事件！！！就是传说中的类级事件！！！
-        // 思路可算通了！！！
         Event::trigger($this, $name, $event);
     }
 

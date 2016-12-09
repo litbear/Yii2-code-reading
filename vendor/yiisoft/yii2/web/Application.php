@@ -154,6 +154,8 @@ class Application extends \yii\base\Application
 
     /**
      * @inheritdoc
+     * 返回核心应用组件的配置
+     * 使用他们，就可以在应用中以\Yii::$app->log的形式获取log实例了
      */
     public function coreComponents()
     {

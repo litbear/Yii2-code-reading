@@ -289,6 +289,7 @@ class View extends Component
                 $renderer = $this->renderers[$ext];
                 $output = $renderer->render($this, $viewFile, $params);
             } else {
+                // 如果没设置模板引擎，则直接使用内部的方法，引入模板文件
                 $output = $this->renderPhpFile($viewFile, $params);
             }
             // 渲染后事件

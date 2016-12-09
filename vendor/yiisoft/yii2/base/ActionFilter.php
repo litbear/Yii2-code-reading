@@ -17,7 +17,7 @@ namespace yii\base;
  * 来参与解析工作流。
  *
  * Check implementation of [[\yii\filters\AccessControl]], [[\yii\filters\PageCache]] and [[\yii\filters\HttpCache]] as examples on how to use it.
- * 查看 [[\yii\filters\AccessControl]], [[\yii\filters\PageCache]] 和 [[\yii\filters\HttpCache]] 三个类的实现，理解如果用它
+ * 查看 [[\yii\filters\AccessControl]], [[\yii\filters\PageCache]] 和 [[\yii\filters\HttpCache]] 三个类的实现，理解如何用它
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0

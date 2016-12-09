@@ -317,14 +317,20 @@ abstract class Application extends Module
 
         // merge core components with custom components
         foreach ($this->coreComponents() as $id => $component) {
-            // 配置数组的组件集合里 如果没有 则用预写的核心组件赋值
+            /**
+             * 传入构造方法的组件配置里如果没有当前核心组件，
+             * 则以当前的配置项赋值。
+             */
             if (!isset($config['components'][$id])) {
                 $config['components'][$id] = $component;
-                // 如果有，且值传来的配置数组元素值为数组，且数组中没有class，则使用预写的class赋值
+            /**
+             * 传入构造方法的组件配置里如果有当前核心组件的配置数组，
+             * 且传入的配置数组中没有class元素，则为其添加class元素，
+             * 其值为$this->coreComponents()中写死的值。
+             */
             } elseif (is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
                 $config['components'][$id]['class'] = $component['class'];
             }
-            // 传来的配置数组中如果有class，则不用管他，留下一步处理
         }
     }
 
@@ -694,6 +700,8 @@ abstract class Application extends Module
 
     /**
      * Returns the configuration of core application components.
+     * 返回核心应用组件的配置
+     * 使用他们，就可以在应用中以\Yii::$app->log的形式获取log实例了
      * @see set()
      */
     public function coreComponents()

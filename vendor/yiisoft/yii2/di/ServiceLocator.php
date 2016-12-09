@@ -14,7 +14,7 @@ use yii\base\InvalidConfigException;
 
 /**
  * ServiceLocator implements a [service locator](http://en.wikipedia.org/wiki/Service_locator_pattern).
- * 张三是张三 :)
+ * 服务定位器与依赖注入不同，并不自动解决与管理不同成员的依赖
  *
  * To use ServiceLocator, you first need to register component IDs with the corresponding component
  * definitions with the locator by calling [[set()]] or [[setComponents()]].
@@ -245,13 +245,19 @@ class ServiceLocator extends Component
 
     /**
      * Registers a set of component definitions in this locator.
+     * 在当前定位器中注册一系列的组件定义
+     * 项目配置数组中的components元素对应的配置值最终会传到本方法内
      *
      * This is the bulk version of [[set()]]. The parameter should be an array
      * whose keys are component IDs and values the corresponding component definitions.
+     * 本方法为set()方法的批量版本。参数应为数组，其中key为组件ID，对应的值为组件的配置数组，
+     * 其中配置数组的class元素为类的命名空间
      *
      * For more details on how to specify component IDs and definitions, please refer to [[set()]].
+     * 更多如何指定组件ID与配置数组的细节请参阅set()方法
      *
      * If a component definition with the same ID already exists, it will be overwritten.
+     * 假如相同的组件ID已经存在了，则会覆盖前者。
      *
      * The following is an example for registering two component definitions:
      *
