@@ -753,7 +753,7 @@ class Component extends Object
         }
         /**
          * 整型就加到数组尾部
-         * 这里的整型指的就是Component::behaviors()返回的数组中的匿名元素。
+         * 这里的整型指的就是Component::behaviors()返回的数组中的索引元素部分。
          * 本方法针对的是Component::behaviors()返回的数组中的每一个元素进行操作的
          * [
          *     'behaviorName' => [

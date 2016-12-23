@@ -89,6 +89,7 @@ class Behavior extends Object
     {
         $this->owner = $owner;
         foreach ($this->events() as $event => $handler) {
+            // 如果events()返回的数组元素中值为字符串，则默认使用[$this, $handler]
             $owner->on($event, is_string($handler) ? [$this, $handler] : $handler);
         }
     }
